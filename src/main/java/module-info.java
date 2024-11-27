@@ -10,13 +10,14 @@
 module fr.cda.campingcar {
     requires com.fasterxml.jackson.databind;
     requires htmlunit;
-    requires java.desktop;
     requires java.net.http;
     requires java.sql;
     requires javafx.controls;
     requires javafx.fxml;
     requires org.apache.logging.log4j;
     requires org.controlsfx.controls;
+    requires org.apache.commons.text;
+    requires org.apache.commons.lang3;
 
     opens fr.cda.campingcar to javafx.fxml;
     exports fr.cda.campingcar;

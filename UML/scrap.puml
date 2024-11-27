@@ -1,0 +1,10 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+HomeController -> ScrapingManager: Authentication Request
+ScrapingManager -> Tache
+Tache -> Scrapping
+
+@enduml
