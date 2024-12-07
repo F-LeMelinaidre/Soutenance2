@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="homePane" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="900.0" styleClass=".main-container" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.HomeController">
+   <children>
+      <MenuBar maxHeight="-Infinity" styleClass="nav-bar">
+        <menus>
+          <Menu mnemonicParsing="false" text="Fichier">
+            <items>
+              <MenuItem fx:id="saveFile" mnemonicParsing="false" onAction="#handlerMenuBar" text="Enregistrer dans un fichier" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="sendMail" mnemonicParsing="false" onAction="#handlerMenuBar" text="Envoi Couriel" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="saveInDataBase" mnemonicParsing="false" onAction="#handlerMenuBar" text="Enregistrer dans la base de données" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="quit" mnemonicParsing="false" onAction="#handlerMenuBar" text="Quitter" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Paramètres">
+            <items>
+              <MenuItem fx:id="paramDB" mnemonicParsing="false" onAction="#handlerMenuBar" text="Base de données" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Aide">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Mode d'emploi" />
+            </items>
+          </Menu>
+        </menus>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </MenuBar>
+   </children>
+</VBox>

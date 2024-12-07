@@ -1,0 +1,289 @@
+@font-face {
+    font-family: 'Poppins Medium';
+    src: url('../fonts/poppins-medium.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins Bold';
+    src: url('../fonts/poppins-bold.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins Italic';
+    src: url('../fonts/poppins-italic.ttf');
+}
+
+#homePane {
+    -fx-background-color: #999999;
+}
+
+.nav-bar {
+    -fx-background-color: black;
+}
+
+.menu-bar > .container > .menu-button {
+    -fx-padding: 2px 4px 0px 4px;
+    -fx-border-width: 0 0 2px 0;
+    -fx-border-color: black;
+}
+
+.menu-bar > .container > .menu-button:hover {
+    -fx-border-color: #A3FF00;
+    -fx-background-color: black;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-font-family: 'Poppins Medium';
+    -fx-text-fill: #DCDCDC;
+}
+
+.search-bar {
+    -fx-text-fill: #DCDCDC;
+    -fx-border-insets: 0;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #DCDCDC;
+    -fx-background-insets: 0;
+    -fx-background-color: #333333;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 6, 0.4, 0, 0);
+
+}
+
+/* --- FORMULAIRE --- */
+
+.search-bar .label,
+.form-label {
+    -fx-font-family: 'Poppins Medium';
+    -fx-font-size: 12;
+    -fx-text-fill: #DCDCDC;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 2, 0.4, 1, 1);
+}
+
+.combo-box,
+.combo-box-base,
+.date-picker,
+.text-field {
+    -fx-font-family: 'Poppins Medium';
+}
+
+.combo-box,
+.combo-box .arrow-button,
+.combo-box .text-input,
+.combo-box-base,
+.combo-box-base .arrow-button,
+.combo-box-base .text-input,
+.date-picker,
+.text-field {
+    -fx-border-insets: 0;
+    -fx-border-radius: 2px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2px;
+}
+
+.text-field {
+    -fx-text-fill: #A3FF00;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-control-inner-background: #777777;
+}
+
+/* --- COMBOBOX --- */
+.combo-box,
+.combo-box-base .arrow-button {
+    -fx-background-color: #555555;
+}
+
+.combo-box .text-input,
+.combo-box-base .text-input {
+    -fx-text-fill: #A3FF00;
+    -fx-background-radius: 2 0 0 2;
+    -fx-background-color: #777777;
+}
+
+.combo-box-base .arrow-button {
+    -fx-background-radius: 0 2 2 0;
+}
+
+.combo-box-base .arrow {
+    -fx-background-color: #999999;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-insets: 0;
+    -fx-background-radius: 2px;
+    -fx-background-color: #999999;
+}
+
+.combo-box .list-cell,
+.combo-box-popup .list-cell:indeterminate {
+    -fx-text-fill: #A3FF00;
+}
+
+.combo-box-popup .list-cell {
+    -fx-text-fill: #434343;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-text-fill: #434343;
+    -fx-background-color: #A3FF00;
+}
+
+.check-box .box {
+    -fx-border-width: 1px;
+    -fx-border-color: #555555;
+    -fx-border-radius: 3px;
+    -fx-background-color: none;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #A3FF00;
+}
+
+.combo-box-popup .list-cell:hover .check-box:selected .mark {
+    -fx-background-color: #434343;
+}
+
+/* --- DATEPICKER --- */
+.date-picker {
+    -fx-font-family: 'Poppins Medium';
+    -fx-font-size: 12px;
+}
+
+.date-picker .arrow-button {
+    -fx-border-width: 0;
+}
+
+.date-picker-popup,
+.date-picker-popup .month-year-pane {
+    -fx-background-color: #434343;
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #777777;
+}
+
+.calendar-grid {
+    -fx-background-color: #434343;
+}
+
+.date-picker-popup .day-name-cell,
+.calendar-grid .week-number-cell {
+    -fx-font-family: 'Poppins Medium';
+    -fx-font-size: 12px;
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup .day-name-cell {
+    -fx-padding: 2px 0 3px 0;
+}
+
+.calendar-grid .week-number-cell {
+    -fx-text-fill: #999999;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+}
+
+.calendar-grid .day-name-cell {
+    -fx-text-fill: #d8ff5e;
+}
+
+.calendar-grid .day-cell {
+    -fx-text-fill: #434343;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+}
+
+.calendar-grid .day-cell.today {
+    -fx-text-fill: #777777;
+    -fx-background-color: #e9ffa6;
+    -fx-background-insets: 1px;
+}
+
+.calendar-grid .day-cell .current-month {
+    -fx-background-color: #A3FF00;
+}
+
+/* --- BOUTON ---*/
+.button {
+    -fx-padding: 0;
+    -fx-font-family: 'Poppins Medium';
+    -fx-text-fill: #333333;
+    -fx-background-color: #AAAAAA;
+}
+.button .btn {
+    -fx-min-height: 30px;
+    -fx-pref-height: 30px;
+    -fx-min-width: 80px;
+}
+.date-picker-popup .spinner .button {
+    -fx-background-color: transparent;
+}
+
+/* --- MOUSE EVENT --- */
+.button:hover,
+.combo-box-base .arrow-button:hover,
+.calendar-grid .day-cell.today:hover,
+.calendar-grid .day-cell:focused,
+.calendar-grid .day-cell:hover {
+    -fx-text-fill: #333333;
+    -fx-background-color: #A3FF00;
+}
+.date-picker-popup .day-cell.disabled {
+    -fx-text-fill: #777777;
+    -fx-background-color: rgb(255, 192, 192);
+}
+
+.date-picker-popup .spinner .button:hover .left-arrow,
+.date-picker-popup .spinner .button:hover .right-arrow {
+    -fx-cursor: hand;
+    -fx-border-insets: 0;
+    -fx-border-width: 1;
+    -fx-border-color: #A3FF00;
+    -fx-background-insets: 0;
+    -fx-background-color: #A3FF00;
+}
+
+/* --- FENETRE --- */
+#ParamDB,
+#PushDB,
+#sendMailWindow {
+    -fx-font-family: 'Poppins Medium';
+    -fx-background-color: #999999;
+}
+#ParamDB .title,
+#PushDB .title,
+#sendMailWindow .title {
+    -fx-text-fill: #DCDCDC;
+    -fx-font-size: 16px;
+}
+
+#ParamDB .top-bar,
+#PushDB .top-bar,
+#sendMailWindow .top-bar {
+    -fx-font-family: 'Poppins Bold';
+    -fx-background-color: #555555;
+}
+
+/** SEND MAIL WINDOW **/
+#ParamDB .top-bar .label,
+#PushDB .top-bar .label,
+#sendMailWindow .top-bar .label {
+    -fx-text-fill: #DCDCDC;
+    -fx-font-size: 12px;
+}
+
+#ParamDB .button.btn-close,
+#PushDB .button.btn-close,
+#sendMailWindow .button.btn-close {
+    -fx-border-width: 0;
+    -fx-border-radius: 0 2 0 2;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 2 0 2;
+}
+
+#ParamDB .button.btn-close:hover,
+#PushDB .button.btn-close:hover,
+#sendMailWindow .button.btn-close:hover {
+    -fx-background-color: #b60000;
+}
