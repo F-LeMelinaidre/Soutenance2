@@ -1,0 +1,136 @@
+package fr.cda.campingcar.model;
+
+/*
+ * Soutenance Scraping
+ * 2024/nov.
+ *
+ * Le Frédéric Le Mélinaidre
+ * Formation CDA
+ * Greta Vannes
+ */
+
+import fr.cda.campingcar.scraping.ScrapingModel;
+import fr.cda.campingcar.settings.Config;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Annonce implements ScrapingModel
+{
+
+    private String domainUrl;
+    private String url;
+    private String titre;
+    private String ville;
+    private int tarif;
+    private Vehicule vehicule;
+
+    public Annonce()
+    {
+        this.vehicule = new Vehicule();
+    }
+
+    public Vehicule getVehicule()
+    {
+        return vehicule;
+    }
+
+    /**
+     * Extrait le premier Int de la chaine de caratère
+     *
+     * @param value
+     * @return
+     */
+    private int extractInt(String value)
+    {
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(value);
+
+        return (matcher.find()) ? Integer.parseInt(matcher.group()) : 0;
+    }
+
+    @Override
+    public void setDomainUrl(String domainUrl)
+    {
+        this.domainUrl = domainUrl;
+    }
+
+    @Override
+    public String getUrl()
+    {
+        return (url.startsWith("/") || !url.contains("https://www") ) ? this.domainUrl + this.url : this.url;
+    }
+
+    @Override
+    public void setPropertieModel(String key, String value)
+    {
+        int resultInt;
+        switch (key) {
+            case "titre":
+                this.titre = value;
+                break;
+            case "lien":
+                this.url = value;
+                break;
+            case "ville":
+                this.ville = value;
+                break;
+            case "tarif":
+                this.tarif = this.extractInt(value);
+                break;
+            case "model":
+                this.vehicule.setModel(value);
+                break;
+            case "carburant":
+                this.vehicule.setCarburant(value);
+                break;
+            case "boite de vitesse":
+                resultInt = this.extractInt(value);
+                this.vehicule.setBoite(resultInt);
+                break;
+            case "nombre de place":
+                resultInt = this.extractInt(value);
+                this.vehicule.setNbPlace(resultInt);
+                break;
+            case "nombre de couchage":
+                resultInt = this.extractInt(value);
+                this.vehicule.setNbCouchage(resultInt);
+                break;
+            case "douche":
+                boolean douche = value != null;
+                this.vehicule.setDouche(douche);
+                break;
+            case "wc":
+                boolean wc = value != null;
+                this.vehicule.setWc(wc);
+                break;
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return toPrint();
+        /*return "Annonce{" +
+               "domainUrl='" + domainUrl + '\'' +
+               ", url='" + url + '\'' +
+               ", titre='" + titre + '\'' +
+               ", ville='" + ville + '\'' +
+               ", tarif=" + tarif +
+               ", vehicule=" + vehicule +
+               '}';*/
+    }
+
+    public String toPrint()
+    {
+        StringBuilder str = new StringBuilder();
+        str.append(Config.YELLOW).append("Titre : ").append(Config.WHITE).append(this.titre).append("\n");
+        str.append(Config.YELLOW).append("Lien Domain : ").append(Config.WHITE).append(this.domainUrl).append("\n");
+        str.append(Config.YELLOW).append("Lien Recherche : ").append(Config.WHITE).append(this.url).append("\n");
+        str.append(Config.YELLOW).append("Ville : ").append(Config.WHITE).append(this.ville).append("\n");
+        str.append(Config.YELLOW).append("Tarif : ").append(Config.WHITE).append(this.tarif).append("\n");
+        str.append(Config.YELLOW).append("Vehicule : ").append("\n").append(Config.CYAN).append(this.vehicule.toString(true)).append(
+                Config.RESET).append("\n");
+        return str.toString();
+    }
+}
