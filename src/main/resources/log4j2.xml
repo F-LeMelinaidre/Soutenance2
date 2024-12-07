@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <File name="AppLog" fileName="c:/a_thousand_miles/desktop/log/general_log.log" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss},%p,%c,%m%n" />
+        </File>
+
+        <File name="ScrapingLog" fileName="c:/a_thousand_miles/desktop/log/scraping_log.log" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p%n
+                Logger: %c{1}: Méthode: %M. Ligne: %L%n
+                %m%n
+                %ex%n"/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="ScrapingLog" level="info" additivity="false">
+            <AppenderRef ref="ScrapingLog"/>
+        </Logger>
+
+        <Logger name="fr.cda.campingcar.util.LoggerConfig" level="info" additivity="false">
+            <AppenderRef ref="AppLog"/>
+        </Logger>
+
+        <Root level="warn">
+            <AppenderRef ref="AppLog"/>
+        </Root>
+    </Loggers>
+</Configuration>

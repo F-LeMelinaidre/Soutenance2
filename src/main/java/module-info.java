@@ -22,6 +22,7 @@ module fr.cda.campingcar {
     opens fr.cda.campingcar to javafx.fxml;
     exports fr.cda.campingcar;
     exports fr.cda.campingcar.controller;
+    exports fr.cda.campingcar.scraping;
     exports fr.cda.campingcar.model;
     opens fr.cda.campingcar.controller to javafx.fxml;
 }

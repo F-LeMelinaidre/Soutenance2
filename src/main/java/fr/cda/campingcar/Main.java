@@ -16,6 +16,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class Main extends Application
 {
@@ -48,8 +49,9 @@ public class Main extends Application
         stage.show();
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws SQLException
     {
+
         launch();
     }
 }
