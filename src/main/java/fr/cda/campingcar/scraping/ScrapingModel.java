@@ -14,7 +14,11 @@ public interface ScrapingModel<T>
 {
     void setDomainUrl(String domainUrl);
 
+    String getDomainUrl();
+
     String getUrl();
 
     void setPropertieModel(String key, String value);
+
+    void setSiteId(int id);
 }

@@ -22,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -51,6 +52,8 @@ import java.util.*;
 public class SearchController implements Initializable, ControllerRegistry
 {
 
+    @FXML
+    private VBox rechercheVBox;
     @FXML
     private CheckComboBox<Site> siteComboBox;
     @FXML
@@ -398,29 +401,4 @@ public class SearchController implements Initializable, ControllerRegistry
         System.out.println("Fin " + this.periodeFinDatePicker.getValue());*/
         this.rechercherBouton.setDisable(disable);
     }
-
-    /*public static void afficherHierarchy(Map<String, Dom> elementMap, int niv) {
-        for (Map.Entry<String, Dom> entry : elementMap.entrySet()) {
-            Dom element = entry.getValue();
-            System.out.println("  ".repeat(niv) + element.getNom() + " (ID: " + element.getDomElementId() + ")");
-
-            // Appelle récursivement pour afficher les enfants
-            List<Dom> enfants = element.getListEnfants();
-            if (enfants != null && !enfants.isEmpty()) {
-                afficherHierarchy(enfants, niv + 1);
-            }
-        }
-    }
-    public static void afficherHierarchy(List<Dom> elementList, int niv) {
-        for (Dom element : elementList) {
-
-            System.out.println("  ".repeat(niv) + element.getNom() + " (ID: " + element.getDomElementId() + ")");
-
-
-            List<Dom> enfants = element.getListEnfants();
-            if (enfants != null && !enfants.isEmpty()) {
-                afficherHierarchy(enfants, niv + 1);
-            }
-        }
-    }*/
 }

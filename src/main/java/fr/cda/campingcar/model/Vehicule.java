@@ -14,19 +14,19 @@ import fr.cda.campingcar.settings.Config;
 public class Vehicule {
     private String model;
     private TypeVehicule type;
-    private String carburant;
-    private int boite;
-    private int nbPlace;
-    private int nbCouchage;
-    private boolean douche;
-    private boolean wc;
+    private String carburant = "non connu!";
+    private int boite = 0;
+    private int nbPlace = 0;
+    private int nbCouchage = 0;
+    private boolean douche = false;
+    private boolean wc = false;
 
     public void setModel(String model) {
         this.model = model;
     }
 
     public String getModel() {
-        return model;
+        return  this.model;
     }
 
     public void setType(TypeVehicule type) {
@@ -34,25 +34,27 @@ public class Vehicule {
     }
 
     public TypeVehicule getType() {
-        return type;
+        return  this.type;
     }
 
     public void setBoite(int value) {}
 
     public void setCarburant(String value) {}
 
-    public void setNbPlace(int value) {}
-
-    public int getNbPlace() {
-        return nbPlace;
+    public void setNbPlace(int value) {
+        this.nbPlace = value;
     }
 
-    public void setNbCouchage(int nbCouchage) {
-        this.nbCouchage = nbCouchage;
+    public int getNbPlace() {
+        return  this.nbPlace;
+    }
+
+    public void setNbCouchage(int value) {
+        this.nbCouchage = value;
     }
 
     public int getNbCouchage() {
-        return nbCouchage;
+        return  this.nbCouchage;
     }
 
     public void setDouche(boolean douche) {
@@ -60,7 +62,7 @@ public class Vehicule {
     }
 
     public boolean getDouche() {
-        return douche;
+        return  this.douche;
     }
 
     public void setWc(boolean value) {
@@ -68,7 +70,7 @@ public class Vehicule {
     }
 
     public boolean getWc() {
-        return wc;
+        return  this.wc;
     }
 
     public String toString(boolean putTab)

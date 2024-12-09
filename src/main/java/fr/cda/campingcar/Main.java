@@ -9,6 +9,9 @@
 
 package fr.cda.campingcar;
 
+import fr.cda.campingcar.dao.DAOFactory;
+import fr.cda.campingcar.dao.dom.DomDAOImp;
+import fr.cda.campingcar.model.Dom;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class Main extends Application
 {
@@ -34,8 +38,12 @@ public class Main extends Application
 
 
     @Override
-    public void start(Stage stage) throws IOException
+    public void start(Stage stage) throws IOException, SQLException
     {
+        /*DAOFactory daoFactory = DAOFactory.getInstance();
+
+        Map<String, Dom> domList = daoFactory.getDomDAO().findBySite(3);
+        System.out.println(domList.toString());*/
 
         Font.loadFont(Main.class.getResourceAsStream("/fonts/poppins-regular.ttf"), 14);
         Font.loadFont(Main.class.getResourceAsStream("/fonts/poppins-bold.ttf"), 14);

@@ -9,15 +9,17 @@
 
 package fr.cda.campingcar.controller;
 
+import fr.cda.campingcar.model.Annonce;
 import fr.cda.campingcar.model.Recherche;
 import fr.cda.campingcar.scraping.ScrapingManager;
 import fr.cda.campingcar.util.FXMLRender;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.VBox;
+
+import java.util.List;
 
 public class HomeController {
 
@@ -72,9 +74,17 @@ public class HomeController {
 
         ScrapingManager scrapingManager = ScrapingManager.getInstance();
 
-        Task scrapingTask = scrapingManager.scrapTask(recherche);
-        System.out.println(scrapingTask.progressProperty());
-        scrapingTask.setOnSucceeded(event -> System.out.println("Scraping terminé avec succès !"));
+        Task<Void> scrapingTask = scrapingManager.scrapTask(recherche);
+        scrapingTask.setOnSucceeded(event -> {
+
+            List<Annonce> resultats = recherche.getResultats();
+
+            ResultatController resultatController = fxmlRender.loadFXML("resultat.fxml", null);
+            if(resultatController != null) {
+                resultatController.setAnnonce(resultats);
+            }
+            System.out.println("Scraping terminé avec succès !");
+        });
         scrapingTask.setOnFailed(event -> System.out.println("Une erreur est survenue : " + scrapingTask.getException()));
 
         new Thread(scrapingTask).start();

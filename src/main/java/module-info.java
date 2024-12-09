@@ -18,6 +18,7 @@ module fr.cda.campingcar {
     requires org.controlsfx.controls;
     requires org.apache.commons.text;
     requires org.apache.commons.lang3;
+    requires net.bytebuddy;
 
     opens fr.cda.campingcar to javafx.fxml;
     exports fr.cda.campingcar;

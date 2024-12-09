@@ -18,8 +18,10 @@ import java.util.regex.Pattern;
 public class Annonce implements ScrapingModel
 {
 
+    private int site_id;
     private String domainUrl;
     private String url;
+    private String image;
     private String titre;
     private String ville;
     private int tarif;
@@ -30,9 +32,56 @@ public class Annonce implements ScrapingModel
         this.vehicule = new Vehicule();
     }
 
+    @Override
+    public void setSiteId(int id) {
+        this.site_id = id;
+    }
+
+    @Override
+    public void setDomainUrl(String domainUrl)
+    {
+        this.domainUrl = domainUrl;
+    }
+
+    @Override
+    public String getDomainUrl()
+    {
+        return this.domainUrl;
+    }
+
+    @Override
+    public String getUrl()
+    {
+        return (url.startsWith("/") || !url.contains("https://www") ) ? this.domainUrl + this.url : this.url;
+    }
+
+    public String getImage() { return this.image;}
+
+    public String getTitre() {
+        return this.titre;
+    }
+
+    public String getVille()
+    {
+        return this.ville;
+    }
+
+    public int getTarif()
+    {
+        return this.tarif;
+    }
+
     public Vehicule getVehicule()
     {
         return vehicule;
+    }
+
+    public int getPlace() {
+        return this.vehicule.getNbPlace();
+    }
+
+    public int getCouchage() {
+        return this.vehicule.getNbCouchage();
     }
 
     /**
@@ -49,16 +98,18 @@ public class Annonce implements ScrapingModel
         return (matcher.find()) ? Integer.parseInt(matcher.group()) : 0;
     }
 
-    @Override
-    public void setDomainUrl(String domainUrl)
-    {
-        this.domainUrl = domainUrl;
-    }
+    private String formateVille(String value) {
+        Pattern pattern = Pattern.compile("\\(\\d+\\)");
+        Matcher matcher = pattern.matcher(value);
+        if(matcher.find()) {
+            value = value.replaceAll("\\s*\\(\\d+\\)", "");
+        }
 
-    @Override
-    public String getUrl()
-    {
-        return (url.startsWith("/") || !url.contains("https://www") ) ? this.domainUrl + this.url : this.url;
+        if(value.contains("Disponible à")) {
+            value = value.replaceAll("Disponible à\\s*", "");
+        }
+
+        return value;
     }
 
     @Override
@@ -66,14 +117,17 @@ public class Annonce implements ScrapingModel
     {
         int resultInt;
         switch (key) {
+            case "image":
+                this.image = value;
+                break;
             case "titre":
                 this.titre = value;
                 break;
-            case "lien":
+            case "lien principal":
                 this.url = value;
                 break;
             case "ville":
-                this.ville = value;
+                this.ville = this.formateVille(value);
                 break;
             case "tarif":
                 this.tarif = this.extractInt(value);

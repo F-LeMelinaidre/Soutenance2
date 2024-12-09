@@ -244,46 +244,66 @@
     -fx-background-color: #A3FF00;
 }
 
-/* --- FENETRE --- */
-#ParamDB,
-#PushDB,
-#sendMailWindow {
-    -fx-font-family: 'Poppins Medium';
-    -fx-background-color: #999999;
-}
-#ParamDB .title,
-#PushDB .title,
-#sendMailWindow .title {
-    -fx-text-fill: #DCDCDC;
-    -fx-font-size: 16px;
+
+/* //// LES VUES //// */
+
+/* --- NEW WINDOW --- */
+.window {
+    -fx-border-color: #777777;
+    -fx-border-width: 1;
+    -fx-background-color: #CCCCCC;
 }
 
-#ParamDB .top-bar,
-#PushDB .top-bar,
-#sendMailWindow .top-bar {
+.window .top-bar {
     -fx-font-family: 'Poppins Bold';
     -fx-background-color: #555555;
 }
 
-/** SEND MAIL WINDOW **/
-#ParamDB .top-bar .label,
-#PushDB .top-bar .label,
-#sendMailWindow .top-bar .label {
+.window .top-bar .label {
     -fx-text-fill: #DCDCDC;
     -fx-font-size: 12px;
 }
 
-#ParamDB .button.btn-close,
-#PushDB .button.btn-close,
-#sendMailWindow .button.btn-close {
+.window .button.btn-close {
     -fx-border-width: 0;
     -fx-border-radius: 0 2 0 2;
     -fx-background-color: transparent;
     -fx-background-radius: 0 2 0 2;
 }
 
-#ParamDB .button.btn-close:hover,
-#PushDB .button.btn-close:hover,
-#sendMailWindow .button.btn-close:hover {
+.window .button.btn-close:hover {
     -fx-background-color: #b60000;
+}
+
+/* --- RESULTAT --- */
+#resultatAnchor,
+#resultatScrollPane,
+#resultatFlowPane,
+.scroll-pane,
+.viewport {
+    -fx-background-color: transparent;
+}
+#resultatAnchor .label {
+    -fx-font-family: 'Poppins Medium';
+    -fx-text-fill: #DCDCDC;
+}
+
+#annonceElement {
+    -fx-background-color: #777777;
+}
+#annonceElement .titre {
+    -fx-font-size: 16;
+}
+
+/* --- FENETRE --- */
+#ParamDB,
+#PushDB,
+#sendMailWindow {
+    -fx-font-family: 'Poppins Medium';
+}
+#ParamDB .title,
+#PushDB .title,
+#sendMailWindow .title {
+    -fx-text-fill: #DCDCDC;
+    -fx-font-size: 16px;
 }

@@ -17,20 +17,24 @@ import java.util.List;
 public class Dom
 {
 
+    private int id;
     private int siteId;
     private int domElementId;
     private String nom;
     private String xpath;
-    private int domParent;
+    private int domParentId;
     private List<Dom> listEnfants = new ArrayList<>();
-    private List<String> motCle = new ArrayList();
 
-    public Dom(int siteId, int domElementId, String nom, String xpath, int domParent) {
+    public Dom(int id, int siteId, int domElementId, String nom, String xpath, int domParentId) {
+        this.id = id;
         this.siteId       = siteId;
         this.domElementId = domElementId;
         this.nom          = nom;
-        this.xpath     = xpath;
-        this.domParent = domParent;
+        this.xpath       = xpath;
+        this.domParentId = domParentId;
+    }
+    public int getId() {
+        return this.id;
     }
 
     public int getDomElementId()
@@ -47,16 +51,8 @@ public class Dom
         return this.xpath;
     }
 
-    public Integer getDomParent() {
-        return this.domParent;
-    }
-
-    public List<String> getMotCles() {
-        return this.motCle;
-    }
-
-    public void addMotCle(String motCle) {
-        this.motCle.add(motCle);
+    public Integer getDomParentId() {
+        return this.domParentId;
     }
 
     public void setEnfants(List<Dom> enfants) {
@@ -78,10 +74,12 @@ public class Dom
         StringBuilder str = new StringBuilder();
         str.append(indent).append(Config.YELLOW).append("siteId : ").append(Config.WHITE).append(this.siteId).append("\n");
         str.append(indent).append(Config.YELLOW).append("domElementId : ").append(Config.WHITE).append(this.domElementId).append("\n");
+        str.append(indent).append(Config.YELLOW).append("domParentId : ").append(Config.WHITE).append(this.domParentId).append("\n");
         str.append(indent).append(Config.YELLOW).append("nom : ").append(Config.WHITE).append(this.nom).append("\n");
-        str.append(indent).append(Config.YELLOW).append("xPath : ").append(Config.CYAN).append(this.xpath).append(Config.RESET).append("\n");
-
+        str.append(indent).append(Config.YELLOW).append("xPath : ").append(Config.CYAN).append(this.xpath).append("\n");
+        str.append(indent).append(Config.YELLOW).append("xPath Child : ").append(Config.CYAN).append(this.listEnfants.toString()).append(Config.RESET).append("\n");
 
         return str.toString();
     }
+
 }

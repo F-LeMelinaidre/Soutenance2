@@ -35,12 +35,11 @@ public class DomDAOImp implements DomDAO
     @Override
     public Map<String, Dom> findBySite(int siteId)
     {
-        String sql = "SELECT dp.site_id, dp.dom_element_id, dp.path, dp.dom_path_parent_id, " +
-                     "de.nom, mc.mot " +
+        String sql = "SELECT dp.id, dp.site_id, dp.dom_element_id, dp.path, dp.dom_path_parent_id, " +
+                     "de.nom " +
                      "FROM dom_path AS dp " +
-                     "LEFT JOIN dom_path AS dp2 ON dp2.site_id = dp.site_id AND dp2.dom_element_id = dp.dom_path_parent_id " +
+                     "LEFT JOIN dom_path AS dp2 ON dp2.dom_element_id = dp.dom_path_parent_id " +
                      "LEFT JOIN dom_element AS de ON de.id = dp.dom_element_id " +
-                     "LEFT JOIN mot_cle AS mc ON dp.site_id = mc.site_id AND dp.dom_element_id = mc.dom_element_id " +
                      "WHERE dp.site_id = ? ";
 
         Map<Integer, Dom> domMap = new HashMap<>();
@@ -52,21 +51,17 @@ public class DomDAOImp implements DomDAO
 
             while ( rs.next() ) {
 
+                int id = rs.getInt("id");
                 siteId = rs.getInt("site_id");
-                int    domKey    = rs.getInt("dom_element_id");
+                int    domElementId    = rs.getInt("dom_element_id");
                 String path      = rs.getString("path");
-                int    domParent = rs.getInt("dom_path_parent_id");
+                int    domParentId = rs.getInt("dom_path_parent_id");
                 String nom       = rs.getString("nom");
-                String motCle    = rs.getString("mot");
 
-                Dom dom = domMap.get(domKey);
+                Dom dom = domMap.get(id);
                 if ( dom == null ) {
-                    dom = new Dom(siteId, domKey, nom, path, domParent);
-                    domMap.put(domKey, dom);
-                }
-
-                if ( motCle != null ) {
-                    dom.addMotCle(motCle);
+                    dom = new Dom(id, siteId, domElementId, nom, path, domParentId);
+                    domMap.put(id, dom);
                 }
 
             }
@@ -75,30 +70,26 @@ public class DomDAOImp implements DomDAO
             System.out.println(e.getMessage());
         }
         List<Dom> domList = new ArrayList<>(domMap.values());
-        return this.buildHierarchy(domList, 0);
+        Map<String, Dom> results = this.buildHierarchy(domList, 0);
+        return results;
     }
 
+    private Map<String, Dom> buildHierarchy(List<Dom> domList, Integer parentId) {
+        Map<String, Dom> hierarchy = new HashMap<>();
 
-    private Map<String, Dom> buildHierarchy(List<Dom> domList, Integer parentId)
-    {
-        Map<String, Dom> hierarchyMap = new HashMap<>();
+        for (Dom dom : domList) {
+            if ( (parentId == null && dom.getDomParentId() == 0) ||
+                 (parentId != null && dom.getDomParentId().equals(parentId))) {
 
-        for ( Dom dom : domList ) {
-            // Vérifiication si dom est un enfant du parentId donné
-            if ( (parentId == null && dom.getDomParent() == null) ||
-                 (parentId != null && parentId.equals(dom.getDomParent())) ) {
-                // Ajout dom à la hiérarchie
-                hierarchyMap.put(dom.getNom(), dom);
+                // Ajouter l'élément au niveau actuel
+                hierarchy.put(dom.getNom(), dom);
 
-                // Appel récursif pour trouver les enfants
-                Map<String, Dom> enfants = this.buildHierarchy(domList, dom.getDomElementId());
-
-                // Ajout des enfants à dom
-                dom.setEnfants(new ArrayList<>(enfants.values()));
+                // Appel récursif pour construire les enfants
+                dom.setEnfants(new ArrayList<>(buildHierarchy(domList, dom.getDomElementId()).values()));
             }
         }
 
-        return hierarchyMap;
+        return hierarchy;
     }
 
 }
