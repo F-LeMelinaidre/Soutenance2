@@ -26,15 +26,41 @@ public class AnnonceElement extends VBox implements Initializable
     @FXML
     private ImageView imageView;
     @FXML
-    private Label titre;
+    private Label titreLabel;
     @FXML
-    private Label ville;
+    private Label titreLabelValue;
     @FXML
-    private Label tarif;
+    private Label villeLabel;
     @FXML
-    private Label place;
+    private Label villeLabelValue;
     @FXML
-    private Label couchage;
+    private Label tarifLabel;
+    @FXML
+    private Label tarifLabelValue;
+    @FXML
+    private Label placeLabel;
+    @FXML
+    private Label carburantLabel;
+    @FXML
+    private Label carburantLabelValue;
+    @FXML
+    private Label transmissionLabel;
+    @FXML
+    private Label transmissionLabelValue;
+    @FXML
+    private Label placeLabelValue;
+    @FXML
+    private Label couchageLabel;
+    @FXML
+    private Label couchageLabelValue;
+    @FXML
+    private Label doucheLabel;
+    @FXML
+    private Label doucheLabelValue;
+    @FXML
+    private Label wcLabel;
+    @FXML
+    private Label wcLabelValue;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
@@ -42,8 +68,9 @@ public class AnnonceElement extends VBox implements Initializable
 
     }
 
-    public void setImage (String path) {
-        if (path != null) {
+    public void setImage(String path)
+    {
+        if ( path != null ) {
             Image image = new Image(path);
             this.imageView.setImage(image);
 
@@ -54,27 +81,99 @@ public class AnnonceElement extends VBox implements Initializable
 
     }
 
-    public void setTitre (String titre) {
-        this.titre.setText(titre);
+    public void setTitreLabelValue(String titreLabelValue)
+    {
+        this.titreLabelValue.setText(titreLabelValue);
     }
 
-    public void setVille(String ville)
+    public void setVilleLabelValue(String villeLabelValue)
     {
-        this.ville.setText(ville);
+        this.villeLabelValue.setText(villeLabelValue);
     }
 
-    public void setTarif(int tarif)
+    public void setTarifLabelValue(int tarifLabelValue)
     {
-        this.tarif.setText(String.valueOf(tarif) + "€");
+        String value = (tarifLabelValue == 0) ? "??" : String.valueOf(tarifLabelValue);
+        this.tarifLabelValue.setText(value + "€");
+        this.setStyle(this.tarifLabelValue, tarifLabelValue);
     }
 
-    public void setPlace(int place)
+    public void setCarburantLabelValue(String carburantLabelValue)
     {
-        this.place.setText(String.valueOf(place));
+        String value = (carburantLabelValue == null) ? "??" : carburantLabelValue;
+        this.carburantLabelValue.setText(value);
+        this.setStyle(this.carburantLabelValue, carburantLabelValue);
     }
 
-    public void setCouchage(int couchage)
+    public void setTransmissionLabelValue(Integer transmissionLabelValue)
     {
-        this.couchage.setText(String.valueOf(couchage));
+        String value = (transmissionLabelValue == null || transmissionLabelValue == 0) ? "??" : String.valueOf(transmissionLabelValue);
+        this.transmissionLabelValue.setText(value);
+        this.setStyle(this.transmissionLabelValue, transmissionLabelValue);
+    }
+
+    public void setPlaceLabelValue(Integer placeLabelValue)
+    {
+        String value = (placeLabelValue == null || placeLabelValue == 0) ? "??" : String.valueOf(placeLabelValue);
+        this.placeLabelValue.setText(value);
+        this.setStyle(this.placeLabelValue, placeLabelValue);
+    }
+
+    public void setCouchageLabelValue(Integer couchageLabelValue)
+    {
+        String value = (couchageLabelValue == null || couchageLabelValue == 0) ? "??" : String.valueOf(couchageLabelValue);
+        this.couchageLabelValue.setText(value);
+        this.setStyle(this.couchageLabelValue, couchageLabelValue);
+    }
+
+    public void setDoucheLabelValue(Boolean doucheLabelValue)
+    {
+        String value = (doucheLabelValue == null) ? "??" : (doucheLabelValue ? "V" : "x");
+        this.doucheLabelValue.setText(value);
+        this.setStyle(this.doucheLabelValue, doucheLabelValue);
+    }
+
+    public void setWcLabelValue(Boolean wcLabelValue)
+    {
+        String value = (wcLabelValue == null) ? "??" : (wcLabelValue ? "V" : "x");
+        this.wcLabelValue.setText(value);
+        this.setStyle(this.wcLabelValue, wcLabelValue);
+    }
+
+    private void setStyle(Label label, String value)
+    {
+        label.getStyleClass().clear();
+        label.getStyleClass().add("value-label");
+        if ( value == null ) {
+            label.getStyleClass().add("warning");
+        }
+        label.applyCss();
+        label.layout();
+    }
+
+    private void setStyle(Label label, Integer value)
+    {
+        label.getStyleClass().clear();
+        label.getStyleClass().add("value-label");
+        if ( value == null || value == 0) {
+            label.getStyleClass().add("warning");
+        }
+        label.applyCss();
+        label.layout();
+    }
+
+    private void setStyle(Label label, Boolean value)
+    {
+        label.getStyleClass().clear();
+        label.getStyleClass().add("value-label");
+        if ( Boolean.TRUE.equals(value) ) {
+            label.getStyleClass().add("valid");
+        } else if ( Boolean.FALSE.equals(value) ) {
+            label.getStyleClass().add("invalid");
+        } else if (value == null) {
+            label.getStyleClass().add("warning");
+        }
+        label.applyCss();
+        label.layout();
     }
 }

@@ -14,12 +14,12 @@ import fr.cda.campingcar.settings.Config;
 public class Vehicule {
     private String model;
     private TypeVehicule type;
-    private String carburant = "non connu!";
-    private int boite = 0;
-    private int nbPlace = 0;
-    private int nbCouchage = 0;
-    private boolean douche = false;
-    private boolean wc = false;
+    private String carburant = null;
+    private Integer transmission = null;
+    private Integer nbPlace = null;
+    private Integer nbCouchage = null;
+    private Boolean douche = null;
+    private Boolean wc = null;
 
     public void setModel(String model) {
         this.model = model;
@@ -37,49 +37,62 @@ public class Vehicule {
         return  this.type;
     }
 
-    public void setBoite(int value) {}
+    public void setCarburant(String value) {
 
-    public void setCarburant(String value) {}
+        this.carburant = value;
+    }
 
-    public void setNbPlace(int value) {
+    public String getCarburant() {
+        return  this.carburant;
+    }
+
+    public void setTransmission(Integer value) {
+        this.transmission = value;
+    }
+
+    public Integer getTransmission() {
+        return this.transmission;
+    }
+
+    public void setNbPlace(Integer value) {
         this.nbPlace = value;
     }
 
-    public int getNbPlace() {
+    public Integer getNbPlace() {
         return  this.nbPlace;
     }
 
-    public void setNbCouchage(int value) {
+    public void setNbCouchage(Integer value) {
         this.nbCouchage = value;
     }
 
-    public int getNbCouchage() {
+    public Integer getNbCouchage() {
         return  this.nbCouchage;
     }
 
-    public void setDouche(boolean douche) {
+    public void setDouche(Boolean douche) {
         this.douche = douche;
     }
 
-    public boolean getDouche() {
+    public Boolean getDouche() {
         return  this.douche;
     }
 
-    public void setWc(boolean value) {
+    public void setWc(Boolean value) {
         this.wc = value;
     }
 
-    public boolean getWc() {
+    public Boolean getWc() {
         return  this.wc;
     }
 
-    public String toString(boolean putTab)
+    public String toString(Boolean putTab)
     {
         String tab = (putTab ? "\t" : "");
         StringBuilder str = new StringBuilder();
         str.append(Config.YELLOW).append(tab).append("Model : ").append(Config.WHITE).append(this.model).append("\n");
         str.append(Config.YELLOW).append(tab).append("Carburant : ").append(Config.WHITE).append(this.carburant).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Boite : ").append(Config.WHITE).append(this.boite).append("\n");
+        str.append(Config.YELLOW).append(tab).append("Boite : ").append(Config.WHITE).append(this.transmission).append("\n");
         str.append(Config.YELLOW).append(tab).append("Nb Place : ").append(Config.WHITE).append(this.nbPlace).append("\n");
         str.append(Config.YELLOW).append(tab).append("Nb Couchage : ").append(Config.WHITE).append(this.nbCouchage).append("\n");
         str.append(Config.YELLOW).append(tab).append("Douche : ").append(Config.WHITE).append(this.douche).append("\n");

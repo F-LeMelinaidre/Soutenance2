@@ -44,11 +44,15 @@ public class ResultatController implements Initializable, ControllerRegistry
         for (Annonce annonce : resultats) {
             AnnonceElement annonceElement = this.fxmlRender.loadFXML("annonceElement.fxml", null);
             annonceElement.setImage(annonce.getImage());
-            annonceElement.setTitre(annonce.getTitre());
-            annonceElement.setVille(annonce.getVille());
-            annonceElement.setTarif(annonce.getTarif());
-            annonceElement.setPlace(annonce.getPlace());
-            annonceElement.setCouchage(annonce.getCouchage());
+            annonceElement.setTitreLabelValue(annonce.getTitre());
+            annonceElement.setVilleLabelValue(annonce.getVille());
+            annonceElement.setTarifLabelValue(annonce.getTarif());
+            annonceElement.setCarburantLabelValue(annonce.getCarburant());
+            annonceElement.setTransmissionLabelValue(annonce.getTransmission());
+            annonceElement.setPlaceLabelValue(annonce.getPlace());
+            annonceElement.setCouchageLabelValue(annonce.getCouchage());
+            annonceElement.setDoucheLabelValue(annonce.getDouche());
+            annonceElement.setWcLabelValue(annonce.getWc());
         }
     }
 }

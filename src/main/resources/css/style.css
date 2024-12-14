@@ -211,11 +211,13 @@
     -fx-text-fill: #333333;
     -fx-background-color: #AAAAAA;
 }
+
 .button .btn {
     -fx-min-height: 30px;
     -fx-pref-height: 30px;
     -fx-min-width: 80px;
 }
+
 .date-picker-popup .spinner .button {
     -fx-background-color: transparent;
 }
@@ -229,6 +231,7 @@
     -fx-text-fill: #333333;
     -fx-background-color: #A3FF00;
 }
+
 .date-picker-popup .day-cell.disabled {
     -fx-text-fill: #777777;
     -fx-background-color: rgb(255, 192, 192);
@@ -283,7 +286,9 @@
 .viewport {
     -fx-background-color: transparent;
 }
-#resultatAnchor .label {
+
+#resultatAnchor .label,
+.value-label {
     -fx-font-family: 'Poppins Medium';
     -fx-text-fill: #DCDCDC;
 }
@@ -291,8 +296,13 @@
 #annonceElement {
     -fx-background-color: #777777;
 }
+
 #annonceElement .titre {
     -fx-font-size: 16;
+}
+
+#annonceElement .icon-label {
+    -fx-fill: #A3FF00;
 }
 
 /* --- FENETRE --- */
@@ -301,9 +311,22 @@
 #sendMailWindow {
     -fx-font-family: 'Poppins Medium';
 }
+
 #ParamDB .title,
 #PushDB .title,
 #sendMailWindow .title {
     -fx-text-fill: #DCDCDC;
     -fx-font-size: 16px;
+}
+
+.valid {
+    -fx-text-fill: #A3FF00;
+}
+
+.invalid {
+    -fx-text-fill: #ac0000;
+}
+
+.warning {
+    -fx-text-fill: #ff9b00;
 }

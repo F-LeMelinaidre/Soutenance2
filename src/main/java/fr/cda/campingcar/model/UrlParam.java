@@ -12,7 +12,6 @@ package fr.cda.campingcar.model;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class UrlParam
@@ -30,11 +29,11 @@ public class UrlParam
     public UrlParam(int site_id, int position, String groupe, String type, String critere, String key, String defaultValue, String format)
     {
         //System.out.println(Config.CYAN + "URLParam: " + site_id + " " + groupe + " " + reference + " " + paramKey + " " + format + Config.RESET);
-        this.site_id  = site_id;
-        this.position = position;
-        this.groupe   = groupe;
-        this.type     = type;
-        this.critere = critere;
+        this.site_id      = site_id;
+        this.position     = position;
+        this.groupe       = groupe;
+        this.type         = type;
+        this.critere      = critere;
         this.key          = key;
         this.defaultValue = defaultValue;
         this.format       = format;
@@ -43,18 +42,20 @@ public class UrlParam
     public UrlParam(int site_id, int position, String groupe, String type, String critere, String key, String value)
     {
         //System.out.println(Config.CYAN + "URLParam: " + site_id + " " + groupe + " " + reference + " " + paramKey + " " + format + Config.RESET);
-        this.site_id  = site_id;
-        this.position = position;
-        this.groupe   = groupe;
-        this.type     = type;
-        this.critere  = critere;
+        this.site_id      = site_id;
+        this.position     = position;
+        this.groupe       = groupe;
+        this.type         = type;
+        this.critere      = critere;
         this.key          = key;
         this.defaultValue = value;
     }
 
-    public int getPosition() {
+    public int getPosition()
+    {
         return this.position;
     }
+
     public String getGroupe()
     {
         return this.groupe;
@@ -70,17 +71,19 @@ public class UrlParam
         return this.critere;
     }
 
-    public <T> void setValue(T value) {
-        if ( value instanceof Ville) {
+    public <T> void setValue(T value)
+    {
+        if ( value instanceof Ville ) {
             this.setLocalisationParam((Ville) value);
         } else if ( value instanceof LocalDate ) {
             this.setFormateDate((LocalDate) value);
-        } else if( value instanceof String ) {
-            this.value = (String)value;
+        } else if ( value instanceof String ) {
+            this.value = (String) value;
         }
     }
 
-    public String getKeyValueParam() {
+    public String getKeyValueParam()
+    {
         String value = (this.value == null) ? this.defaultValue : this.value;
         return this.key + "=" + value;
     }

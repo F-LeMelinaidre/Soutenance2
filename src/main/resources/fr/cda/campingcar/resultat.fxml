@@ -9,7 +9,7 @@
    <children>
       <ScrollPane fx:id="resultatScrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="NEVER" layoutY="0.800000011920929" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <content>
-            <FlowPane fx:id="resultatFlowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="8.0" vgap="8.0">
+            <FlowPane fx:id="resultatFlowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="16.0" vgap="16.0">
                <padding>
                   <Insets bottom="8.0" left="8.0" right="8.0" top="12.0" />
                </padding>

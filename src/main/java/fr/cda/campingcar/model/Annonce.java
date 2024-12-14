@@ -24,7 +24,7 @@ public class Annonce implements ScrapingModel
     private String image;
     private String titre;
     private String ville;
-    private int tarif;
+    private Integer tarif;
     private Vehicule vehicule;
 
     public Annonce()
@@ -66,7 +66,7 @@ public class Annonce implements ScrapingModel
         return this.ville;
     }
 
-    public int getTarif()
+    public Integer getTarif()
     {
         return this.tarif;
     }
@@ -76,12 +76,28 @@ public class Annonce implements ScrapingModel
         return vehicule;
     }
 
-    public int getPlace() {
+    public String getCarburant() {
+        return this.vehicule.getCarburant();
+    }
+
+    public Integer getTransmission() {
+        return this.vehicule.getTransmission();
+    }
+
+    public Integer getPlace() {
         return this.vehicule.getNbPlace();
     }
 
-    public int getCouchage() {
+    public Integer getCouchage() {
         return this.vehicule.getNbCouchage();
+    }
+
+    public Boolean getDouche() {
+        return this.vehicule.getDouche();
+    }
+
+    public Boolean getWc() {
+        return this.vehicule.getWc();
     }
 
     /**
@@ -140,7 +156,7 @@ public class Annonce implements ScrapingModel
                 break;
             case "boite de vitesse":
                 resultInt = this.extractInt(value);
-                this.vehicule.setBoite(resultInt);
+                this.vehicule.setTransmission(resultInt);
                 break;
             case "nombre de place":
                 resultInt = this.extractInt(value);
