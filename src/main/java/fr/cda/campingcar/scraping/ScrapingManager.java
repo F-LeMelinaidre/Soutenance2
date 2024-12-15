@@ -7,30 +7,25 @@ import fr.cda.campingcar.scraping.exception.HTMLElementException;
 import fr.cda.campingcar.settings.Config;
 import fr.cda.campingcar.util.LoggerConfig;
 import javafx.concurrent.Task;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.logging.log4j.Logger;
 import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.WebClient;
-import org.htmlunit.html.HtmlElement;
-import org.htmlunit.html.HtmlImage;
-import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.*;
+import org.htmlunit.xpath.operations.Div;
 
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class permettant le scraping asynchrone d une liste de recherche de pages internet
  */
 public class ScrapingManager
 {
-    protected static final Logger LOGGER = LoggerConfig.getLogger();
     protected static final Logger LOGGER_SCRAPING = LoggerConfig.getLoggerScraping();
 
     private static ScrapingManager _instance = null;
     private ExecutorService executor = Executors.newCachedThreadPool();
-    private ScrapingModel scrapingModel;
     private Recherche recherche;
 
     public static synchronized ScrapingManager getInstance()
@@ -63,17 +58,16 @@ public class ScrapingManager
         this.recherche = recherche;
         List<Site> sites = recherche.getListSites();
 
-        return new Task<Void>()
+        return new Task<>()
         {
             @Override
-            protected Void call() throws Exception
+            protected Void call()
             {
                 debug("SCRAP_TASK", "Nombre de sites", String.valueOf(sites.size()), null, true);
                 List<Future<List<ScrapingModel>>> futures = new ArrayList<>();
 
                 // PARCOURS LES SITES DE LA RECHERCHE
                 for ( Site site : sites ) {
-                    ;
                     LOGGER_SCRAPING.info("Recherche sur " + site.getNom());
                     // CREE LA TACHE POUR OUVRIR LA PAGE DU SITE
                     futures.add(executor.submit(scrapingCards(site)));
@@ -85,6 +79,7 @@ public class ScrapingManager
 
                         recherche.addResultats(resultats);
                     } catch ( InterruptedException | ExecutionException e ) {
+                        debug("SCRAP_TASK", "InterruptedException | ExecutionException", "FUTURE LIST", e.getMessage(), false);
                         LOGGER_SCRAPING.error("Erreur lors du scraping: " + e.getMessage(), e);
                     }
                 }
@@ -98,7 +93,7 @@ public class ScrapingManager
     /**
      *
      * @param site
-     * @return
+     * @return Callable
      */
     private Callable<List<ScrapingModel>> scrapingCards(Site site)
     {
@@ -118,10 +113,11 @@ public class ScrapingManager
                 List<Dom> domCardEnfants = domCard.getListEnfants();
 
                 List<HtmlElement> cards = page.getByXPath(domCard.getXPath());
-                debug("SCRAPING CARDS", "Nombre de cards", String.valueOf(cards.size()),null, true);
+                debug("SCRAPING CARDS", "Nombre de cards", String.valueOf(cards.size()), null, true);
 
                 cards.forEach(card -> {
                     //debug("SCRAPING CARDS", "Cards numéro", String.valueOf(c.get()), null, true);
+
                     ScrapingModel model = recherche.createScrapingSupplier();
                     model.setDomainUrl(site.getUrlRoot());
 
@@ -141,7 +137,7 @@ public class ScrapingManager
                 try {
                     future.get();
                 } catch ( InterruptedException | ExecutionException e ) {
-                    System.out.println("FUTURE ERROR " + e.getMessage());
+                    debug("FUTURE ERROR", "InterruptedException | ExecutionException", "ERREUR", e.getMessage(), false);
                     LOGGER_SCRAPING.error("Erreur lors du scraping: " + e.getMessage(), e);
                 }
             }
@@ -150,12 +146,11 @@ public class ScrapingManager
     }
 
     /**
-     *
-     * @param webClient
-     * @param url
-     * @param model
-     * @param domPage
-     * @return
+     * @param webClient WebClient
+     * @param url url
+     * @param model {@link ScrapingModel}
+     * @param domPage {@link Dom}
+     * @return Callable
      */
     private Callable<Void> scrapPage(WebClient webClient, String url, ScrapingModel model, Dom domPage)
     {
@@ -164,7 +159,7 @@ public class ScrapingManager
         try {
             Thread.sleep(new Random().nextInt(2000));
         } catch ( InterruptedException e ) {
-            System.out.println("ERROR TIME THREAD SLEEP " + e.getMessage());
+            debug("SCRAPING PAGE", "InterruptedException", "TIME THREAD SLEEP", e.getMessage(), false);
         }
 
         return () -> {
@@ -179,11 +174,15 @@ public class ScrapingManager
                         throw new HTMLElementException(
                                 "Url: " + url + " | Contneur: " + domPage.getNom() + " | XPath: " + domPage.getXPath());
 
-                    List<Dom>    domEnfants     = domPage.getListEnfants();
+                    List<Dom>    domEnfants      = domPage.getListEnfants();
                     List<String> pagesSecondaire = this.scrapElements(conteneur, domEnfants, model);
 
                 } catch ( HTMLElementException e ) {
-                    System.out.println("ERROR SCRAP PAGE HTML_ELEMENT " + e.getMessage());
+                    debug("ERROR SCRAP PAGE HTML_ELEMENT", "HTMLElementException", domPage.getNom(),
+                          page.getDocumentURI() + " " + domPage.getXPath(),
+                          false);
+                    LOGGER_SCRAPING.warn(
+                            "ERROR SCRAP PAGE HTML_ELEMENT : " + e.getMessage(), e);
                 }
 
 
@@ -194,11 +193,10 @@ public class ScrapingManager
     }
 
     /**
-     *
-     * @param conteneur
-     * @param domCardEnfants
-     * @param model
-     * @return
+     * @param conteneur {@link HtmlElement}
+     * @param domCardEnfants {@code List<String>}
+     * @param model {@link ScrapingModel}
+     * @return List<String>
      */
     private List<String> scrapElements(HtmlElement conteneur, List<Dom> domCardEnfants, ScrapingModel model)
     {
@@ -209,33 +207,45 @@ public class ScrapingManager
             try {
                 HtmlElement element = conteneur.getFirstByXPath("." + dom.getXPath());
 
-                if (element != null) {
+                if ( element != null ) {
                     String value = dom.getNom().contains("lien") ? element.getAttribute("href").trim() : element.getTextContent().trim();
+
                     if ( dom.getNom().equals("lien secondaire") ) {
-                        //debug("SCRAP_ELEMENT " + model.getDomainUrl(), dom.getNom(), dom.getXPath(), value, true);
+
                         liensSecondaire.add(value);
-                    } else {
-                            //debug("SCRAP ELEMENT", dom.getNom(), value, conteneur.getNodeName() + " " + dom.getXPath(), true);
+                    } else if ( dom.getNom().equals("image") ) {
 
+                        value = this.getImage(element);
+                    }
+                    if ( !value.isEmpty() ) {
                         model.setPropertieModel(dom.getNom(), value);
                     }
 
-                    if (element instanceof HtmlImage ) {
-                        HtmlImage imgElement = (HtmlImage) element; // Conversion en HtmlImage
-                        value = imgElement.getAttribute("src"); // Récupération de l'attribut src
-                        model.setPropertieModel(dom.getNom(), value);
-                    }
                 } else {
-                        //debug("SCRAP ELEMENT", dom.getNom(), "not find", conteneur.getNodeName() + " " + dom.getXPath(), false);
-
                     throw new HTMLElementException(" Element: " + dom.getNom() + " | " + dom.getXPath());
                 }
 
             } catch ( HTMLElementException e ) {
-                //System.out.println("ERROR SCRAP ELEMENT HTML ELEMENT " + e.getMessage());
+                LOGGER_SCRAPING.warn("SCRAP ELEMENT : " + e.getMessage(), e);
+                debug("SCRAP ELEMENT", "HTMLElementException", dom.getNom(), conteneur.getNodeName() + " " + dom.getXPath(), false);
             }
         });
         return liensSecondaire;
+    }
+
+    private String getImage(HtmlElement element)
+    {
+        String value = "";
+        if ( element instanceof HtmlImage imgElement ) {
+            value = imgElement.getAttribute("src");
+        } else if ( element instanceof HtmlSource sourceElement ) {
+            value = sourceElement.getAttribute("srcset");
+            String[] values = value.trim().split(" ");
+            value = values[0];
+        } else if ( "div".equals(element.getTagName()) ) {
+            value = element.getAttribute("data-src");
+        }
+        return value;
     }
 
     private HtmlPage openPage(WebClient webClient, String url)
@@ -246,31 +256,32 @@ public class ScrapingManager
             page = webClient.getPage(url);
 
         } catch ( MalformedURLException e ) {
-            System.out.println("ERRUR OUVERTURE PAGE : " + e.getMessage());
+            debug("OPEN PAGE", "MalformedURLException", "ERREUR OUVERTURE", e.getMessage(), false);
+            System.out.println("ERREUR OUVERTURE PAGE : " + e.getMessage());
             LOGGER_SCRAPING.error("Erreur Format url " + url + " : " + e.getMessage(), e);
 
         } catch ( FailingHttpStatusCodeException e ) {
-            System.out.println("ERRUR OUVERTURE PAGE : " + e.getMessage());
+            debug("OPEN PAGE", "FailingHttpStatusCode", "ERREUR OUVERTURE", e.getMessage(), false);
             int    statusCode   = e.getStatusCode();
             String errorMessage = e.getMessage();
             LOGGER_SCRAPING.error("Erreur Statut " + url + ": " + statusCode + " - " + errorMessage, e);
 
         } catch ( Exception e ) {
-            System.out.println("ERRUR OUVERTURE PAGE : " + e.getMessage());
+            debug("OPEN PAGE", "Exception", "ERREUR OUVERTURE", e.getMessage(), false);
             LOGGER_SCRAPING.error("Erreur OpenPage " + url + " : " + e.getMessage(), e);
 
         }
         return page;
     }
 
-    private void shutdown()
-    {
-        this.executor.shutdown();
+    public void reset() {
+        executor.shutdownNow();
+        executor = Executors.newCachedThreadPool();
+        LOGGER_SCRAPING.info("ScrapingManager reset.");
     }
 
     /**
-     *
-     * @return
+     * @return {@link WebClient}
      */
     private WebClient createWebClient()
     {
@@ -291,12 +302,11 @@ public class ScrapingManager
     }
 
     /**
-     *
-     * @param task
-     * @param titre
-     * @param statut
-     * @param details
-     * @param valid
+     * @param task Nom de la Task
+     * @param titre Titre de l'événement
+     * @param statut Status de L'événement
+     * @param details Détail de l'événement
+     * @param valid true invalide false (défini la couleur de la valeur du paramètre statut)
      */
     private void debug(String task, String titre, String statut, String details, Boolean valid)
     {

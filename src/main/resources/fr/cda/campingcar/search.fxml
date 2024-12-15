@@ -28,7 +28,7 @@
                 <RowConstraints maxHeight="-Infinity" minHeight="24.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="-Infinity" prefHeight="34.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="-Infinity" prefHeight="34.0" valignment="BOTTOM" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="-Infinity" prefHeight="34.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="-Infinity" prefHeight="34.0" valignment="CENTER" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
             <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="10.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
@@ -38,8 +38,8 @@
                </children>
             </HBox>
             <Label alignment="TOP_CENTER" layoutX="749.0" layoutY="16.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0" text="Budget journalier" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
-                <TextField fx:id="budgetMin" focusTraversable="false" minHeight="-Infinity" minWidth="150.0" prefHeight="30.0" prefWidth="150.0" promptText="Min / Jours" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <TextField fx:id="budgetMax" focusTraversable="false" layoutX="463.0" layoutY="48.0" minHeight="-Infinity" minWidth="150.0" prefHeight="30.0" prefWidth="150.0" promptText="Max / Jours" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                <TextField fx:id="budgetMin" focusTraversable="false" minHeight="-Infinity" minWidth="150.0" onKeyTyped="#isInteger" prefHeight="30.0" prefWidth="150.0" promptText="Min / Jours" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <TextField fx:id="budgetMax" focusTraversable="false" layoutX="463.0" layoutY="48.0" minHeight="-Infinity" minWidth="150.0" onKeyTyped="#isInteger" prefHeight="30.0" prefWidth="150.0" promptText="Max / Jours" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                 <Label alignment="TOP_CENTER" minHeight="-Infinity" prefHeight="20.0" text="Lieu" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
                 <ComboBox fx:id="villeDepartField" editable="true" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" onKeyReleased="#autocompleteVilleField" prefHeight="30.0" prefWidth="150.0" promptText="Ville de Départ" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                 <ComboBox fx:id="villeArriveeField" editable="true" focusTraversable="false" layoutX="392.0" layoutY="46.0" maxHeight="-Infinity" minHeight="-Infinity" onKeyReleased="#autocompleteVilleField" prefHeight="30.0" prefWidth="150.0" promptText="Ville d'Arrivée" GridPane.columnIndex="3" GridPane.rowIndex="2" />
@@ -66,6 +66,7 @@
                   <CheckComboBox fx:id="siteComboBox" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="150.0" />
                </children>
             </HBox>
+            <Label fx:id="hintLabel" styleClass="hintLabel" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" />
             </children>
             <VBox.margin>
                 <Insets />

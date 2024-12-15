@@ -80,7 +80,7 @@ public class Annonce implements ScrapingModel
         return this.vehicule.getCarburant();
     }
 
-    public Integer getTransmission() {
+    public String getTransmission() {
         return this.vehicule.getTransmission();
     }
 
@@ -155,8 +155,7 @@ public class Annonce implements ScrapingModel
                 this.vehicule.setCarburant(value);
                 break;
             case "boite de vitesse":
-                resultInt = this.extractInt(value);
-                this.vehicule.setTransmission(resultInt);
+                this.vehicule.setTransmission(value);
                 break;
             case "nombre de place":
                 resultInt = this.extractInt(value);

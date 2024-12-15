@@ -58,6 +58,13 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 2, 0.4, 1, 1);
 }
 
+.label.hint-error {
+    -fx-text-fill: #cf0000;
+}
+.label.hint-warning {
+    -fx-text-fill: #ff9b00;
+}
+
 .combo-box,
 .combo-box-base,
 .date-picker,
@@ -84,6 +91,11 @@
     -fx-border-width: 0;
     -fx-background-insets: 0;
     -fx-control-inner-background: #777777;
+}
+
+.textfield-error {
+    -fx-border-width: 1px;
+    -fx-border-color: #ac0000;
 }
 
 /* --- COMBOBOX --- */
@@ -275,7 +287,7 @@
 }
 
 .window .button.btn-close:hover {
-    -fx-background-color: #b60000;
+    -fx-background-color: #ac0000;
 }
 
 /* --- RESULTAT --- */

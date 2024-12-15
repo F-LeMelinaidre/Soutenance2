@@ -105,9 +105,9 @@ public class AnnonceElement extends VBox implements Initializable
         this.setStyle(this.carburantLabelValue, carburantLabelValue);
     }
 
-    public void setTransmissionLabelValue(Integer transmissionLabelValue)
+    public void setTransmissionLabelValue(String transmissionLabelValue)
     {
-        String value = (transmissionLabelValue == null || transmissionLabelValue == 0) ? "??" : String.valueOf(transmissionLabelValue);
+        String value = (transmissionLabelValue == null || transmissionLabelValue.isEmpty()) ? "??" : transmissionLabelValue;
         this.transmissionLabelValue.setText(value);
         this.setStyle(this.transmissionLabelValue, transmissionLabelValue);
     }

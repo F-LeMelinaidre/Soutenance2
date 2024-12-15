@@ -21,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
@@ -31,6 +32,8 @@ import org.controlsfx.control.CheckComboBox;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 // TODO
@@ -72,6 +75,10 @@ public class SearchController implements Initializable, ControllerRegistry
     private TextField budgetMax;
     @FXML
     private Button rechercherBouton;
+    @FXML
+    private Button effacerBouton;
+    @FXML
+    private Label hintLabel;
 
     private HomeController homeController = null;
     private final DAOFactory daoFactory;
@@ -85,28 +92,32 @@ public class SearchController implements Initializable, ControllerRegistry
         this.dateCourante  = LocalDate.now();
     }
 
+    public void test()
+    {
+        System.out.println(dateCourante);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
         this.loadSiteComboBox();
-        this.siteComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Site>) change -> {
-            this.refreshTypeVehiculeComboBox();
-        });
-        this.typeVehiculeComboBox.getCheckModel().getCheckedItems().addListener(
-                (ListChangeListener<TypeVehicule>) change -> this.updateRechercherBoutonState());
-        this.budgetMin.textProperty().addListener(
-                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
-
         this.configureVilleComboBox(this.villeDepartField);
         this.configureVilleComboBox(this.villeArriveeField);
-
         this.initializeDatePicker();
+        this.initializeEventListener();
+
 
         this.rechercherBouton.setDisable(true);
     }
 
+    @Override
+    public void setMainController(Object homeController)
+    {
+        this.homeController = (HomeController) homeController;
+    }
+
     @FXML
-    public void reseach() throws SQLException
+    private void reseach() throws SQLException
     {
 
         List<Site>         sitesSelected         = this.siteComboBox.getCheckModel().getCheckedItems();
@@ -119,7 +130,8 @@ public class SearchController implements Initializable, ControllerRegistry
         LocalDate          dateDepart            = this.periodeDebutDatePicker.getValue();
         LocalDate          dateArrivee           = this.periodeFinDatePicker.getValue();
 
-        Map<String, Object> critereRecherche = new HashMap<>() {{
+        Map<String, Object> critereRecherche = new HashMap<>()
+        {{
             put("Liste Sites", sitesSelected);
             put("Liste Véhicules", typeVehiculesSelected);
             put("Budget Max", budgetMax);
@@ -144,11 +156,13 @@ public class SearchController implements Initializable, ControllerRegistry
         Recherche recherche = new Recherche(sitesSelected, critereRecherche, Annonce::new);
 
         this.homeController.startScrapping(recherche);
+
+        this.rechercherBouton.setDisable(true);
+        this.effacerBouton.setDisable(true);
     }
 
-
     @FXML
-    public void effacer()
+    private void effacer()
     {
 
         this.siteComboBox.getCheckModel().clearChecks();
@@ -170,7 +184,6 @@ public class SearchController implements Initializable, ControllerRegistry
     /**
      * Rafraichi la liste des types de véhicules proposés par les sites sélectionnés.
      */
-    // TODO PEUT ETRE CREE UN CLASS COMPONENT POUR LES CHECKCOMBOBOX POUR RETIRER DU CODE DU CONTROLLER
     @FXML
     private void refreshTypeVehiculeComboBox()
     {
@@ -207,6 +220,33 @@ public class SearchController implements Initializable, ControllerRegistry
         // Restaure la selection
         for ( TypeVehicule type : selectedItems ) {
             typeVehiculeComboBox.getCheckModel().check(type);
+        }
+    }
+
+    /**
+     * Vérifie si la valeur saisie dans le {@link TextField} est un entier.<br>
+     * Si le texte ne correspond pas, un message d'indication est affiché et le champ de texte est vidé.<br>
+     * Si le texte est valide, appel la méthode de mise à jour d'état du bouton de recherche.
+     *
+     * @param event l'événement {@link KeyEvent}
+     */
+    @FXML
+    private void isInteger(KeyEvent event)
+    {
+        this.clearHintLabel();
+
+        TextField textField = (TextField) event.getSource();
+
+        String currentValue = textField.getText();
+        if ( !currentValue.matches("\\d*") ) {
+            String msg = "Budget journalier: Veuillez saisir une valeur numérique!";
+            this.setHintLabel(msg, "error");
+
+            textField.getStyleClass().add("textfield-error");
+            textField.clear();
+        } else {
+            updateRechercherBoutonState();
+            textField.getStyleClass().remove("textfield-error");
         }
     }
 
@@ -249,9 +289,16 @@ public class SearchController implements Initializable, ControllerRegistry
         } else {
             item.getItems().clear();
         }
-        this.updateRechercherBoutonState();
     }
 
+    /**
+     * {@link DatePicker} Gère l'événement de sélection de la date de debut.<br>
+     * Met à jour la cellule du jour, et permet de verrouiller les dates antérieures à celle-ci,<br>
+     * pour le {@link DatePicker} {@code periodeDebutFinPicker}<br>
+     * Appel également la méthode de mise à jour d'état du bouton de recherche
+     *
+     * @param event l'événement {@link ActionEvent}
+     */
     // TODO Deplacer l affichage de l agenda en fonction de la selection de date de fin
     @FXML
     private void onStartDateSelected(ActionEvent event)
@@ -265,12 +312,21 @@ public class SearchController implements Initializable, ControllerRegistry
         }
     }
 
+    /**
+     * {@link DatePicker} Gère l'événement de sélection de la date de fin.<br>
+     * Met à jour la cellule du jour selectionné, et permet de verrouiller les dates supérieures à celle-ci,<br>
+     * pour le {@link DatePicker} {@code periodeDebutDatePicker}<br>
+     * Appel également la méthode de mise à jour d'état du bouton de recherche
+     *
+     * @param event l'événement {@link ActionEvent}
+     */
     // TODO Modifier deplacer l affichage de l agenda en fonction de la date depart selectionné
     @FXML
     private void onEndDateSelected(ActionEvent event)
     {
         DatePicker date    = (DatePicker) event.getSource();
         LocalDate  dateFin = (LocalDate) date.getValue();
+
         if ( date.getValue() != null ) {
             this.periodeDebutDatePicker.setDayCellFactory(
                     getDateCellFactory(this.dateCourante, dateFin.minusDays(1)));
@@ -278,12 +334,34 @@ public class SearchController implements Initializable, ControllerRegistry
         }
     }
 
-    @Override
-    public void setMainController(Object homeController)
+    // TODO AJOUTER EVENT POUR RETIRER LE MESSAGE DE DEMANDE DE VALIDATION PAR ENTRER POUR LES DATEPICKERS
+    private void initializeEventListener()
     {
-        this.homeController = (HomeController) homeController;
+        this.siteComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Site>) change -> {
+            this.refreshTypeVehiculeComboBox();
+        });
+
+        this.typeVehiculeComboBox.getCheckModel().getCheckedItems().addListener(
+                (ListChangeListener<TypeVehicule>) change -> this.updateRechercherBoutonState());
+        this.budgetMin.textProperty().addListener(
+                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
+        this.villeDepartField.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
+        this.villeArriveeField.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
+
+        // Vérifie et indique si le format de la date saisi manuellement est valide
+        this.periodeDebutDatePicker.getEditor().textProperty().addListener(
+                (observable, oldValue, newValue) -> this.isDate(newValue, this.periodeDebutDatePicker));
+        this.periodeFinDatePicker.getEditor().textProperty().addListener(
+                (observable, oldValue, newValue) -> this.isDate(newValue, this.periodeFinDatePicker));
+
     }
 
+    /**
+     * Charge la liste des sites dans le {@link ComboBox}. <br>
+     * Cette méthode récupère tous les sites à partir de la base de données.
+     */
     private void loadSiteComboBox()
     {
         List<Site> listeSites = new ArrayList<Site>();
@@ -330,7 +408,7 @@ public class SearchController implements Initializable, ControllerRegistry
             }
 
 
-            // Rechercher une ville correspondant à au formatage nom + numéro de département dans la liste du ComboBox
+            // Rechercher une ville correspondant au formatage nom + numéro de département dans la liste du ComboBox
             @Override
             public Ville fromString(String villeName)
             {
@@ -344,15 +422,50 @@ public class SearchController implements Initializable, ControllerRegistry
         });
     }
 
+    /**
+     * Initialise les sélecteurs de date pour la période de début et de fin.<br>
+     * Configure le {@link DatePicker} pour ne permettre la sélection que des dates à partir de la date actuelle.
+     *
+     * @see DatePicker
+     * @see #getDateCellFactory(LocalDate, LocalDate)
+     */
     private void initializeDatePicker()
     {
         this.periodeDebutDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now(), null));
         this.periodeFinDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now().plusDays(1), null));
     }
 
+    private void isDate(String date, DatePicker datePicker)
+    {
+        this.clearHintLabel();
+        datePicker.getStyleClass().remove("textfield-error");
+
+        String dateFormatRegex = "^(0[1-9]|[12][0-9]|3[01])\\/(0[1-9]|1[0-2])\\/(\\d{4})$";// '?' pour rendre l'année optionnelle
+        String msg             = "Période: Valider votre saisi par Entrer!";
+
+        // Vérifier si la saisie contient des caractères alpha
+        if ( date.matches(".*[a-zA-Z]+.*") || !date.matches(dateFormatRegex) ) {
+            msg = "Période: Veuillez saisir une date au format jj/mm/aaaa!";
+            this.setHintLabel(msg, "error");
+            datePicker.getStyleClass().add("textfield-error");
+        } else {
+            DateTimeFormatter formatter    = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate         formatedDate = LocalDate.parse(date, formatter);
+
+            if ( formatedDate.isBefore(this.dateCourante) ) {
+                msg = "Période: Veuillez saisir une date supérieur à la date du jour!";
+                this.setHintLabel(msg, "error");
+                datePicker.getStyleClass().add("textfield-error");
+            } else if ( datePicker.getValue() == null ) {
+                this.setHintLabel(msg, "warning");
+            }
+        }
+
+    }
+
     /**
      * {@link Callback} utilisé par un {@link DatePicker} pour personnaliser les cellules de date. <br>
-     * Désactive et modifie le style, des cellules dates avant {@code minDate} et après {@code maxDate}.
+     * Désactive et modifie le style, des cellules dates avant {@code minDate} et après {@code maxDate}.<br>
      * // TODO METTRE DU CSS
      *
      * @param minDate La date minimale
@@ -383,6 +496,24 @@ public class SearchController implements Initializable, ControllerRegistry
         };
     }
 
+    private void setHintLabel(String msg, String style)
+    {
+        this.hintLabel.setText(msg);
+        if ( style.equals("error") ) {
+            this.hintLabel.getStyleClass().remove("hint-warning");
+            this.hintLabel.getStyleClass().add("hint-error");
+        } else if ( style.equals("warning") ) {
+            this.hintLabel.getStyleClass().remove("hint-error");
+            this.hintLabel.getStyleClass().add("hint-warning");
+        }
+    }
+
+    private void clearHintLabel()
+    {
+        this.hintLabel.setText("");
+        this.hintLabel.getStyleClass().remove("hint-warning");
+        this.hintLabel.getStyleClass().remove("hint-error");
+    }
 
     private void updateRechercherBoutonState()
     {
@@ -400,5 +531,11 @@ public class SearchController implements Initializable, ControllerRegistry
         System.out.println("Debut " + this.periodeDebutDatePicker.getValue());
         System.out.println("Fin " + this.periodeFinDatePicker.getValue());*/
         this.rechercherBouton.setDisable(disable);
+    }
+
+    public void enableButton()
+    {
+        this.effacerBouton.setDisable(false);
+        this.rechercherBouton.setDisable(false);
     }
 }

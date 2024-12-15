@@ -15,11 +15,11 @@ public class Vehicule {
     private String model;
     private TypeVehicule type;
     private String carburant = null;
-    private Integer transmission = null;
+    private String transmission = null;
     private Integer nbPlace = null;
     private Integer nbCouchage = null;
-    private Boolean douche = null;
-    private Boolean wc = null;
+    private Boolean douche = false;
+    private Boolean wc = false;
 
     public void setModel(String model) {
         this.model = model;
@@ -46,11 +46,11 @@ public class Vehicule {
         return  this.carburant;
     }
 
-    public void setTransmission(Integer value) {
+    public void setTransmission(String value) {
         this.transmission = value;
     }
 
-    public Integer getTransmission() {
+    public String getTransmission() {
         return this.transmission;
     }
 

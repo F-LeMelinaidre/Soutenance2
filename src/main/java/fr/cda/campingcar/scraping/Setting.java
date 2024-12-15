@@ -17,8 +17,8 @@ public class Setting
     public static final boolean SSL = true;
     public static final boolean ENABLE_CSS = false;
     public static final boolean ENABLE_JS = false;
-    public static final int TIMEOUT = 10000;
-    public static final int JS_TIMEOUT = 10000;
+    public static final int TIMEOUT = 12000;
+    public static final int JS_TIMEOUT = 12000;
     public static final boolean THROW_EXCEPTION_ON_JS_ERROR = false;
     public static final boolean THROW_EXCEPTION_ON_STATUS_CODE = false;
 

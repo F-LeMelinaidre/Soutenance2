@@ -101,7 +101,7 @@ public class FXMLRender {
      */
     private Parent findViewById(String viewId) {
         for (Node node : targetContainer.getChildren()) {
-            if (node instanceof Parent && node.getId().equals(viewId)) {
+            if (node instanceof Parent && node.getId() != null && node.getId().equals(viewId)) {
                 return (Parent) node;
             }
         }

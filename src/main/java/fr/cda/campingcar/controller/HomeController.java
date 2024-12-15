@@ -37,11 +37,12 @@ public class HomeController {
     private MenuItem quit;
 
     private FXMLRender fxmlRender;
+    private SearchController searchController;
 
     @FXML
     public void initialize() {
         this.fxmlRender = new FXMLRender(this.homePane, this);
-        this.fxmlRender.loadFXML("search.fxml", null);
+        searchController = this.fxmlRender.loadFXML("search.fxml", null);
     }
 
     @FXML
@@ -65,10 +66,6 @@ public class HomeController {
         }
     }
 
-    public void afficher() {
-
-    }
-
     public void startScrapping(Recherche recherche)
     {
 
@@ -79,13 +76,18 @@ public class HomeController {
 
             List<Annonce> resultats = recherche.getResultats();
 
-            ResultatController resultatController = fxmlRender.loadFXML("resultat.fxml", null);
+            ResultatController resultatController = fxmlRender.loadFXML("resultat.fxml", "resultatAnchor");
             if(resultatController != null) {
                 resultatController.setAnnonce(resultats);
             }
-            System.out.println("Scraping terminé avec succès !");
+            this.searchController.enableButton();
+            scrapingManager.reset();
         });
-        scrapingTask.setOnFailed(event -> System.out.println("Une erreur est survenue : " + scrapingTask.getException()));
+        scrapingTask.setOnFailed(event -> {
+            this.searchController.enableButton();
+            scrapingManager.reset();
+            System.out.println("Une erreur est survenue : " + scrapingTask.getException());
+        });
 
         new Thread(scrapingTask).start();
 
