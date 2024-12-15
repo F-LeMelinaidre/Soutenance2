@@ -11,14 +11,45 @@ import org.apache.logging.log4j.Logger;
 import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.WebClient;
 import org.htmlunit.html.*;
-import org.htmlunit.xpath.operations.Div;
 
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * Class permettant le scraping asynchrone d une liste de recherche de pages internet
+ * Class permettant le scraping asynchrone d'une liste de recherche de pages internet.
+ * <p>
+ * L'objet {@link Recherche} passé en paramètre doit contenir une liste d'objet {@link Site} lui même contenant l'url de recherche, et un {@code HashMap}, représentant les xPaths des élément Html à scraper.
+ * </p>
+ * <p>
+ * Le {@code HashMap<String, Dom>} est hiérarchise:
+ * <ul>
+ *      <li>La clé "card" représente le conteneur de l'annonce présente sur la première page du site.
+ *          <ul>
+ *              <li>Le xPath est accessible avec la méthode {@link Dom#getXPath()}</li>
+ *              <li>Ce {@link Dom} contient une {@code List} représentant les éléments enfant de ce conteneur à scraper {@link Dom#getListEnfants()}.</li>
+ *          </ul>
+ *     </li>
+ *     <li> La clé "page" représente la page lié à chaque annonce et est hiérarchisé de la même manière.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Chaque Annonce scrapé est stocké dans un objet qui implémente l'interface {@link ScrapingModel}.
+ * La class implémentant {@link ScrapingModel}, est passer à l'objet {@link Recherche} à l'instanciation de celui-ci.
+ * Cela nous permet:
+ * <ul>
+ *     <li>Créer des objets Annonce (ou autre si une autre class était passé en argument de Recherche)</li>
+ *     <li>D'accéder à des méthodes pour setter les propriétés de l'objet</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Une fois la tâche principale terminée, la méthode {@link ScrapingManager#scrapTask(Recherche)},<br>
+ * retourne l'objet recherche contenant l'ensemble des objets Annonce scrapé sur le ou les sites.
+ * </p>
+ * <p>
+ * Cette class est un Singleton, afin de pouvoir avoir accès au compteur des tâches en cours, terminées.
+ * Il est essentiellement utile pour la vue du loader et son contrôleur.
+ * </p>
  */
 public class ScrapingManager
 {
@@ -91,9 +122,17 @@ public class ScrapingManager
     }
 
     /**
+     * Prépare une tâche de scraping pour extraire plusieurs éléments Html à partir d'un site web.
      *
-     * @param site
-     * @return Callable
+     * <p>
+     * Cette méthode crée un appel asynchrone qui ouvre une page web à partir de l'URL. <br>
+     * Dans un premier temps, on récupère chaque annonce de la page principale de la recherche. <br>
+     * Dans un second temps une fois tous les annonces sont récupérées et stockées dans {@code List}, <br>
+     * chaque annonce est soumise à l'exécuteur pour un traitement asynchrone, afin de scraper les pages de chaque annonce.
+     * </p>
+     *
+     * @param site L'objet {@link Site} contenant les informations sur le site à scrapper.
+     * @return {@link Callable} qui réalise le scraping des éléments.
      */
     private Callable<List<ScrapingModel>> scrapingCards(Site site)
     {
@@ -146,11 +185,17 @@ public class ScrapingManager
     }
 
     /**
-     * @param webClient WebClient
-     * @param url url
-     * @param model {@link ScrapingModel}
-     * @param domPage {@link Dom}
-     * @return Callable
+     * Prépare une tâche de scraping pour une page web.
+     *
+     * <p>Crée un appel asynchrone qui ouvre une page web à partir de l'URL fournie,
+     * extrait un élément conteneur basé sur l'expression XPath fournie {@link Dom#getXPath()}, et scrappe les éléments
+     * enfants en appelant la méthode {@link ScrapingManager#scrapElements(HtmlElement, List, ScrapingModel)}.</p>
+     *
+     * @param webClient Client web utilisé pour ouvrir la page
+     * @param url       URL de la page à scrapper
+     * @param model     Objet dans lequel les données extraites seront stockées
+     * @param domPage   {@link Dom} représentant les XPath à scrapper
+     * @return {@link Callable} qui réalise le scraping de la page
      */
     private Callable<Void> scrapPage(WebClient webClient, String url, ScrapingModel model, Dom domPage)
     {
@@ -171,8 +216,9 @@ public class ScrapingManager
                     HtmlElement conteneur = page.getFirstByXPath(domPage.getXPath());
 
                     if ( conteneur == null )
-                        throw new HTMLElementException(
-                                "Url: " + url + " | Contneur: " + domPage.getNom() + " | XPath: " + domPage.getXPath());
+                        throw new HTMLElementException("Url: " + url +
+                                                       " | Contneur: " + domPage.getNom() +
+                                                       " | XPath: " + domPage.getXPath());
 
                     List<Dom>    domEnfants      = domPage.getListEnfants();
                     List<String> pagesSecondaire = this.scrapElements(conteneur, domEnfants, model);
@@ -193,10 +239,17 @@ public class ScrapingManager
     }
 
     /**
-     * @param conteneur {@link HtmlElement}
-     * @param domCardEnfants {@code List<String>}
-     * @param model {@link ScrapingModel}
-     * @return List<String>
+     * Extrait des informations à partir d'un élément HTML conteneur.<br>
+     * {@link List<Dom>} liste des xPaths pour localiser les sous-éléments d'où extraire les valeurs.
+     *
+     * <p>Extrait soit un lien (attribut {@code href}), soit le contenu textuel de l'élément.</p>
+     * <p>Les valeurs extraites sont enregistrées dans l'objet {@code ScrapingModel}.</p>
+     *
+     * @param conteneur      l'élément HTML conteneur d'où extraire les éléments
+     * @param domCardEnfants la liste d'objets {@link Dom} contenant le xPath de l'éléments où extraire une valeur.
+     * @param model          Objet où les valeurs extraites seront stockées
+     * @return Liste de liens secondaires à visiter
+     * @throws HTMLElementException Exception levé si l'élément n'est pas trouvé avec l'xPath
      */
     private List<String> scrapElements(HtmlElement conteneur, List<Dom> domCardEnfants, ScrapingModel model)
     {
@@ -211,7 +264,7 @@ public class ScrapingManager
                     String value = dom.getNom().contains("lien") ? element.getAttribute("href").trim() : element.getTextContent().trim();
 
                     if ( dom.getNom().equals("lien secondaire") ) {
-
+                        // TODO IMPLEMENTER L OUVERTUR DES MODALS
                         liensSecondaire.add(value);
                     } else if ( dom.getNom().equals("image") ) {
 
@@ -233,6 +286,20 @@ public class ScrapingManager
         return liensSecondaire;
     }
 
+    /**
+     * Methode récupèrant l'URL d'un image à partir d'un élément HTML.
+     *
+     * <p>l'url recherché doit se trouver dans un Tag:
+     * <ul>
+     *     <li>{@code img} et contenir l'attribut {@code src} </li>
+     *     <li>{@code source} et contenir l'attribut {@code srcset}</li>
+     *     <li>{@code div} et contenir l'attribut {@code data-src}</li>
+     * </ul>
+     * approprié pour obtenir l'URL de l'image.</p>
+     *
+     * @param element l'élément HTML où extraire l'URL de l'image
+     * @return l'URL de l'image, ou une chaîne vide si aucun URL n'est trouvé
+     */
     private String getImage(HtmlElement element)
     {
         String value = "";
@@ -248,6 +315,13 @@ public class ScrapingManager
         return value;
     }
 
+    /**
+     * Ouvre une page web à partir de l'URL passée en paramètre.
+     *
+     * @param webClient le client web utilisé pour la requête
+     * @param url       l'URL de la page à ouvrir
+     * @return la page web ouverte, ou {@code null} en cas d'erreur
+     */
     private HtmlPage openPage(WebClient webClient, String url)
     {
         HtmlPage page = null;
@@ -274,14 +348,35 @@ public class ScrapingManager
         return page;
     }
 
-    public void reset() {
+    /**
+     * Methode de réinitialisation de la class ScrapingManager.<br>
+     * Arrête l'{@code Executors} actuel et créé un nouveau pool de threads mis en cache.<br>
+     * <p>
+     * Interrompt toutes les tâches actuellement en cours , entraînant l'arrêt des tâches.</p>
+     */
+    public void reset()
+    {
         executor.shutdownNow();
         executor = Executors.newCachedThreadPool();
         LOGGER_SCRAPING.info("ScrapingManager reset.");
     }
 
     /**
-     * @return {@link WebClient}
+     * Crée et configure un nouveau {@link WebClient}.
+     * <p>
+     * Les options du client Web configurées:</p>
+     * <ul>
+     *     <li>SSL non sécurisé {@link WebClient#getOptions()#setUseInsecureSSL(boolean)}</li>
+     *     <li>Activation/Désactivation du CSS {@link WebClient#getOptions()#setCssEnabled(boolean)}</li>
+     *     <li>Activation/Désactivation du Javascript {@link WebClient#getOptions()#setJavascriptEnabled(boolean)}</li>
+     *     <li>Délai d'attente pour le Javascript {@link WebClient#getOptions()#waitForBackgroundJavaScript(long)}</li>
+     *     <li>Délai d'attente pour la requete HTTP avant abandon {@link WebClient#getOptions()#setTimeOut(int)} </li>
+     *     <li>Activation/Désactivation des cas d'erreurs de script {@link WebClient#getOptions()#setThrowExceptionOnScriptError(boolean)}</li>
+     *     <li>Activation/Désactivation des codes de statuts échoués {@link WebClient#getOptions()#setThrowExceptionOnFailingStatusCode(boolean)}</li>
+     * </ul>
+     * Les valeurs sont definies dans {@link Setting}
+     *
+     * @return {@link WebClient} configuré
      */
     private WebClient createWebClient()
     {
@@ -302,11 +397,11 @@ public class ScrapingManager
     }
 
     /**
-     * @param task Nom de la Task
-     * @param titre Titre de l'événement
-     * @param statut Status de L'événement
+     * @param task    Nom de la Task
+     * @param titre   Titre de l'événement
+     * @param statut  Status de L'événement
      * @param details Détail de l'événement
-     * @param valid true invalide false (défini la couleur de la valeur du paramètre statut)
+     * @param valid   true invalide false (défini la couleur de la valeur du paramètre statut)
      */
     private void debug(String task, String titre, String statut, String details, Boolean valid)
     {
