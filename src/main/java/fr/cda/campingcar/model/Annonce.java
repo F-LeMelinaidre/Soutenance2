@@ -9,13 +9,13 @@ package fr.cda.campingcar.model;
  * Greta Vannes
  */
 
-import fr.cda.campingcar.scraping.ScrapingModel;
+import fr.cda.campingcar.scraping.ScrapingModelInt;
 import fr.cda.campingcar.settings.Config;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Annonce implements ScrapingModel
+public class Annonce implements ScrapingModelInt
 {
 
     private int site_id;
@@ -129,49 +129,48 @@ public class Annonce implements ScrapingModel
     }
 
     @Override
-    public void setPropertieModel(String key, String value)
+    public void setPropertieModel(String key, Object value)
     {
-        int resultInt;
         switch (key) {
             case "image":
-                this.image = value;
+                this.image = (String)value;
                 break;
             case "titre":
-                this.titre = value;
+                this.titre = (String)value;
                 break;
             case "lien principal":
-                this.url = value;
+                this.url = (String)value;
                 break;
             case "ville":
-                this.ville = this.formateVille(value);
+                this.ville = this.formateVille((String)value);
                 break;
             case "tarif":
-                this.tarif = this.extractInt(value);
+                this.tarif = this.extractInt((String)value);
                 break;
             case "model":
-                this.vehicule.setModel(value);
+                this.vehicule.setModel((String)value);
                 break;
             case "carburant":
-                this.vehicule.setCarburant(value);
+                this.vehicule.setCarburant((String)value);
                 break;
             case "boite de vitesse":
-                this.vehicule.setTransmission(value);
+                this.vehicule.setTransmission((String)value);
                 break;
             case "nombre de place":
-                resultInt = this.extractInt(value);
-                this.vehicule.setNbPlace(resultInt);
+                Integer nbPlace = this.extractInt((String)value);
+                this.vehicule.setNbPlace(nbPlace);
                 break;
             case "nombre de couchage":
-                resultInt = this.extractInt(value);
-                this.vehicule.setNbCouchage(resultInt);
+                Integer nbCouchage = this.extractInt((String)value);
+                this.vehicule.setNbCouchage(nbCouchage);
                 break;
             case "douche":
                 boolean douche = value != null;
-                this.vehicule.setDouche(douche);
+                this.vehicule.setDouche((Boolean)douche);
                 break;
             case "wc":
                 boolean wc = value != null;
-                this.vehicule.setWc(wc);
+                this.vehicule.setWc((Boolean)wc);
                 break;
         }
     }

@@ -58,7 +58,7 @@ public class HomeController {
                 this.fxmlRender.openNewWindow("sendMail.fxml", "Envoi Email", 400, 175);
                 break;
             case "paramDB":
-                this.fxmlRender.openNewWindow("parameterDB.fxml", "Paramètres Base de Donnée", 450, 315);
+                this.fxmlRender.openNewWindow("parameterDB.fxml", "Paramètres Base de Donnée", 385, 295);
                 break;
             case "quit":
             default:

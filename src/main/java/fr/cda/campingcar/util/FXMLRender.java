@@ -10,9 +10,7 @@ package fr.cda.campingcar.util;
  */
 
 import fr.cda.campingcar.controller.ControllerRegistry;
-import fr.cda.campingcar.controller.HomeController;
 import fr.cda.campingcar.settings.Config;
-import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -53,6 +51,8 @@ public class FXMLRender {
         this.parentController = parentController;
         this.targetContainer = targetContainer;
     }
+
+    public FXMLRender(){}
 
     /**
      * Méthode pour charger ou remplacer le FXML.
@@ -120,10 +120,11 @@ public class FXMLRender {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(Config.FXML_ROOT_PATH + fxmlPath));
             Parent root = loader.load();
             root.getStyleClass().add("window");
-            addTopBar(root, title);
 
+            Pane topBar = addTopBar(root, title);
+            Double topBarHeight = topBar.getPrefHeight();
             Stage stage = new Stage();
-            Scene scene = new Scene(root, width, height);
+            Scene scene = new Scene(root, width, height + topBarHeight);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setTitle(title);
             stage.setScene(scene);
@@ -137,15 +138,17 @@ public class FXMLRender {
 
     /**
      * Cree une topBar Sur les nouvelles fenêtres
+     *
      * @param root
      * @param title
+     * @return
      */
-    private void addTopBar(Parent root, String title) {
+    private Pane addTopBar(Parent root, String title) {
         if (!(root instanceof Pane pane)) {
             String errorMessage = "FXML RENDER addTopBar ERROR: New Window '" + title + "' it's not a Pane.";
             LOGGER.error(errorMessage);
             System.err.println(errorMessage);
-            return;
+            return null;
         }
 
         AnchorPane topBar = new AnchorPane();
@@ -179,6 +182,8 @@ public class FXMLRender {
         pane.getChildren().add(0, topBar);
 
         this.windowDragging(topBar, root);
+
+        return topBar;
     }
 
     /**

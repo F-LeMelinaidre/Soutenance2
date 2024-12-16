@@ -10,11 +10,11 @@ package fr.cda.campingcar.dao;
  */
 
 
-import fr.cda.campingcar.dao.site.SiteDAOImp;
-import fr.cda.campingcar.dao.urlParam.URLParamDAOImp;
-import fr.cda.campingcar.dao.vehicule.TypeVehiculeDAOImp;
-import fr.cda.campingcar.dao.vehicule.VehiculeDAOImp;
-import fr.cda.campingcar.dao.dom.DomDAOImp;
+import fr.cda.campingcar.dao.site.SiteDAO;
+import fr.cda.campingcar.dao.urlParam.URLParamDAO;
+import fr.cda.campingcar.dao.vehicule.TypeVehiculeDAO;
+import fr.cda.campingcar.dao.vehicule.VehiculeDAO;
+import fr.cda.campingcar.dao.dom.DomDAO;
 import fr.cda.campingcar.settings.Config;
 
 import java.sql.Connection;
@@ -73,23 +73,23 @@ public class DAOFactory {
         }
     }
 
-    public SiteDAOImp getSiteDAO() throws SQLException {
-        return new SiteDAOImp(this);
+    public SiteDAO getSiteDAO() throws SQLException {
+        return new SiteDAO(this);
     }
 
-    public URLParamDAOImp getURLParamDAO() throws SQLException {
-        return new URLParamDAOImp(this);
+    public URLParamDAO getURLParamDAO() throws SQLException {
+        return new URLParamDAO(this);
     }
 
-    public TypeVehiculeDAOImp getTypeVehiculeDAO() throws SQLException {
-        return new TypeVehiculeDAOImp(this);
+    public TypeVehiculeDAO getTypeVehiculeDAO() throws SQLException {
+        return new TypeVehiculeDAO(this);
     }
 
-    public VehiculeDAOImp getVehiculeDAO() throws SQLException {
-        return new VehiculeDAOImp();
+    public VehiculeDAO getVehiculeDAO() throws SQLException {
+        return new VehiculeDAO();
     }
 
-    public DomDAOImp getDomDAO() throws SQLException {
-        return new DomDAOImp(this);
+    public DomDAO getDomDAO() throws SQLException {
+        return new DomDAO(this);
     }
 }

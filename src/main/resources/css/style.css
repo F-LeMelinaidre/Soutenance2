@@ -50,8 +50,7 @@
 
 /* --- FORMULAIRE --- */
 
-.search-bar .label,
-.form-label {
+.search-bar .label {
     -fx-font-family: 'Poppins Medium';
     -fx-font-size: 12;
     -fx-text-fill: #DCDCDC;
@@ -61,6 +60,7 @@
 .label.hint-error {
     -fx-text-fill: #cf0000;
 }
+
 .label.hint-warning {
     -fx-text-fill: #ff9b00;
 }
@@ -88,6 +88,7 @@
 
 .text-field {
     -fx-text-fill: #A3FF00;
+    -fx-prompt-text-fill: #AAAAAA;
     -fx-border-width: 0;
     -fx-background-insets: 0;
     -fx-control-inner-background: #777777;
@@ -262,33 +263,6 @@
 
 /* //// LES VUES //// */
 
-/* --- NEW WINDOW --- */
-.window {
-    -fx-border-color: #777777;
-    -fx-border-width: 1;
-    -fx-background-color: #CCCCCC;
-}
-
-.window .top-bar {
-    -fx-font-family: 'Poppins Bold';
-    -fx-background-color: #555555;
-}
-
-.window .top-bar .label {
-    -fx-text-fill: #DCDCDC;
-    -fx-font-size: 12px;
-}
-
-.window .button.btn-close {
-    -fx-border-width: 0;
-    -fx-border-radius: 0 2 0 2;
-    -fx-background-color: transparent;
-    -fx-background-radius: 0 2 0 2;
-}
-
-.window .button.btn-close:hover {
-    -fx-background-color: #ac0000;
-}
 
 /* --- RESULTAT --- */
 #resultatAnchor,
@@ -317,18 +291,75 @@
     -fx-fill: #A3FF00;
 }
 
-/* --- FENETRE --- */
-#ParamDB,
-#PushDB,
-#sendMailWindow {
-    -fx-font-family: 'Poppins Medium';
+/* --- NEW WINDOW --- */
+.window {
+    -fx-border-color: #777777;
+    -fx-border-width: 1;
+    -fx-background-color: #CCCCCC;
 }
+
+.window .top-bar {
+    -fx-font-family: 'Poppins Bold';
+    -fx-background-color: #555555;
+}
+
+.window .top-bar .label {
+    -fx-text-fill: #A3FF00;
+    -fx-font-size: 12px;
+}
+
+.window .text-field .text,
+.window .btn .text {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 0.5, 0.4, 1, 1);
+}
+
+.window .button {
+    -fx-font-family: "Poppins Medium";
+    -fx-text-fill: #ECECEC;
+}
+
+.window .button:hover {
+    -fx-text-fill: #777777;
+}
+
+.window .button:hover .text {
+    -fx-effect: null;
+}
+
+.window .button.btn-close {
+    -fx-text-fill: #DCDCDC;
+    -fx-border-width: 0;
+    -fx-border-radius: 0 2 0 2;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 2 0 2;
+}
+
+.window .button.btn-close:hover {
+    -fx-background-color: #ac0000;
+}
+
+/* --- FENETRE --- */
 
 #ParamDB .title,
 #PushDB .title,
 #sendMailWindow .title {
     -fx-text-fill: #DCDCDC;
-    -fx-font-size: 16px;
+}
+
+#ParamDB .text-field,
+#PushDB .text-field,
+#sendMailWindow .text-field {
+    -fx-text-fill: #ECECEC;
+    -fx-prompt-text-fill: #ECECEC;
+    -fx-background-color: #AAAAAA;
+}
+
+
+#ParamDB .form-label,
+#PushDB .form-label,
+#sendMailWindow .form-label {
+    -fx-font-family: 'Poppins Bold';
+    -fx-text-fill: #777777;
 }
 
 .valid {
