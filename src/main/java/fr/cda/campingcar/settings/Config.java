@@ -19,7 +19,7 @@ public class Config
 {
     public static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final String SQL_SERVER = "jdbc:mysql://localhost:3306/";
-    public static final String SQL_DATA_BASE = "thousand_miles";
+    public static final String SQL_DATA_BASE = "thousand_miles_desktop";
     public static final String SQL_USER = "admin";
     public static final String SQL_PASS = "admin";
 
@@ -27,20 +27,10 @@ public class Config
      * Racine du dossier des fichiers FXML
      */
     public static final String FXML_ROOT_PATH = "/fr/cda/campingcar/";
+    public static final String BINARIE_FOLDER_PATH = "binaries/";
+    public static final String BINARIE_EXT = "bin";
 
     public static final int THREAD_POOL_SIZE = 50;
-
-    /**
-     * Mise en couleur du texte console
-     */
-    public static final String RESET = "\u001B[0m";
-    public static final String RED = "\u001B[31m";
-    public static final String GREEN = "\u001B[32m";
-    public static final String YELLOW = "\u001B[33m";
-    public static final String BLUE = "\u001B[34m";
-    public static final String PURPLE = "\u001B[35m";
-    public static final String CYAN = "\u001B[36m";
-    public static final String WHITE = "\u001B[37m";
 
     /**
      * non utilisé pour le moment
@@ -69,4 +59,16 @@ public class Config
             "numDep", ville -> String.valueOf(ville.getDepartement().getNumero()),
             "region", ville -> ville.getDepartement().getRegion()
                                                                                    );
+
+    /**
+     * Mise en couleur du texte console
+     */
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String YELLOW = "\u001B[33m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String PURPLE = "\u001B[35m";
+    public static final String CYAN = "\u001B[36m";
+    public static final String WHITE = "\u001B[37m";
 }
