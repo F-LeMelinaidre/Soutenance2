@@ -9,5 +9,6 @@ package fr.cda.campingcar.dao.vehicule;
  * Greta Vannes
  */
 
-public interface VehiculeDAO {
+public class VehiculeDAO implements VehiculeDAOInt
+{
 }

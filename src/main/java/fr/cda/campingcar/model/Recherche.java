@@ -1,10 +1,8 @@
 package fr.cda.campingcar.model;
 
-import fr.cda.campingcar.scraping.ScrapingManager;
-import fr.cda.campingcar.scraping.ScrapingModel;
+import fr.cda.campingcar.scraping.ScrapingModelInt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -17,11 +15,11 @@ import java.util.function.Supplier;
  * Formation CDA
  * Greta Vannes
  */
-public class Recherche<T extends ScrapingModel>
+public class Recherche<T extends ScrapingModelInt>
 {
     private List<Site> sites;
     private Map<String, Object> critereRecherche;
-    private List<ScrapingModel> resultats = new ArrayList<>();
+    private List<ScrapingModelInt> resultats = new ArrayList<>();
     private Supplier<T> scrapingSupplier;
 
     public Recherche(List<Site> site, Map<String, Object> critereRecherche, Supplier<T> scrapingSupplier)
@@ -35,11 +33,11 @@ public class Recherche<T extends ScrapingModel>
         return sites;
     }
 
-    public void addResultats(List<ScrapingModel> resultats) {
+    public void addResultats(List<ScrapingModelInt> resultats) {
         this.resultats.addAll(resultats);
     }
 
-    public List<ScrapingModel> getResultats() {
+    public List<ScrapingModelInt> getResultats() {
         return this.resultats;
     }
     public T createScrapingSupplier() {

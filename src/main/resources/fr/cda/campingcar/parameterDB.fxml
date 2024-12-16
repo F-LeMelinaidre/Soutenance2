@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="ParamDB" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="550.0" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="ParamDB" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.ParametreBDController">
    <children>
-      <VBox styleClass="form">
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="form">
          <children>
-            <GridPane hgap="8.0" vgap="16.0">
+            <GridPane hgap="8.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="16.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="152.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="56.0" prefWidth="56.0" />
@@ -43,8 +43,8 @@
             </GridPane>
             <HBox alignment="TOP_RIGHT" spacing="16.0">
                <children>
-                  <Button fx:id="validerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" prefHeight="30.0" styleClass="btn" text="Valider" />
-                  <Button fx:id="fermerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" prefHeight="30.0" styleClass="btn" text="Fermer" />
+                  <Button fx:id="validerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#submitForm" prefHeight="30.0" styleClass="btn" text="Valider" />
+                  <Button fx:id="fermerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" styleClass="btn" text="Fermer" />
                </children>
                <VBox.margin>
                   <Insets top="16.0" />

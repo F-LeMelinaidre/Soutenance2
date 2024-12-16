@@ -1,7 +1,5 @@
 package fr.cda.campingcar.scraping;
 
-import java.util.Map;
-
 /*
  * Soutenance Scraping
  * 2024/déc.
@@ -10,7 +8,7 @@ import java.util.Map;
  * Formation CDA
  * Greta Vannes
  */
-public interface ScrapingModel<T>
+public interface ScrapingModelInt<T>
 {
     void setDomainUrl(String domainUrl);
 
@@ -18,7 +16,8 @@ public interface ScrapingModel<T>
 
     String getUrl();
 
-    void setPropertieModel(String key, String value);
+    <T> void setPropertieModel(String key, T value);
 
     void setSiteId(int id);
+
 }

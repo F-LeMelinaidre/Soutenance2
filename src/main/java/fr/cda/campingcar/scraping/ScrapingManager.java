@@ -15,6 +15,7 @@ import org.htmlunit.html.*;
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Class permettant le scraping asynchrone d'une liste de recherche de pages internet.
@@ -34,8 +35,8 @@ import java.util.concurrent.*;
  * </ul>
  * </p>
  * <p>
- * Chaque Annonce scrapé est stocké dans un objet qui implémente l'interface {@link ScrapingModel}.
- * La class implémentant {@link ScrapingModel}, est passer à l'objet {@link Recherche} à l'instanciation de celui-ci.
+ * Chaque Annonce scrapé est stocké dans un objet qui implémente l'interface {@link ScrapingModelInt}.
+ * La class implémentant {@link ScrapingModelInt}, est passer à l'objet {@link Recherche} à l'instanciation de celui-ci.
  * Cela nous permet:
  * <ul>
  *     <li>Créer des objets Annonce (ou autre si une autre class était passé en argument de Recherche)</li>
@@ -53,7 +54,7 @@ import java.util.concurrent.*;
  */
 public class ScrapingManager
 {
-    protected static final Logger LOGGER_SCRAPING = LoggerConfig.getLoggerScraping();
+    private static final Logger LOGGER_SCRAPING = LoggerConfig.getLoggerScraping();
 
     private static ScrapingManager _instance = null;
     private ExecutorService executor = Executors.newCachedThreadPool();
@@ -95,7 +96,7 @@ public class ScrapingManager
             protected Void call()
             {
                 debug("SCRAP_TASK", "Nombre de sites", String.valueOf(sites.size()), null, true);
-                List<Future<List<ScrapingModel>>> futures = new ArrayList<>();
+                List<Future<List<ScrapingModelInt>>> futures = new ArrayList<>();
 
                 // PARCOURS LES SITES DE LA RECHERCHE
                 for ( Site site : sites ) {
@@ -104,9 +105,9 @@ public class ScrapingManager
                     futures.add(executor.submit(scrapingCards(site)));
                 }
 
-                for ( Future<List<ScrapingModel>> future : futures ) {
+                for ( Future<List<ScrapingModelInt>> future : futures ) {
                     try {
-                        List<ScrapingModel> resultats = future.get();
+                        List<ScrapingModelInt> resultats = future.get();
 
                         recherche.addResultats(resultats);
                     } catch ( InterruptedException | ExecutionException e ) {
@@ -134,12 +135,12 @@ public class ScrapingManager
      * @param site L'objet {@link Site} contenant les informations sur le site à scrapper.
      * @return {@link Callable} qui réalise le scraping des éléments.
      */
-    private Callable<List<ScrapingModel>> scrapingCards(Site site)
+    private Callable<List<ScrapingModelInt>> scrapingCards(Site site)
     {
         debug("SCRAPING_CARDS", "Site", site.getNom(), site.getUrlRecherche(), true);
-        List<Future<Void>>  futures = new ArrayList<>();
-        List<ScrapingModel> models  = new ArrayList<>();
-        String              url     = site.getUrlRecherche();
+        List<Future<Void>>     futures = new ArrayList<>();
+        List<ScrapingModelInt> models  = new ArrayList<>();
+        String                 url     = site.getUrlRecherche();
 
 
         return () -> {
@@ -157,7 +158,7 @@ public class ScrapingManager
                 cards.forEach(card -> {
                     //debug("SCRAPING CARDS", "Cards numéro", String.valueOf(c.get()), null, true);
 
-                    ScrapingModel model = recherche.createScrapingSupplier();
+                    ScrapingModelInt model = recherche.createScrapingSupplier();
                     model.setDomainUrl(site.getUrlRoot());
 
                     this.scrapElements(card, domCardEnfants, model);
@@ -167,7 +168,7 @@ public class ScrapingManager
 
             }
 
-            for ( ScrapingModel model : models ) {
+            for ( ScrapingModelInt model : models ) {
 
                 futures.add(executor.submit(scrapPage(webClient, model.getUrl(), model, site.getDomMap().get("page"))));
             }
@@ -189,7 +190,7 @@ public class ScrapingManager
      *
      * <p>Crée un appel asynchrone qui ouvre une page web à partir de l'URL fournie,
      * extrait un élément conteneur basé sur l'expression XPath fournie {@link Dom#getXPath()}, et scrappe les éléments
-     * enfants en appelant la méthode {@link ScrapingManager#scrapElements(HtmlElement, List, ScrapingModel)}.</p>
+     * enfants en appelant la méthode {@link ScrapingManager#scrapElements(HtmlElement, List, ScrapingModelInt)}.</p>
      *
      * @param webClient Client web utilisé pour ouvrir la page
      * @param url       URL de la page à scrapper
@@ -197,10 +198,10 @@ public class ScrapingManager
      * @param domPage   {@link Dom} représentant les XPath à scrapper
      * @return {@link Callable} qui réalise le scraping de la page
      */
-    private Callable<Void> scrapPage(WebClient webClient, String url, ScrapingModel model, Dom domPage)
+    private Callable<Void> scrapPage(WebClient webClient, String url, ScrapingModelInt model, Dom domPage)
     {
         //debug("SCRAPING PAGE", "Page", String.valueOf(p.get()), null, true);
-
+        AtomicReference<List<String>> pagesSecondaire = new AtomicReference<>(new ArrayList<>());
         try {
             Thread.sleep(new Random().nextInt(2000));
         } catch ( InterruptedException e ) {
@@ -221,7 +222,7 @@ public class ScrapingManager
                                                        " | XPath: " + domPage.getXPath());
 
                     List<Dom>    domEnfants      = domPage.getListEnfants();
-                    List<String> pagesSecondaire = this.scrapElements(conteneur, domEnfants, model);
+                    pagesSecondaire.set(this.scrapElements(conteneur, domEnfants, model));
 
                 } catch ( HTMLElementException e ) {
                     debug("ERROR SCRAP PAGE HTML_ELEMENT", "HTMLElementException", domPage.getNom(),
@@ -232,7 +233,7 @@ public class ScrapingManager
                 }
 
 
-                //debug("SCRAPING PAGE", "Page Secondaire", String.valueOf(pageSecondaire.size()), pageSecondaire.toString(), true);
+                debug("SCRAPING PAGE", "Page Secondaire", String.valueOf(pagesSecondaire.get().size()), pagesSecondaire.toString(), true);
             }
             return null;
         };
@@ -251,7 +252,7 @@ public class ScrapingManager
      * @return Liste de liens secondaires à visiter
      * @throws HTMLElementException Exception levé si l'élément n'est pas trouvé avec l'xPath
      */
-    private List<String> scrapElements(HtmlElement conteneur, List<Dom> domCardEnfants, ScrapingModel model)
+    private List<String> scrapElements(HtmlElement conteneur, List<Dom> domCardEnfants, ScrapingModelInt model)
     {
         List<String> liensSecondaire = new ArrayList<>();
 
@@ -260,6 +261,9 @@ public class ScrapingManager
             try {
                 HtmlElement element = conteneur.getFirstByXPath("." + dom.getXPath());
 
+                // TODO AMELIORER RENDRE PLUS GENERIQUE
+                // AIGUILLER SUIVANT LE TAG, L ATTRIBUT, LE XPATH
+                // VOIR SI LE XPATH A LA METHODE CONTAINS ATTRIBUER LA VALEUR TRUE
                 if ( element != null ) {
                     String value = dom.getNom().contains("lien") ? element.getAttribute("href").trim() : element.getTextContent().trim();
 
@@ -270,8 +274,14 @@ public class ScrapingManager
 
                         value = this.getImage(element);
                     }
+                    if(dom.getNom().equals("douche") || dom.getNom().equals("wc")){
+                        System.out.println(element.asXml().trim());
+                    }
+
                     if ( !value.isEmpty() ) {
                         model.setPropertieModel(dom.getNom(), value);
+                    } else {
+                        model.setPropertieModel(dom.getNom(), true);
                     }
 
                 } else {
