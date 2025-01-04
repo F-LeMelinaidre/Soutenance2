@@ -21,7 +21,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
@@ -33,7 +32,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 // TODO
@@ -56,7 +54,7 @@ public class SearchController implements Initializable, ControllerRegistry
 {
 
     @FXML
-    private VBox rechercheVBox;
+    private VBox searchPane;
     @FXML
     private CheckComboBox<Site> siteComboBox;
     @FXML
@@ -84,17 +82,13 @@ public class SearchController implements Initializable, ControllerRegistry
     private final DAOFactory daoFactory;
     private final GeoApiService geoApiService;
     private final LocalDate dateCourante;
+    private boolean disable = false;
 
     public SearchController()
     {
         this.daoFactory    = DAOFactory.getInstance();
         this.geoApiService = new GeoApiService(new GeoAPI());
         this.dateCourante  = LocalDate.now();
-    }
-
-    public void test()
-    {
-        System.out.println(dateCourante);
     }
 
     @Override
@@ -153,12 +147,11 @@ public class SearchController implements Initializable, ControllerRegistry
 
         }
 
-        Recherche recherche = new Recherche(sitesSelected, critereRecherche, Annonce::new);
+        Recherche recherche = new Recherche(sitesSelected, critereRecherche, Location::new);
 
         this.homeController.startScrapping(recherche);
 
-        this.rechercherBouton.setDisable(true);
-        this.effacerBouton.setDisable(true);
+        this.toggleDisableForm();
     }
 
     @FXML
@@ -179,6 +172,7 @@ public class SearchController implements Initializable, ControllerRegistry
         this.budgetMax.clear();
 
         this.updateRechercherBoutonState();
+        this.homeController.clearResultat();
     }
 
     /**
@@ -271,14 +265,14 @@ public class SearchController implements Initializable, ControllerRegistry
             pause.setOnFinished(event -> {
                 Task<List<Ville>> task = geoApiService.rechercherCommune(communeRecherche);
 
-                task.setOnSucceeded(event1 -> {
+                task.setOnSucceeded(e -> {
                     List<Ville> communes = task.getValue();
                     item.getItems().clear();
                     item.getItems().setAll(communes);
                     item.show();
                 });
 
-                task.setOnFailed(event1 -> {
+                task.setOnFailed(e -> {
                     Throwable exception = task.getException();
                 });
 
@@ -325,7 +319,7 @@ public class SearchController implements Initializable, ControllerRegistry
     private void onEndDateSelected(ActionEvent event)
     {
         DatePicker date    = (DatePicker) event.getSource();
-        LocalDate  dateFin = (LocalDate) date.getValue();
+        LocalDate  dateFin = date.getValue();
 
         if ( date.getValue() != null ) {
             this.periodeDebutDatePicker.setDayCellFactory(
@@ -337,10 +331,8 @@ public class SearchController implements Initializable, ControllerRegistry
     // TODO AJOUTER EVENT POUR RETIRER LE MESSAGE DE DEMANDE DE VALIDATION PAR ENTRER POUR LES DATEPICKERS
     private void initializeEventListener()
     {
-        this.siteComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Site>) change -> {
-            this.refreshTypeVehiculeComboBox();
-        });
-
+        this.siteComboBox.getCheckModel().getCheckedItems().addListener(
+                (ListChangeListener<Site>) change -> this.refreshTypeVehiculeComboBox());
         this.typeVehiculeComboBox.getCheckModel().getCheckedItems().addListener(
                 (ListChangeListener<TypeVehicule>) change -> this.updateRechercherBoutonState());
         this.budgetMin.textProperty().addListener(
@@ -364,7 +356,7 @@ public class SearchController implements Initializable, ControllerRegistry
      */
     private void loadSiteComboBox()
     {
-        List<Site> listeSites = new ArrayList<Site>();
+        List<Site> listeSites;
 
         try {
             listeSites = daoFactory.getSiteDAO().findAllSitesWithVehiclesParamsAndXPaths();
@@ -440,7 +432,7 @@ public class SearchController implements Initializable, ControllerRegistry
         this.clearHintLabel();
         datePicker.getStyleClass().remove("textfield-error");
 
-        String dateFormatRegex = "^(0[1-9]|[12][0-9]|3[01])\\/(0[1-9]|1[0-2])\\/(\\d{4})$";// '?' pour rendre l'année optionnelle
+        String dateFormatRegex = "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/(\\d{4})$";// '?' pour rendre l'année optionnelle
         String msg             = "Période: Valider votre saisi par Entrer!";
 
         // Vérifier si la saisie contient des caractères alpha
@@ -524,18 +516,23 @@ public class SearchController implements Initializable, ControllerRegistry
                           || this.periodeDebutDatePicker.getValue() == null
                           || this.periodeFinDatePicker.getValue() == null;
 
-        /*System.out.println("Vehicule " + this.typeVehiculeComboBox.getCheckModel().getCheckedItems().toString());
-        System.out.println("Budget " + this.budgetField.getText());
-        System.out.println("Dep " + this.villeDepartField.getValue());
-        System.out.println("Arr " + this.villeArriveeField.getValue());
-        System.out.println("Debut " + this.periodeDebutDatePicker.getValue());
-        System.out.println("Fin " + this.periodeFinDatePicker.getValue());*/
         this.rechercherBouton.setDisable(disable);
     }
 
-    public void enableButton()
+    public void toggleDisableForm()
     {
-        this.effacerBouton.setDisable(false);
-        this.rechercherBouton.setDisable(false);
+        this.disable = !this.disable;
+
+        this.siteComboBox.setDisable(this.disable);
+        this.typeVehiculeComboBox.setDisable(this.disable);
+        this.budgetMin.setDisable(this.disable);
+        this.budgetMax.setDisable(this.disable);
+        this.villeDepartField.setDisable(this.disable);
+        this.villeArriveeField.setDisable(this.disable);
+        this.periodeDebutDatePicker.setDisable(this.disable);
+        this.periodeFinDatePicker.setDisable(this.disable);
+
+        this.effacerBouton.setDisable(this.disable);
+        this.rechercherBouton.setDisable(this.disable);
     }
 }

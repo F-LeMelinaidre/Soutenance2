@@ -15,32 +15,50 @@ import java.util.function.Supplier;
  * Formation CDA
  * Greta Vannes
  */
-public class Recherche<T extends ScrapingModelInt>
+public class Recherche<Location extends ScrapingModelInt<Object>>
 {
-    private List<Site> sites;
-    private Map<String, Object> critereRecherche;
-    private List<ScrapingModelInt> resultats = new ArrayList<>();
-    private Supplier<T> scrapingSupplier;
+    private final List<Site> sites;
+    private final Map<String, ?> critereRecherche;
+    private final List<ScrapingModelInt<Object>> resultats = new ArrayList<>();
+    private final Supplier<Location> scrapingSupplier;
 
-    public Recherche(List<Site> site, Map<String, Object> critereRecherche, Supplier<T> scrapingSupplier)
+
+    public Recherche(List<Site> site, Map<String, ?> critereRecherche, Supplier<Location> scrapingSupplier)
     {
-        this.sites = site;
+        this.sites            = site;
         this.critereRecherche = critereRecherche;
-        this.scrapingSupplier    = scrapingSupplier;
+        this.scrapingSupplier = scrapingSupplier;
     }
 
-    public List<Site> getListSites() {
+    public List<Site> getListSites()
+    {
         return sites;
     }
 
-    public void addResultats(List<ScrapingModelInt> resultats) {
+    public Map<String, ?> getCritereRecherche()
+    {
+        return critereRecherche;
+    }
+
+    public void addResultats(List<Location> resultats)
+    {
         this.resultats.addAll(resultats);
     }
 
-    public List<ScrapingModelInt> getResultats() {
-        return this.resultats;
+    public Location createAndAddScrapingSupplier()
+    {
+        Location resultat = scrapingSupplier.get();
+        this.resultats.add(resultat);
+        return resultat;
     }
-    public T createScrapingSupplier() {
-        return this.scrapingSupplier.get();
+
+    public void removeResultat(ScrapingModelInt<Object> resultat)
+    {
+        this.resultats.remove(resultat);
+    }
+
+    public List<ScrapingModelInt<Object>> getResultats()
+    {
+        return this.resultats;
     }
 }

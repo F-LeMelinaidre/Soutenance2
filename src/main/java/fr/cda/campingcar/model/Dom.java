@@ -17,23 +17,28 @@ import java.util.List;
 public class Dom
 {
 
-    private int id;
-    private int siteId;
-    private int domElementId;
-    private String nom;
-    private String xpath;
-    private int domParentId;
-    private List<Dom> listEnfants = new ArrayList<>();
+    private final int id;
+    private final int siteId;
+    private final int domElementId;
+    private final String nom;
+    private final String xpath;
+    private final int domParentId;
+    private final Boolean withTag;
+    private final List<Dom> childrensList = new ArrayList<>();
 
-    public Dom(int id, int siteId, int domElementId, String nom, String xpath, int domParentId) {
-        this.id = id;
+    public Dom(int id, int siteId, int domElementId, String nom, String xpath, int domParentId, Boolean withTag)
+    {
+        this.id           = id;
         this.siteId       = siteId;
         this.domElementId = domElementId;
         this.nom          = nom;
-        this.xpath       = xpath;
-        this.domParentId = domParentId;
+        this.xpath        = xpath;
+        this.domParentId  = domParentId;
+        this.withTag      = withTag;
     }
-    public int getId() {
+
+    public int getId()
+    {
         return this.id;
     }
 
@@ -47,39 +52,48 @@ public class Dom
         return nom;
     }
 
-    public String getXPath() {
+    public String getXPath()
+    {
         return this.xpath;
     }
 
-    public Integer getDomParentId() {
+    public Integer getDomParentId()
+    {
         return this.domParentId;
     }
 
-    public void setEnfants(List<Dom> enfants) {
-        this.listEnfants = enfants;
+    public Boolean getWithTag()
+    {
+        return this.withTag;
     }
 
-    public List<Dom> getListEnfants() {
-        return this.listEnfants;
+    public void setChildrensList(List<Dom> childrensList)
+    {
+        this.childrensList.addAll(childrensList);
+    }
+
+    public List<Dom> geChildrensList()
+    {
+        return this.childrensList;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return this.toString(0);
     }
 
-    public String toString(int indentLevel) {
+    public String toString(int indentLevel)
+    {
         String indent = "  ".repeat(indentLevel);
 
-        StringBuilder str = new StringBuilder();
-        str.append(indent).append(Config.YELLOW).append("siteId : ").append(Config.WHITE).append(this.siteId).append("\n");
-        str.append(indent).append(Config.YELLOW).append("domElementId : ").append(Config.WHITE).append(this.domElementId).append("\n");
-        str.append(indent).append(Config.YELLOW).append("domParentId : ").append(Config.WHITE).append(this.domParentId).append("\n");
-        str.append(indent).append(Config.YELLOW).append("nom : ").append(Config.WHITE).append(this.nom).append("\n");
-        str.append(indent).append(Config.YELLOW).append("xPath : ").append(Config.CYAN).append(this.xpath).append("\n");
-        str.append(indent).append(Config.YELLOW).append("xPath Child : ").append(Config.CYAN).append(this.listEnfants.toString()).append(Config.RESET).append("\n");
-
-        return str.toString();
+        return indent + Config.YELLOW + "siteId : " + Config.WHITE + this.siteId + "\n" +
+               indent + Config.YELLOW + "domElementId : " + Config.WHITE + this.domElementId + "\n" +
+               indent + Config.YELLOW + "domParentId : " + Config.WHITE + this.domParentId + "\n" +
+               indent + Config.YELLOW + "withTag : " + Config.WHITE + this.withTag + "\n" +
+               indent + Config.YELLOW + "nom : " + Config.WHITE + this.nom + "\n" +
+               indent + Config.YELLOW + "xPath : " + Config.CYAN + this.xpath + "\n" +
+               indent + Config.YELLOW + "xPath Child : " + Config.CYAN + this.childrensList + Config.RESET + "\n";
     }
 
 }

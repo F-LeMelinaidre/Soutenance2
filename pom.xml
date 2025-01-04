@@ -37,6 +37,11 @@
             <artifactId>javafx-fxml</artifactId>
             <version>22.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>22.0.2</version>
+        </dependency>
 
         <!-- Composants supplémentaire: CheckComboBox -->
         <dependency>
@@ -81,6 +86,14 @@
             <artifactId>slf4j-api</artifactId>
             <version>2.0.16</version>
         </dependency>
+        <dependency>
+            <groupId>com.sendinblue</groupId>
+            <artifactId>sib-api-v3-sdk</artifactId>
+            <version>7.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+
     </dependencies>
     <build>
         <plugins>

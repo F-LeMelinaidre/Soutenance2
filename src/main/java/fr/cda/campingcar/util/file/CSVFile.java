@@ -1,14 +1,14 @@
-package fr.cda.campingcar.dao.vehicule;
+package fr.cda.campingcar.util.file;
 
 /*
  * Soutenance Scraping
- * 2024/nov.
+ * 2024/déc.
  *
  * Le Frédéric Le Mélinaidre
  * Formation CDA
  * Greta Vannes
  */
 
-public class VehiculeDAO implements VehiculeDAOInt
+public class CSVFile
 {
 }

@@ -59,10 +59,14 @@
 
 .label.hint-error {
     -fx-text-fill: #cf0000;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
 }
 
 .label.hint-warning {
     -fx-text-fill: #ff9b00;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
 }
 
 .combo-box,
@@ -99,6 +103,15 @@
     -fx-border-color: #ac0000;
 }
 
+.textfield-warning {
+    -fx-border-width: 1px;
+    -fx-border-color: #ff9b00;
+}
+
+.textfield-valid {
+    -fx-border-width: 1px;
+    -fx-border-color: #A3FF00;
+}
 /* --- COMBOBOX --- */
 .combo-box,
 .combo-box-base .arrow-button {
@@ -118,6 +131,10 @@
 
 .combo-box-base .arrow {
     -fx-background-color: #999999;
+}
+
+.combo-box-base .arrow-button:hover .arrow {
+    -fx-background-color: #777777;
 }
 
 .combo-box-popup .list-view {
@@ -273,29 +290,91 @@
     -fx-background-color: transparent;
 }
 
-#resultatAnchor .label,
-.value-label {
-    -fx-font-family: 'Poppins Medium';
+#annonceCard .title-rent {
+    -fx-font-family: "Poppins Bold";
+}
+
+#annonceCard .title-rent,
+#annonceCard .feature-grid .label-iconed {
     -fx-text-fill: #DCDCDC;
 }
 
-#annonceElement {
+#annonceCard,
+#annonceDetail {
+    -fx-font-family: 'Poppins Medium';
+}
+
+#annonceCard .feature-value,
+#annonceDetail .feature-value {
+    -fx-font-family: 'Poppins Medium';
+}
+
+#annonceCard {
     -fx-background-color: #777777;
 }
 
-#annonceElement .titre {
+#annonceCard .title-rent,
+#annonceDetail .title-rent {
     -fx-font-size: 16;
 }
 
-#annonceElement .icon-label {
+#annonceCard .title-rent {
+    -fx-cursor: hand;
+}
+
+#annonceCard .title-rent:hover {
+    -fx-text-fill: #A3FF00;
+}
+
+#annonceCard .icon,
+#annonceDetail .icon {
     -fx-fill: #A3FF00;
+}
+
+#annonceCard .icon,
+#annonceDetail .icon,
+#annonceCard .bool-status,
+#annonceDetail .bool-status {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 1, 0.2, 1, 1);
+}
+
+
+#annonceCard .bool-status,
+#annonceDetail .bool-status {
+    -fx-font-family: "Poppins Bold";
+}
+
+#annonceDetail .description .label,
+#annonceDetail .feature-grid .label-iconed {
+    -fx-text-fill: #434343;
+}
+
+.web-view-container {
+    -fx-background-color: #f60000;
+}
+
+.figure-caption {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+}
+
+.figure-caption .label-iconed {
+    -fx-text-fill: #CCCCCC;
+}
+
+.figure-caption .title-rent,
+.figure-caption .feature-value {
+    -fx-text-fill: #DCDCDC;
 }
 
 /* --- NEW WINDOW --- */
 .window {
     -fx-border-color: #777777;
     -fx-border-width: 1;
-    -fx-background-color: #CCCCCC;
+    -fx-background-color: #BBBBBB;
+}
+
+.window .label {
+    -fx-font-family: 'Poppins Bold';
 }
 
 .window .top-bar {
@@ -308,22 +387,51 @@
     -fx-font-size: 12px;
 }
 
-.window .text-field .text,
-.window .btn .text {
+.window .text-field .text {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 0.5, 0.4, 1, 1);
 }
 
-.window .button {
-    -fx-font-family: "Poppins Medium";
-    -fx-text-fill: #ECECEC;
+.window .title {
+    -fx-font-size: 16px;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 0.5, 0.4, 1, 1);
 }
 
-.window .button:hover {
+.window .message {
+    -fx-font-size: 12px;
     -fx-text-fill: #777777;
 }
 
-.window .button:hover .text {
-    -fx-effect: null;
+.window .text-field {
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #ECECEC;
+    -fx-background-color: #8c8c8c;
+}
+
+
+.window .form-label {
+    -fx-text-fill: #777777;
+}
+
+.window .hint-error {
+    -fx-font-family: 'Poppins Medium';
+    -fx-text-fill: #cf0000;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+.window .button {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #777777;
+}
+
+.window .button:hover {
+    -fx-text-fill: #333333;
+    -fx-background-color: #A3FF00;
+}
+
+.window .button:disabled {
+    -fx-text-fill: #333333;
 }
 
 .window .button.btn-close {
@@ -338,32 +446,8 @@
     -fx-background-color: #ac0000;
 }
 
-/* --- FENETRE --- */
-
-#ParamDB .title,
-#PushDB .title,
-#sendMailWindow .title {
-    -fx-text-fill: #DCDCDC;
-}
-
-#ParamDB .text-field,
-#PushDB .text-field,
-#sendMailWindow .text-field {
-    -fx-text-fill: #ECECEC;
-    -fx-prompt-text-fill: #ECECEC;
-    -fx-background-color: #AAAAAA;
-}
-
-
-#ParamDB .form-label,
-#PushDB .form-label,
-#sendMailWindow .form-label {
-    -fx-font-family: 'Poppins Bold';
-    -fx-text-fill: #777777;
-}
-
 .valid {
-    -fx-text-fill: #A3FF00;
+    -fx-text-fill: #37b502;
 }
 
 .invalid {
@@ -372,4 +456,94 @@
 
 .warning {
     -fx-text-fill: #ff9b00;
+}
+@font-face {
+    font-family: 'Poppins Medium';
+    src: url('../fonts/poppins-medium.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins Bold';
+    src: url('../fonts/poppins-bold.ttf');
+}
+
+
+* {
+}
+
+#loaderPane {
+    -fx-padding: 10px 18px 14px 16px;
+    -fx-spacing: 4px;
+    -fx-font-family: 'Poppins Medium';
+    -fx-background-color: #BBBBBB;
+}
+
+#loaderPane .title {
+    -fx-min-width: 224px;
+    -fx-pref-width: 224px;
+    -fx-max-width: 224px;
+    -fx-padding: 0 8px 0 0;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+
+
+#Main-Counter,
+#Main-Counter .label {
+    -fx-min-height: 24px;
+    -fx-pref-height: 24px;
+    -fx-max-height: 24px;
+}
+
+#Main-Counter .label {
+    -fx-font-family: 'Poppins Bold' !important;
+    -fx-font-size: 14px;
+    -fx-text-fill: #efefef;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 0.2, 0.2, 1, 1);
+
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 1, 0.5, 1, 1);*/
+}
+
+#Main-Counter .number {
+    -fx-min-width: 63px;
+    -fx-pref-width: 63px;
+    -fx-max-width: 63px;
+    -fx-text-fill: #0095ff;
+    -fx-effect: none !important;
+}
+#Main-Counter .number.ended {
+    -fx-padding: 0 8px 0 0;
+    -fx-alignment: CENTER_RIGHT;
+}
+#Main-Counter .number.total {
+    -fx-padding: 0 0 0 8px;
+}
+
+#loaderPane .sub-counter,
+#loaderPane .sub-counter .label {
+    -fx-min-height: 20px;
+    -fx-pref-height: 20px;
+    -fx-max-height: 20px;
+}
+
+#loaderPane .sub-counter .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #0095ff;
+}
+
+#loaderPane .sub-counter .number {
+}
+
+#loaderPane .sub-counter .number.ended {
+    -fx-min-width: 22px;
+    -fx-pref-width: 22px;
+    -fx-max-width: 22px;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+#loaderPane .sub-counter .number.total {
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-max-width: 34px;
+    -fx-padding: 0 8px 0 0;
 }

@@ -20,9 +20,9 @@ public class Site
 
     private int id;
     private String nom;
-    private Url url;
+    private final Url url;
     private Map<String, Dom> domMap;
-    private Map<Integer, TypeVehicule> typeVehicules = new HashMap<Integer, TypeVehicule>();
+    private final Map<Integer, TypeVehicule> typeVehicules = new HashMap<>();
 
 
     public Site(int id, String name, String url)
@@ -35,7 +35,7 @@ public class Site
 
     public int getId()
     {
-        return id;
+        return this.id;
     }
 
     public void setId(int id)
@@ -43,12 +43,12 @@ public class Site
         this.id = id;
     }
 
-    public String getNom()
+    public String getName()
     {
-        return nom;
+        return this.nom;
     }
 
-    public void setNom(String name)
+    public void setName(String name)
     {
         this.nom = name;
     }

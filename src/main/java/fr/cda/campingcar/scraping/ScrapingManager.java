@@ -4,8 +4,8 @@ import fr.cda.campingcar.model.Dom;
 import fr.cda.campingcar.model.Recherche;
 import fr.cda.campingcar.model.Site;
 import fr.cda.campingcar.scraping.exception.HTMLElementException;
-import fr.cda.campingcar.settings.Config;
 import fr.cda.campingcar.util.LoggerConfig;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.apache.logging.log4j.Logger;
 import org.htmlunit.FailingHttpStatusCodeException;
@@ -15,7 +15,8 @@ import org.htmlunit.html.*;
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
+
+import static fr.cda.campingcar.util.DebugHelper.debug;
 
 /**
  * Class permettant le scraping asynchrone d'une liste de recherche de pages internet.
@@ -28,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *      <li>La clé "card" représente le conteneur de l'annonce présente sur la première page du site.
  *          <ul>
  *              <li>Le xPath est accessible avec la méthode {@link Dom#getXPath()}</li>
- *              <li>Ce {@link Dom} contient une {@code List} représentant les éléments enfant de ce conteneur à scraper {@link Dom#getListEnfants()}.</li>
+ *              <li>Ce {@link Dom} contient une {@code List} représentant les éléments enfant de ce conteneur à scraper {@link Dom#geChildrensList()}.</li>
  *          </ul>
  *     </li>
  *     <li> La clé "page" représente la page lié à chaque annonce et est hiérarchisé de la même manière.</li>
@@ -44,78 +45,75 @@ import java.util.concurrent.atomic.AtomicReference;
  * </ul>
  * </p>
  * <p>
- * Une fois la tâche principale terminée, la méthode {@link ScrapingManager#scrapTask(Recherche)},<br>
+ * Une fois la tâche principale terminée, la méthode {@link ScrapingManager#scrapTask()},<br>
  * retourne l'objet recherche contenant l'ensemble des objets Annonce scrapé sur le ou les sites.
- * </p>
- * <p>
- * Cette class est un Singleton, afin de pouvoir avoir accès au compteur des tâches en cours, terminées.
- * Il est essentiellement utile pour la vue du loader et son contrôleur.
  * </p>
  */
 public class ScrapingManager
 {
+    // TODO COUNTERTASK : DECREMENTER EN CAS D ERREUR D'ERREUR
     private static final Logger LOGGER_SCRAPING = LoggerConfig.getLoggerScraping();
 
-    private static ScrapingManager _instance = null;
-    private ExecutorService executor = Executors.newCachedThreadPool();
-    private Recherche recherche;
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final Recherche<ScrapingModelInt<Object>> recherche;
+    private final List<Site> sites;
+    private TaskCounter counterTask;
 
-    public static synchronized ScrapingManager getInstance()
+    public ScrapingManager(Recherche<ScrapingModelInt<Object>> recherche)
     {
-        if ( _instance == null ) {
-            _instance = new ScrapingManager();
-        }
-        return _instance;
+        this.recherche = recherche;
+        this.sites     = this.recherche.getListSites();
+
+        this.counterTask = TaskCounter.getInstance();
     }
 
     /**
-     * Crée une nouvelle tâche de scraping pour une liste de sites de l'objet {@link Recherche}.
-     *
+     * Crée une nouvelle tâche de scraping pour une liste de sites de l'objet {@link Recherche}.<br>
+     * <p>Initialise le compteur {@link TaskCounter#setMainCounterTotal(int)}
      * <p>Créé un objet {@link Future} pour chaque site, et l'ajoute à une liste {@code List<Future<String>> futures}, <br>
-     * permettant le traitement des tâches de manière asynchrone.
+     * permettant le traitement des tâches {@link #scrapCards} de manière asynchrone.
      * </p>
      * Chaque objets {@link Future} de la liste permettent :
      * <ul>
      *     <li>D'attendre l'achèvement des tâches et sous tâches</li>
-     *     <li>Gérer les résultats ou les exceptions qui peuvent survenir</li>
+     *     <li>Gérer les résultats ou les exceptions</li>
      * </ul>
      * <p>Cette méthode fermera le service d'exécution après que toutes les tâches soient terminées.</p>
      *
-     * @param recherche L'objet {@link Recherche} ne doit pas être nul et doit contenir au moins un site.
      * @return Une {@link Task} Effectue l'opération de manière asynchrone, et renverra null à son achèvement.
      * @throws IllegalArgumentException si l'objet {@link Recherche} est nulle ou ne contient aucun site.
      */
-    public Task<Void> scrapTask(Recherche recherche)
+    public Task<Void> scrapTask()
     {
-        this.recherche = recherche;
-        List<Site> sites = recherche.getListSites();
 
         return new Task<>()
         {
+
             @Override
             protected Void call()
             {
-                debug("SCRAP_TASK", "Nombre de sites", String.valueOf(sites.size()), null, true);
-                List<Future<List<ScrapingModelInt>>> futures = new ArrayList<>();
+                // counterTask set total mainCounter
 
-                // PARCOURS LES SITES DE LA RECHERCHE
-                for ( Site site : sites ) {
-                    LOGGER_SCRAPING.info("Recherche sur " + site.getNom());
-                    // CREE LA TACHE POUR OUVRIR LA PAGE DU SITE
-                    futures.add(executor.submit(scrapingCards(site)));
-                }
 
-                for ( Future<List<ScrapingModelInt>> future : futures ) {
+                Platform.runLater(() -> {
+                    counterTask.setMainCounterTotal(sites.size());
+                });
+
+                List<Future<Void>> futures = new ArrayList<>();
+                sites.forEach(site -> {
+                    LOGGER_SCRAPING.info("Recherche sur {}", site.getName());
+                    futures.add(executor.submit(scrapCards(site)));
+                });
+
+                futures.forEach(future -> {
                     try {
-                        List<ScrapingModelInt> resultats = future.get();
-
-                        recherche.addResultats(resultats);
+                        future.get();
                     } catch ( InterruptedException | ExecutionException e ) {
-                        debug("SCRAP_TASK", "InterruptedException | ExecutionException", "FUTURE LIST", e.getMessage(), false);
-                        LOGGER_SCRAPING.error("Erreur lors du scraping: " + e.getMessage(), e);
+                        LOGGER_SCRAPING.warn("ERROR FUTURE : {}", e.getMessage(), e);
                     }
-                }
+                });
 
+                pauseExecution(200);
                 executor.shutdown();
                 return null;
             }
@@ -123,66 +121,86 @@ public class ScrapingManager
     }
 
     /**
-     * Prépare une tâche de scraping pour extraire plusieurs éléments Html à partir d'un site web.
+     * Met en pause l'exécution.
+     */
+    private void pauseExecution(int time)
+    {
+        try {
+            Thread.sleep(time);
+        } catch ( InterruptedException e ) {
+            debug("ScrapingManager", "pauseExecution", "InterruptedException", e.getMessage(), false);
+            LOGGER_SCRAPING.error("ERROR pauseExecution : {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Prépare une tâche de scraping pour extraire plusieurs éléments Html à partir d'un site web.<br>
      *
      * <p>
      * Cette méthode crée un appel asynchrone qui ouvre une page web à partir de l'URL. <br>
-     * Dans un premier temps, on récupère chaque annonce de la page principale de la recherche. <br>
-     * Dans un second temps une fois tous les annonces sont récupérées et stockées dans {@code List}, <br>
-     * chaque annonce est soumise à l'exécuteur pour un traitement asynchrone, afin de scraper les pages de chaque annonce.
+     * Dans un premier temps, on récupère chaque bloc Html représentant une annonce sur la page principale de la recherche. <br>
+     * Dans un second temps une fois tous les annonces sont récupérées et stockées dans {@code List<HtmlElement> cards}:
+     * <ul>
+     *     <li>On crée un objet {@link ScrapingModelInt} {@code model}.</li>
+     *     <li>On incrémente le total des annonces de {@link TaskCounter}.</li>
+     *     <li>On execute {@link #scrapElements}.</li>
+     * </ul>
+     * Chaque objet {@code model} est soumise à l'exécuteur pour un traitement asynchrone, de {@link #scrapPage} pour scraper chacune des pages annonces.<br>
+     * La boucle while parcours {@code List<Future<Void>} afin d'incrémenter le {@link TaskCounter} des pages annonces parcours, si la tâche est terminée.
      * </p>
      *
      * @param site L'objet {@link Site} contenant les informations sur le site à scrapper.
-     * @return {@link Callable} qui réalise le scraping des éléments.
+     * @return {@link Callable} et {@code List<ScrapingModelInt>} models.
      */
-    private Callable<List<ScrapingModelInt>> scrapingCards(Site site)
+    private Callable<Void> scrapCards(Site site)
     {
-        debug("SCRAPING_CARDS", "Site", site.getNom(), site.getUrlRecherche(), true);
-        List<Future<Void>>     futures = new ArrayList<>();
-        List<ScrapingModelInt> models  = new ArrayList<>();
-        String                 url     = site.getUrlRecherche();
-
+        // TODO FACTORISER
+        List<Future<Void>> futures = new ArrayList<>();
+        String url = site.getUrlRecherche();
 
         return () -> {
             WebClient webClient = createWebClient();
-            HtmlPage  page      = openPage(webClient, url);
+            HtmlPage page = openPage(webClient, url);
 
             if ( page != null ) {
 
-                Dom       domCard        = site.getDomMap().get("card");
-                List<Dom> domCardEnfants = domCard.getListEnfants();
-
+                Dom domCard = site.getDomMap().get("card");
+                List<Dom> childrensDom = domCard.geChildrensList();
                 List<HtmlElement> cards = page.getByXPath(domCard.getXPath());
-                debug("SCRAPING CARDS", "Nombre de cards", String.valueOf(cards.size()), null, true);
+
+                this.counterTask.addSubCounter(site.getName(), cards.size());
 
                 cards.forEach(card -> {
-                    //debug("SCRAPING CARDS", "Cards numéro", String.valueOf(c.get()), null, true);
+                    ScrapingModelInt<Object> model = recherche.createAndAddScrapingSupplier();
+                    model.setSite(site);
 
-                    ScrapingModelInt model = recherche.createScrapingSupplier();
-                    model.setDomainUrl(site.getUrlRoot());
+                    this.scrapElements(card, childrensDom, model);
 
-                    this.scrapElements(card, domCardEnfants, model);
-
-                    models.add(model);
+                    futures.add(executor.submit(
+                                        scrapPage(webClient,
+                                                  model.getUrl(),
+                                                  model,
+                                                  site.getDomMap().get("page")))
+                               );
                 });
 
+            } else {
+                this.counterTask.decrementMainCounterTotal();
+                debug("ScrapingManager", "ScrapCards", "openPage = null", null, false);
             }
 
-            for ( ScrapingModelInt model : models ) {
-
-                futures.add(executor.submit(scrapPage(webClient, model.getUrl(), model, site.getDomMap().get("page"))));
-            }
-
-            for ( Future<Void> future : futures ) {
+            futures.forEach(future -> {
                 try {
                     future.get();
                 } catch ( InterruptedException | ExecutionException e ) {
-                    debug("FUTURE ERROR", "InterruptedException | ExecutionException", "ERREUR", e.getMessage(), false);
-                    LOGGER_SCRAPING.error("Erreur lors du scraping: " + e.getMessage(), e);
+                    LOGGER_SCRAPING.warn("ERROR FUTURE : {}", e.getMessage(), e);
                 }
-            }
-            return models;
+            });
+
+            return null;
         };
+
     }
 
     /**
@@ -198,15 +216,9 @@ public class ScrapingManager
      * @param domPage   {@link Dom} représentant les XPath à scrapper
      * @return {@link Callable} qui réalise le scraping de la page
      */
-    private Callable<Void> scrapPage(WebClient webClient, String url, ScrapingModelInt model, Dom domPage)
+    private Callable<Void> scrapPage(WebClient webClient, String url, ScrapingModelInt<Object> model, Dom domPage)
     {
-        //debug("SCRAPING PAGE", "Page", String.valueOf(p.get()), null, true);
-        AtomicReference<List<String>> pagesSecondaire = new AtomicReference<>(new ArrayList<>());
-        try {
-            Thread.sleep(new Random().nextInt(2000));
-        } catch ( InterruptedException e ) {
-            debug("SCRAPING PAGE", "InterruptedException", "TIME THREAD SLEEP", e.getMessage(), false);
-        }
+        this.pauseExecution(new Random().nextInt(2000));
 
         return () -> {
             HtmlPage page = openPage(webClient, url);
@@ -217,83 +229,96 @@ public class ScrapingManager
                     HtmlElement conteneur = page.getFirstByXPath(domPage.getXPath());
 
                     if ( conteneur == null )
-                        throw new HTMLElementException("Url: " + url +
-                                                       " | Contneur: " + domPage.getNom() +
-                                                       " | XPath: " + domPage.getXPath());
+                        throw new HTMLElementException(
+                                "Url: " + url + " | Conteneur: " + domPage.getNom() + " | XPath: " + domPage.getXPath());
 
-                    List<Dom>    domEnfants      = domPage.getListEnfants();
-                    pagesSecondaire.set(this.scrapElements(conteneur, domEnfants, model));
+                    List<Dom> childrensDom = domPage.geChildrensList();
+
+                    this.scrapElements(conteneur, childrensDom, model);
+
+                    this.counterTask.incrementSubCounterEnded(model.getSite().getName());
 
                 } catch ( HTMLElementException e ) {
-                    debug("ERROR SCRAP PAGE HTML_ELEMENT", "HTMLElementException", domPage.getNom(),
-                          page.getDocumentURI() + " " + domPage.getXPath(),
-                          false);
-                    LOGGER_SCRAPING.warn(
-                            "ERROR SCRAP PAGE HTML_ELEMENT : " + e.getMessage(), e);
+                    this.counterTask.decrementSubContentTotal(model.getSite().getName());
+                    this.recherche.removeResultat(model);
+
+                    debug("ScrapingManager", "ScrapPage", "HTMLElementException", e.getMessage(), false);
+                    LOGGER_SCRAPING.warn("ERROR SCRAP PAGE HTML_ELEMENT : {}", e.getMessage(), e);
                 }
 
-
-                debug("SCRAPING PAGE", "Page Secondaire", String.valueOf(pagesSecondaire.get().size()), pagesSecondaire.toString(), true);
+            } else {
+                this.counterTask.decrementSubContentTotal(model.getSite().getName());
+                debug("ScrapingManager", "ScrapCards", "openPage = null", null, false);
             }
+
+/*
+            Map<String, String> result = new HashMap<>();
+            result.put("counterName", "subCounter");
+            result.put("subCounterName", model.getSite().getName());*/
             return null;
         };
     }
 
     /**
      * Extrait des informations à partir d'un élément HTML conteneur.<br>
-     * {@link List<Dom>} liste des xPaths pour localiser les sous-éléments d'où extraire les valeurs.
+     * {@code List<Dom>childrenDom} liste des xPaths pour localiser les sous-éléments d'où extraire les valeurs.
      *
      * <p>Extrait soit un lien (attribut {@code href}), soit le contenu textuel de l'élément.</p>
      * <p>Les valeurs extraites sont enregistrées dans l'objet {@code ScrapingModel}.</p>
      *
-     * @param conteneur      l'élément HTML conteneur d'où extraire les éléments
-     * @param domCardEnfants la liste d'objets {@link Dom} contenant le xPath de l'éléments où extraire une valeur.
-     * @param model          Objet où les valeurs extraites seront stockées
+     * @param conteneur    l'élément HTML conteneur d'où extraire les éléments
+     * @param childrensDom la liste d'objets {@link Dom} contenant le xPath de l'éléments où extraire une valeur.
+     * @param model        Objet où les valeurs extraites seront stockées
      * @return Liste de liens secondaires à visiter
-     * @throws HTMLElementException Exception levé si l'élément n'est pas trouvé avec l'xPath
      */
-    private List<String> scrapElements(HtmlElement conteneur, List<Dom> domCardEnfants, ScrapingModelInt model)
+    private List<String> scrapElements(HtmlElement conteneur, List<Dom> childrensDom, ScrapingModelInt<Object> model)
     {
-        List<String> liensSecondaire = new ArrayList<>();
+        List<String> liens = new ArrayList<>();
 
-        domCardEnfants.forEach(dom -> {
+        childrensDom.forEach(dom -> {
+            String value;
 
+            //System.out.println(Config.YELLOW + "Element: " + Config.GREEN + dom.getNom() + Config.RESET);
+            //System.out.println(Config.YELLOW + "Path: " + Config.CYAN + dom.getXPath() + Config.RESET);
             try {
                 HtmlElement element = conteneur.getFirstByXPath("." + dom.getXPath());
 
-                // TODO AMELIORER RENDRE PLUS GENERIQUE
-                // AIGUILLER SUIVANT LE TAG, L ATTRIBUT, LE XPATH
-                // VOIR SI LE XPATH A LA METHODE CONTAINS ATTRIBUER LA VALEUR TRUE
                 if ( element != null ) {
-                    String value = dom.getNom().contains("lien") ? element.getAttribute("href").trim() : element.getTextContent().trim();
+                    value = dom.getNom().contains("lien") ? element.getAttribute("href").trim() : element.getTextContent().trim();
+                    String domName = dom.getNom();
 
-                    if ( dom.getNom().equals("lien secondaire") ) {
-                        // TODO IMPLEMENTER L OUVERTUR DES MODALS
-                        liensSecondaire.add(value);
-                    } else if ( dom.getNom().equals("image") ) {
+                    switch (domName) {
+                        case "lien":
+                            value = element.getAttribute("href").trim();
 
-                        value = this.getImage(element);
+                            model.setPropertieModel(dom.getNom(), value);
+                            break;
+                        case "description":
+                            value = element.asXml()
+                                           .replaceAll("\\s*(class|id)=\"[^\"]*\"", "")
+                                           .replaceAll("(?i)</?(strong|b|i|u|em|mark|small|big)[^>]*>", "");
+
+                            model.setPropertieModel(dom.getNom(), value);
+                            break;
+                        case "image":
+                            value = this.getImage(element);
+                            model.setPropertieModel(dom.getNom(), value);
+                            break;
+                        default:
+                            value = element.getTextContent().trim();
+                            model.setPropertieModel(dom.getNom(), value);
+                            break;
                     }
-                    if(dom.getNom().equals("douche") || dom.getNom().equals("wc")){
-                        System.out.println(element.asXml().trim());
-                    }
-
-                    if ( !value.isEmpty() ) {
-                        model.setPropertieModel(dom.getNom(), value);
-                    } else {
-                        model.setPropertieModel(dom.getNom(), true);
-                    }
-
                 } else {
-                    throw new HTMLElementException(" Element: " + dom.getNom() + " | " + dom.getXPath());
+                    throw new HTMLElementException(" Element: " + dom.getNom() + " | " + dom.getXPath() + "\n" + model.getUrl());
                 }
 
             } catch ( HTMLElementException e ) {
-                LOGGER_SCRAPING.warn("SCRAP ELEMENT : " + e.getMessage(), e);
-                debug("SCRAP ELEMENT", "HTMLElementException", dom.getNom(), conteneur.getNodeName() + " " + dom.getXPath(), false);
+                LOGGER_SCRAPING.warn("SCRAP ELEMENT : {}", e.getMessage(), e);
+                debug("ScrapingManager", "ScrapElement", "HTMLElementException", e.getMessage(), false);
             }
         });
-        return liensSecondaire;
+        return liens;
     }
 
     /**
@@ -335,40 +360,21 @@ public class ScrapingManager
     private HtmlPage openPage(WebClient webClient, String url)
     {
         HtmlPage page = null;
-        //System.out.println(url);
         try {
             page = webClient.getPage(url);
-
         } catch ( MalformedURLException e ) {
-            debug("OPEN PAGE", "MalformedURLException", "ERREUR OUVERTURE", e.getMessage(), false);
-            System.out.println("ERREUR OUVERTURE PAGE : " + e.getMessage());
-            LOGGER_SCRAPING.error("Erreur Format url " + url + " : " + e.getMessage(), e);
-
+            debug("ScrapingManager", "OpenPage", "MalformedURLException", e.getMessage(), false);
+            LOGGER_SCRAPING.error("Erreur Format url {} : {}", url, e.getMessage(), e);
         } catch ( FailingHttpStatusCodeException e ) {
-            debug("OPEN PAGE", "FailingHttpStatusCode", "ERREUR OUVERTURE", e.getMessage(), false);
-            int    statusCode   = e.getStatusCode();
+            debug("ScrapingManager", "OpenPage", "FailingHttpStatusCode", e.getMessage(), false);
+            int statusCode = e.getStatusCode();
             String errorMessage = e.getMessage();
-            LOGGER_SCRAPING.error("Erreur Statut " + url + ": " + statusCode + " - " + errorMessage, e);
-
+            LOGGER_SCRAPING.error("Erreur Statut {} : {} - {}", url, statusCode, errorMessage, e);
         } catch ( Exception e ) {
-            debug("OPEN PAGE", "Exception", "ERREUR OUVERTURE", e.getMessage(), false);
-            LOGGER_SCRAPING.error("Erreur OpenPage " + url + " : " + e.getMessage(), e);
-
+            debug("ScrapingManager", "OpenPage", "Exception", e.getMessage(), false);
+            LOGGER_SCRAPING.error("Erreur OpenPage {} : {}", url, e.getMessage(), e);
         }
         return page;
-    }
-
-    /**
-     * Methode de réinitialisation de la class ScrapingManager.<br>
-     * Arrête l'{@code Executors} actuel et créé un nouveau pool de threads mis en cache.<br>
-     * <p>
-     * Interrompt toutes les tâches actuellement en cours , entraînant l'arrêt des tâches.</p>
-     */
-    public void reset()
-    {
-        executor.shutdownNow();
-        executor = Executors.newCachedThreadPool();
-        LOGGER_SCRAPING.info("ScrapingManager reset.");
     }
 
     /**
@@ -406,27 +412,4 @@ public class ScrapingManager
         return webClient;
     }
 
-    /**
-     * @param task    Nom de la Task
-     * @param titre   Titre de l'événement
-     * @param statut  Status de L'événement
-     * @param details Détail de l'événement
-     * @param valid   true invalide false (défini la couleur de la valeur du paramètre statut)
-     */
-    private void debug(String task, String titre, String statut, String details, Boolean valid)
-    {
-        String color = (valid) ? Config.GREEN : Config.RED;
-        titre  = (titre != null ? titre : "");
-        statut = (statut != null) ? statut : "";
-        StringBuilder sb = new StringBuilder(Config.PURPLE);
-        sb.append(task).append("\n")
-          .append(Config.YELLOW).append(String.format("%3s-", "")).append(titre).append(" :")
-          .append(color).append(String.format("%2s", "")).append(statut).append("\n");
-        if ( details != null ) {
-            sb.append(Config.CYAN).append(String.format("%4s-", "")).append(details);
-        }
-        sb.append(Config.RESET);
-        System.out.println(sb);
-        sb.setLength(0);
-    }
 }

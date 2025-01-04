@@ -15,5 +15,5 @@ import java.util.Map;
 
 public interface DomDAOInt
 {
-    public Map<String, Dom> findBySite(int id);
+    Map<String, Dom> findBySite(int id);
 }

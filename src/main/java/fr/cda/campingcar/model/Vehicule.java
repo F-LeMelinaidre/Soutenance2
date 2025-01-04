@@ -89,14 +89,12 @@ public class Vehicule {
     public String toString(Boolean putTab)
     {
         String tab = (putTab ? "\t" : "");
-        StringBuilder str = new StringBuilder();
-        str.append(Config.YELLOW).append(tab).append("Model : ").append(Config.WHITE).append(this.model).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Carburant : ").append(Config.WHITE).append(this.carburant).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Boite : ").append(Config.WHITE).append(this.transmission).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Nb Place : ").append(Config.WHITE).append(this.nbPlace).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Nb Couchage : ").append(Config.WHITE).append(this.nbCouchage).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Douche : ").append(Config.WHITE).append(this.douche).append("\n");
-        str.append(Config.YELLOW).append(tab).append("Wc : ").append(Config.WHITE).append(this.wc).append("\n").append(Config.RESET).append("\n");
-        return str.toString();
+        return Config.YELLOW + tab + "Model : " + Config.WHITE + this.model + "\n" +
+               Config.YELLOW + tab + "Carburant : " + Config.WHITE + this.carburant + "\n" +
+               Config.YELLOW + tab + "Boite : " + Config.WHITE + this.transmission + "\n" +
+               Config.YELLOW + tab + "Nb Place : " + Config.WHITE + this.nbPlace + "\n" +
+               Config.YELLOW + tab + "Nb Couchage : " + Config.WHITE + this.nbCouchage + "\n" +
+               Config.YELLOW + tab + "Douche : " + Config.WHITE + this.douche + "\n" +
+               Config.YELLOW + tab + "Wc : " + Config.WHITE + this.wc + "\n" + Config.RESET + "\n";
     }
 }

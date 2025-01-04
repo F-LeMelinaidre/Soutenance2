@@ -12,6 +12,9 @@ package fr.cda.campingcar.dao.site;
 
 import fr.cda.campingcar.dao.DAOFactory;
 import fr.cda.campingcar.model.*;
+import fr.cda.campingcar.util.DebugHelper;
+import fr.cda.campingcar.util.LoggerConfig;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,7 +27,7 @@ import java.util.Map;
 
 public class SiteDAO implements SiteDAOInt
 {
-
+    private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
     protected Connection conn;
 
     public SiteDAO(DAOFactory daoFactory) throws SQLException
@@ -32,7 +35,8 @@ public class SiteDAO implements SiteDAOInt
         try {
             this.conn = daoFactory.getConnection();
         } catch ( SQLException e ) {
-            throw new SQLException("Erreur getConnect() SiteDAOImp() " + e);
+            DebugHelper.debug("SiteDAO", "Constructor", "ERROR", e.getSQLState(), false);
+            throw new SQLException("Erreur SiteDAO " + e);
         }
     }
 
@@ -61,7 +65,9 @@ public class SiteDAO implements SiteDAOInt
                 sites.add(site);
             }
         } catch ( SQLException e ) {
-            System.out.println(e.getMessage());
+            DebugHelper.debug("DAOFACTORY", "findAll", "ERROR", e.getSQLState(), false);
+            LOGGER_DAO.error("Close Connection ERROR - SQL State : {}, Message: {}",
+                             e.getSQLState(), e.getMessage(), e);
         }
         return sites;
     }
@@ -172,7 +178,9 @@ public class SiteDAO implements SiteDAOInt
                 } while ( rs.next() );
             }
         } catch ( SQLException e ) {
-            System.out.println(e.getMessage());
+            DebugHelper.debug("DAOFACTORY", "findAllSitesWithVehiclesParamsAndXPaths", "ERROR", e.getSQLState(), false);
+            LOGGER_DAO.error("findAllSitesWithVehiclesParamsAndXPaths ERROR - SQL State : {}, Message: {}",
+                             e.getSQLState(), e.getMessage(), e);
         }
         return new ArrayList<>(siteMap.values());
     }

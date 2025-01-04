@@ -11,6 +11,9 @@ package fr.cda.campingcar.dao.dom;
 
 import fr.cda.campingcar.dao.DAOFactory;
 import fr.cda.campingcar.model.Dom;
+import fr.cda.campingcar.util.DebugHelper;
+import fr.cda.campingcar.util.LoggerConfig;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +24,7 @@ import java.util.*;
 public class DomDAO implements DomDAOInt
 {
 
+    private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
     protected Connection conn;
 
     public DomDAO(DAOFactory daoFactory) throws SQLException
@@ -28,14 +32,15 @@ public class DomDAO implements DomDAOInt
         try {
             this.conn = daoFactory.getConnection();
         } catch ( SQLException e ) {
-            throw new SQLException("Erreur getConnect() DomMappingDAOImp() - " + e.getMessage());
+            DebugHelper.debug("DomDAO", "Constructor", "ERROR", e.getSQLState(), false);
+            throw new SQLException("Erreur DomDAO - " + e.getMessage());
         }
     }
 
     @Override
     public Map<String, Dom> findBySite(int siteId)
     {
-        String sql = "SELECT dp.id, dp.site_id, dp.dom_element_id, dp.path, dp.dom_path_parent_id, " +
+        String sql = "SELECT dp.id, dp.site_id, dp.dom_element_id, dp.path, dp.dom_path_parent_id, dp.with_tag , " +
                      "de.nom " +
                      "FROM dom_path AS dp " +
                      "LEFT JOIN dom_path AS dp2 ON dp2.dom_element_id = dp.dom_path_parent_id " +
@@ -56,18 +61,21 @@ public class DomDAO implements DomDAOInt
                 int    domElementId    = rs.getInt("dom_element_id");
                 String path      = rs.getString("path");
                 int    domParentId = rs.getInt("dom_path_parent_id");
+                Boolean withTag = rs.getBoolean("with_tag");
                 String nom       = rs.getString("nom");
 
                 Dom dom = domMap.get(id);
                 if ( dom == null ) {
-                    dom = new Dom(id, siteId, domElementId, nom, path, domParentId);
+                    dom = new Dom(id, siteId, domElementId, nom, path, domParentId, withTag);
                     domMap.put(id, dom);
                 }
 
             }
 
         } catch ( SQLException e ) {
-            System.out.println(e.getMessage());
+            DebugHelper.debug("DomDAO", "findBySite", "ERROR", e.getSQLState(), false);
+            LOGGER_DAO.error("findBySite ERROR - SQL State : {}, Message: {}",
+                             e.getSQLState(), e.getMessage(), e);
         }
         List<Dom> domList = new ArrayList<>(domMap.values());
         Map<String, Dom> results = this.buildHierarchy(domList, 0);
@@ -85,7 +93,7 @@ public class DomDAO implements DomDAOInt
                 hierarchy.put(dom.getNom(), dom);
 
                 // Appel récursif pour construire les enfants
-                dom.setEnfants(new ArrayList<>(buildHierarchy(domList, dom.getDomElementId()).values()));
+                dom.setChildrensList(new ArrayList<>(buildHierarchy(domList, dom.getDomElementId()).values()));
             }
         }
 

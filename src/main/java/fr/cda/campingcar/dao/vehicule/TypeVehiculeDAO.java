@@ -12,6 +12,9 @@ package fr.cda.campingcar.dao.vehicule;
 
 import fr.cda.campingcar.dao.DAOFactory;
 import fr.cda.campingcar.model.TypeVehicule;
+import fr.cda.campingcar.util.DebugHelper;
+import fr.cda.campingcar.util.LoggerConfig;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,17 +23,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO LOG4J
 public class TypeVehiculeDAO implements TypeVehiculeDAOInt
 {
 
     protected Connection conn;
+    private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
 
     public TypeVehiculeDAO(DAOFactory daoFactory) throws SQLException {
         try {
             this.conn = daoFactory.getConnection();
         } catch (SQLException e) {
-            throw new SQLException("Erreur getConnect() TypeVehiculeDAOImp() - " + e.getMessage());
+            DebugHelper.debug("TypeVehiculeDAO", "Constructor", "ERROR", e.getSQLState(), false);
+            throw new SQLException("Erreur VehiculeDAO - " + e.getMessage());
         }
     }
 
@@ -68,6 +72,9 @@ public class TypeVehiculeDAO implements TypeVehiculeDAOInt
             }
 
         } catch (SQLException e) {
+            DebugHelper.debug("TypeVehiculeDAO", "findBySite", "ERROR", e.getSQLState(), false);
+            LOGGER_DAO.error("findBySite ERROR - SQL State : {}, Message: {}",
+                             e.getSQLState(), e.getMessage(), e);
             System.out.println(e.getMessage());
         }
 

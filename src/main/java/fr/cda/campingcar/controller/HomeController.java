@@ -9,19 +9,23 @@
 
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.Annonce;
 import fr.cda.campingcar.model.Recherche;
 import fr.cda.campingcar.scraping.ScrapingManager;
+import fr.cda.campingcar.scraping.ScrapingModelInt;
 import fr.cda.campingcar.util.FXMLRender;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-public class HomeController {
+public class HomeController
+{
 
     @FXML
     private VBox homePane;
@@ -35,30 +39,41 @@ public class HomeController {
     private MenuItem paramDB;
     @FXML
     private MenuItem quit;
+    @FXML
+    private StackPane mainContainer;
 
     private FXMLRender fxmlRender;
+    private LoaderController loaderController;
+    private ResultatController resultatController;
+    private List<ScrapingModelInt<Object>> resultats;
     private SearchController searchController;
 
     @FXML
-    public void initialize() {
-        this.fxmlRender = new FXMLRender(this.homePane, this);
-        searchController = this.fxmlRender.loadFXML("search.fxml", null);
+    public void initialize()
+    {
+        this.fxmlRender  = new FXMLRender(this.homePane, this);
+        searchController = this.fxmlRender.loadAtPosition("component/search.fxml", 2);
     }
 
     @FXML
-    public void handlerMenuBar(ActionEvent event) {
+    public void handlerMenuBar(ActionEvent event)
+    {
         MenuItem item = (MenuItem) event.getSource();
 
         switch (item.getId()) {
             case "saveFile":
+                FileChooser fileDialog = new FileChooser();
+                fileDialog.setTitle("Save file");
+                fileDialog.showSaveDialog(this.homePane.getScene().getWindow());
+                break;
             case "saveInDataBase":
-                this.fxmlRender.openNewWindow("transmissionDB.fxml", "Sauvegarder En Base de Donnée", 450, 152);
+                FXMLRender.openNewWindow("window/transmissionDB.fxml", "Sauvegarder En Base de Donnée");
                 break;
             case "sendMail":
-                this.fxmlRender.openNewWindow("sendMail.fxml", "Envoi Email", 400, 175);
+                FXMLRender.openNewWindow("window/sendMail.fxml", "Envoi Email");
                 break;
             case "paramDB":
-                this.fxmlRender.openNewWindow("parameterDB.fxml", "Paramètres Base de Donnée", 385, 295);
+                FXMLRender.openNewWindow("window/parameterDB.fxml", "Paramètres Base de Donnée");
                 break;
             case "quit":
             default:
@@ -66,30 +81,43 @@ public class HomeController {
         }
     }
 
-    public void startScrapping(Recherche recherche)
+
+    public void startScrapping(Recherche<ScrapingModelInt<Object>> recherche)
     {
 
-        ScrapingManager scrapingManager = ScrapingManager.getInstance();
+        if (this.resultatController == null) this.resultatController = this.fxmlRender.loadFXML("resultat.fxml", this.mainContainer);
 
-        Task<Void> scrapingTask = scrapingManager.scrapTask(recherche);
-        scrapingTask.setOnSucceeded(event -> {
+        Task<Void> scrapingTask = new ScrapingManager(recherche).scrapTask();
 
-            List<Annonce> resultats = recherche.getResultats();
-
-            ResultatController resultatController = fxmlRender.loadFXML("resultat.fxml", "resultatAnchor");
-            if(resultatController != null) {
-                resultatController.setAnnonce(resultats);
+        scrapingTask.setOnScheduled(event -> {
+            if(this.loaderController == null) {
+                this.loaderController = this.fxmlRender.loadFXML("component/loader.fxml", this.mainContainer);
             }
-            this.searchController.enableButton();
-            scrapingManager.reset();
-        });
-        scrapingTask.setOnFailed(event -> {
-            this.searchController.enableButton();
-            scrapingManager.reset();
-            System.out.println("Une erreur est survenue : " + scrapingTask.getException());
+            this.loaderController.setTitleMainCounter("de la recherche", "Site");
         });
 
-        new Thread(scrapingTask).start();
+        scrapingTask.setOnSucceeded(event -> {
+            CompletableFuture.runAsync(() -> {
+                // Travail du second thread
+                System.out.println("Traitement des résultats...");
+            }).thenRun(() -> {
+                // Action à exécuter une fois le travail terminé
+            });
+            this.loaderController.setTitleMainCounter("du chargement", "Annonce");
+            this.resultats = recherche.getResultats();
+            this.resultatController.loadAndShow(this.resultats, () -> this.searchController.toggleDisableForm());
 
+        });
+
+        Thread scrapingThread = new Thread(scrapingTask);
+        scrapingThread.setDaemon(true);
+        scrapingThread.start();
+
+    }
+
+    public void clearResultat() {
+        if(this.resultatController != null) {
+            this.resultatController.clear();
+        }
     }
 }

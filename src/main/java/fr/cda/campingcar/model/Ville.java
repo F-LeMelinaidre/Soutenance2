@@ -10,7 +10,6 @@
 package fr.cda.campingcar.model;
 
 import fr.cda.campingcar.settings.Config;
-import org.apache.commons.lang3.text.StrSubstitutor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +17,12 @@ import java.util.Map;
 public class Ville
 {
     private int geoId;
-    private int code;
+    private final int code;
     private int codePostal;
-    private double lat;
-    private double lng;
+    private final double lat;
+    private final double lng;
     private String nom;
-    private Departement departement;
+    private final Departement departement;
 
     public Ville(int code, String nom, double lat, double lng, int codePostal, Departement departement)
     {

@@ -9,7 +9,6 @@ package fr.cda.campingcar.model;
  * Greta Vannes
  */
 
-import fr.cda.campingcar.settings.Config;
 
 import java.util.Objects;
 

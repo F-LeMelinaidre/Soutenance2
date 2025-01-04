@@ -11,9 +11,9 @@ package fr.cda.campingcar.model;
 
 public class Departement
 {
-    private int numero;
+    private final int numero;
     private String nom;
-    private String region;
+    private final String region;
 
     public Departement(int numero, String nom, String region)
     {
@@ -22,9 +22,9 @@ public class Departement
         this.region = region;
     }
 
-    public int getNumero()
+    public String getNumero()
     {
-        return numero;
+        return String.format("%02d", this.numero);
     }
 
     public String getNom()

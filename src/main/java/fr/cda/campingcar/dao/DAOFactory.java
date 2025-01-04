@@ -11,27 +11,36 @@ package fr.cda.campingcar.dao;
 
 
 import fr.cda.campingcar.dao.site.SiteDAO;
-import fr.cda.campingcar.dao.urlParam.URLParamDAO;
 import fr.cda.campingcar.dao.vehicule.TypeVehiculeDAO;
-import fr.cda.campingcar.dao.vehicule.VehiculeDAO;
 import fr.cda.campingcar.dao.dom.DomDAO;
 import fr.cda.campingcar.settings.Config;
+import fr.cda.campingcar.util.DebugHelper;
+import fr.cda.campingcar.util.LoggerConfig;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-// TODO LOG4J
 
 public class DAOFactory {
 
     private static Connection _conn;
+    private final String sqlSever = Config.SQL_SERVER;
+    private final String sqlDataBase = Config.SQL_DATA_BASE;
+    private final String sqlUser = Config.SQL_USER;
+    private final String sqlPass = Config.SQL_PASS;
+
+    private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
 
     public static DAOFactory getInstance() {
         try {
             Class.forName(Config.JDBC_DRIVER);
         } catch (ClassNotFoundException e) {
+            DebugHelper.debug("DAOFACTORY", "getInstance", "ERROR", e.getMessage(), false);
+            LOGGER_DAO.error("Get Instance ERROR - Message: {}",
+                             e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
@@ -40,13 +49,13 @@ public class DAOFactory {
 
     public Connection getConnection() throws SQLException {
         if (_conn == null || _conn.isClosed()) {
-            String url = Config.SQL_SERVER + Config.SQL_DATA_BASE;
-            _conn = DriverManager.getConnection(url, Config.SQL_USER, Config.SQL_PASS);
+            String url = this.sqlSever + this.sqlDataBase;
+            _conn = DriverManager.getConnection(url, this.sqlUser, this.sqlPass);
         }
         return _conn;
     }
 
-    // TODO REGARDER LA FACTORY DE MEDIATHEQUE 3
+    // TODO REGARDER LA METHODE DANS LES DAO
     public void closeConnection() throws SQLException {
         if (_conn != null) {
             try {
@@ -54,13 +63,15 @@ public class DAOFactory {
                 _conn = null;
             } catch (SQLException e) {
                 _conn = null;
-                System.out.println(e.getSQLState());
+                DebugHelper.debug("DAOFACTORY", "Connection", "ERROR", e.getSQLState(), false);
+                LOGGER_DAO.error("Close Connection ERROR - SQL State : {}, Message: {}",
+                                 e.getSQLState(), e.getMessage(), e);
             }
 
         }
     }
 
-    // TODO REGARDER LA FACTORY DE MEDIATHEQUE 3
+    // TODO UTILISER LA METHODE DANS LES DAO
     public void closeResultSet(ResultSet rs)
     {
         if (rs != null) {
@@ -68,7 +79,9 @@ public class DAOFactory {
                 rs.close();
                 rs = null;
             } catch (SQLException e) {
-                System.out.println(e.getSQLState());
+                DebugHelper.debug("DAOFACTORY", "ResultSet", "ERROR", e.getSQLState(), false);
+                LOGGER_DAO.error("Close ResultSet ERROR - SQL State : {}, Message: {}",
+                                 e.getSQLState(), e.getMessage(), e);
             }
         }
     }
@@ -77,16 +90,8 @@ public class DAOFactory {
         return new SiteDAO(this);
     }
 
-    public URLParamDAO getURLParamDAO() throws SQLException {
-        return new URLParamDAO(this);
-    }
-
     public TypeVehiculeDAO getTypeVehiculeDAO() throws SQLException {
         return new TypeVehiculeDAO(this);
-    }
-
-    public VehiculeDAO getVehiculeDAO() throws SQLException {
-        return new VehiculeDAO();
     }
 
     public DomDAO getDomDAO() throws SQLException {

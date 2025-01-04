@@ -1,5 +1,7 @@
 package fr.cda.campingcar.scraping;
 
+import fr.cda.campingcar.model.Site;
+
 /*
  * Soutenance Scraping
  * 2024/déc.
@@ -8,16 +10,13 @@ package fr.cda.campingcar.scraping;
  * Formation CDA
  * Greta Vannes
  */
-public interface ScrapingModelInt<T>
+public interface ScrapingModelInt<Object>
 {
-    void setDomainUrl(String domainUrl);
+    void setSite(Site site);
 
-    String getDomainUrl();
+    Site getSite();
 
     String getUrl();
 
-    <T> void setPropertieModel(String key, T value);
-
-    void setSiteId(int id);
-
+    void setPropertieModel(String key, String value);
 }

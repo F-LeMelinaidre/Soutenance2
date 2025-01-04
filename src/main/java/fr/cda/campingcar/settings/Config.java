@@ -30,8 +30,6 @@ public class Config
     public static final String BINARIE_FOLDER_PATH = "binaries/";
     public static final String BINARIE_EXT = "bin";
 
-    public static final int THREAD_POOL_SIZE = 50;
-
     /**
      * non utilisé pour le moment
      */

@@ -9,20 +9,20 @@ package fr.cda.campingcar.model;
  * Greta Vannes
  */
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class UrlParam
 {
-    private int site_id;
-    private int position;
-    private String groupe;
-    private String type;
-    private String critere;
-    private String key;
-    private String defaultValue;
+    private final int site_id;
+    private final int position;
+    private final String groupe;
+    private final String type;
+    private final String critere;
+    private final String key;
+    private final String defaultValue;
     private String value;
     private String format;
 
@@ -123,12 +123,8 @@ public class UrlParam
 
     private String encodeUTF8(String item)
     {
-        String result = "";
-        try {
-            result = URLEncoder.encode(item, "UTF-8");
-        } catch ( UnsupportedEncodingException e ) {
-            throw new RuntimeException("Erreur d'encodage : " + e.getMessage(), e);
-        }
+        String result;
+        result = URLEncoder.encode(item, StandardCharsets.UTF_8);
 
         return result;
     }

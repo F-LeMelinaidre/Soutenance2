@@ -1,0 +1,87 @@
+@font-face {
+    font-family: 'Poppins Medium';
+    src: url('../fonts/poppins-medium.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins Bold';
+    src: url('../fonts/poppins-bold.ttf');
+}
+
+* {
+}
+
+#Loading-Window {
+    -fx-font-family: 'Poppins Medium';
+    -fx-background-color: #BBBBBB;
+}
+
+#Loading-Window .title {
+    -fx-min-width: 224px;
+    -fx-pref-width: 224px;
+    -fx-max-width: 224px;
+    -fx-padding: 0 8px 0 0;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+
+
+#Main-Counter,
+#Main-Counter .label {
+    -fx-min-height: 24px;
+    -fx-pref-height: 24px;
+    -fx-max-height: 24px;
+}
+
+#Main-Counter .label {
+    -fx-font-family: 'Poppins Bold' !important;
+    -fx-font-size: 14px;
+    -fx-text-fill: #efefef;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 0.2, 0.2, 1, 1);
+
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 1, 0.5, 1, 1);*/
+}
+
+#Main-Counter .number {
+    -fx-min-width: 63px;
+    -fx-pref-width: 63px;
+    -fx-max-width: 63px;
+    -fx-text-fill: #0095ff;
+    -fx-effect: none !important;
+}
+#Main-Counter .number.ended {
+    -fx-padding: 0 8px 0 0;
+    -fx-alignment: CENTER_RIGHT;
+}
+#Main-Counter .number.total {
+    -fx-padding: 0 0 0 8px;
+}
+
+#Loading-Window .sub-counter,
+#Loading-Window .sub-counter .label {
+    -fx-min-height: 20px;
+    -fx-pref-height: 20px;
+    -fx-max-height: 20px;
+}
+
+#Loading-Window .sub-counter .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #0095ff;
+}
+
+#Loading-Window .sub-counter .number {
+}
+
+#Loading-Window .sub-counter .number.ended {
+    -fx-min-width: 22px;
+    -fx-pref-width: 22px;
+    -fx-max-width: 22px;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+#Loading-Window .sub-counter .number.total {
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-max-width: 34px;
+    -fx-padding: 0 8px 0 0;
+}

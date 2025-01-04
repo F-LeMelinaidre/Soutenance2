@@ -16,11 +16,11 @@ import java.util.regex.Matcher;
  */
 public class Url
 {
-    private int site_id;
-    private String url;
+    private final int site_id;
+    private final String url;
     private String urlRecherche = null;
-    private Map<String, UrlParam> params = new HashMap<>() {};
-    private Map<String, Dom> xpath = new HashMap<String, Dom>();
+    private final Map<String, UrlParam> params = new HashMap<>() {};
+    private final Map<String, Dom> xpath = new HashMap<>();
 
     public Url(int site_id, String url)
     {
@@ -52,13 +52,6 @@ public class Url
      * En fonction de la recherche prepare les parametres d'url
      * La paire clé valeur est enregistré en bd, avec pour certain un format
      * Formate les parametres
-     * @param typeVehiculesSelected
-     * @param villeDep
-     * @param villeArr
-     * @param dateDepart
-     * @param dateArrivee
-     * @param budgetMin
-     * @param budgetMax
      */
     public void setValueParams(List<TypeVehicule> typeVehiculesSelected, Ville villeDep, Ville villeArr,
                                LocalDate dateDepart, LocalDate dateArrivee, String budgetMin, String budgetMax)
@@ -99,8 +92,6 @@ public class Url
     /**
      * Ajoute les vehicules à la map urlParams en fonction de la selection et des vehicules propsoé par le site
      * @param position position du parametre dans l url
-     * @param typeVehiculesSelected
-     * @param urlParams
      */
     private void resolveTypeVehiculeParams(int position, List<TypeVehicule> typeVehiculesSelected, Map<Integer, String> urlParams) {
         for (TypeVehicule typeVehicule : typeVehiculesSelected) {
