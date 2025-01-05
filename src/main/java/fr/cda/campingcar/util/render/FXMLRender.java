@@ -1,4 +1,4 @@
-package fr.cda.campingcar.util;
+package fr.cda.campingcar.util.render;
 
 /*
  * Soutenance Scraping
@@ -11,8 +11,8 @@ package fr.cda.campingcar.util;
 
 import fr.cda.campingcar.controller.ControllerRegistry;
 import fr.cda.campingcar.settings.Config;
+import fr.cda.campingcar.util.LoggerConfig;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,12 +31,13 @@ public class FXMLRender
 {
 
     protected static final Logger LOGGER = LoggerConfig.getLogger();
+    private static final Map<String, Stage> _openWindows = new HashMap<>();
+    private static Button _buttonClose;
 
     private final Object parentController;
     private Pane targetContainer;
     private String fxmlPath;
     private String viewId;
-    private static final Map<String, Stage> openWindows = new HashMap<>();
 
 
     /**
@@ -203,7 +204,7 @@ public class FXMLRender
     {
         T controller = null;
 
-        Stage existingStage = openWindows.get(fxmlPath);
+        Stage existingStage = _openWindows.get(fxmlPath);
         if ( existingStage != null ) {
             existingStage.toFront();
             controller = (T) existingStage.getUserData();
@@ -230,29 +231,25 @@ public class FXMLRender
             Parent root = loader.load();
             root.getStyleClass().add("window");
 
-            addTopBar(root, title, fxmlPath);
-
             Stage stage = new Stage();
-            stage.setTitle(title);
             stage.setScene(new Scene(root));
+            stage.setTitle(title);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setResizable(true);
+            stage.centerOnScreen();
+            stage.setAlwaysOnTop(true);
 
             // Stock le contrôleur pour le restituer ultérieurement
             stage.setUserData(loader.getController());
 
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.setTitle(title);
-            stage.setResizable(true);
-            stage.setAlwaysOnTop(true);
+            if (loader.getController() instanceof FXMLWindow) {
+                ((FXMLWindow) loader.getController()).initialize(stage, root, title);
+            }
 
-            stage.show();
-
-            // Stocker la référence du Stage dans la Map
-            openWindows.put(fxmlPath, stage);
-
-            // Retirer la fenêtre de la Map lorsque celle-ci se ferme
-            stage.setOnCloseRequest(event -> openWindows.remove(fxmlPath));
 
             controller = loader.getController();
+
+            stage.show();
 
         } catch ( IOException e ) {
 
@@ -263,101 +260,9 @@ public class FXMLRender
         return controller;
     }
 
-    /**
-     * Ferme la fenêtre par son nom de fichier fxml, stocké dans {@code openWindows}
-     *
-     * @param fxmlPath fichier fxml avec extention
-     */
-    public static void closeWindow(String fxmlPath)
+
+    public void hideCloseButton()
     {
-        Stage stage = openWindows.get(fxmlPath);
-        if ( stage != null ) {
-            openWindows.remove(fxmlPath);
-            stage.close();
-        }
-    }
-
-    public void addProgressIndicator()
-    {
-        ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setPrefSize(50, 50);
-        this.targetContainer.getChildren().add(progressIndicator);
-    }
-
-    /**
-     * Cree une topBar Sur les nouvelles fenêtres
-     *
-     * @param root
-     * @param title
-     * @return
-     */
-    private static Pane addTopBar(Parent root, String title, String fxmlPath)
-    {
-        if ( !(root instanceof Pane pane) ) {
-            String errorMessage = "FXML RENDER addTopBar ERROR: New Window '" + title + "' it's not a Pane.";
-            LOGGER.error(errorMessage);
-            System.err.println(errorMessage);
-            return null;
-        }
-
-        AnchorPane topBar = new AnchorPane();
-        topBar.getStyleClass().add("top-bar");
-        topBar.setPrefHeight(26);
-        topBar.setMinHeight(26);
-
-        Label titleLabel = new Label(title);
-        titleLabel.getStyleClass().add("title-label");
-        titleLabel.setAlignment(Pos.CENTER_LEFT);
-        titleLabel.setContentDisplay(ContentDisplay.CENTER);
-
-        AnchorPane.setTopAnchor(titleLabel, 0.0);
-        AnchorPane.setBottomAnchor(titleLabel, 0.0);
-        AnchorPane.setLeftAnchor(titleLabel, 8.0);
-        AnchorPane.setRightAnchor(titleLabel, 26.0);
-
-        Button buttonClose = new Button("X");
-        buttonClose.getStyleClass().add("btn-close");
-        buttonClose.setPrefHeight(25);
-        buttonClose.setMinHeight(25);
-        buttonClose.setPrefWidth(25);
-
-        buttonClose.setOnAction(event -> {
-            openWindows.remove(fxmlPath);
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.close();
-        });
-
-        AnchorPane.setRightAnchor(buttonClose, 0.0);
-        AnchorPane.setTopAnchor(buttonClose, 0.0);
-
-        topBar.getChildren().addAll(titleLabel, buttonClose);
-
-        pane.getChildren().add(0, topBar);
-
-        windowDragging(topBar, root);
-
-        return topBar;
-    }
-
-    /**
-     * Gère le deplacement de la fenêtre
-     *
-     * @param topBar
-     * @param root
-     */
-    private static void windowDragging(Node topBar, Parent root)
-    {
-        final double[] delta = new double[2]; // Tableau pour stocker les coordonnées de décalage
-
-        topBar.setOnMousePressed(event -> {
-            delta[0] = event.getScreenX() - root.getScene().getWindow().getX();
-            delta[1] = event.getScreenY() - root.getScene().getWindow().getY();
-        });
-
-        topBar.setOnMouseDragged(event -> {
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setX(event.getScreenX() - delta[0]);
-            stage.setY(event.getScreenY() - delta[1]);
-        });
+        _buttonClose.setVisible(false);
     }
 }

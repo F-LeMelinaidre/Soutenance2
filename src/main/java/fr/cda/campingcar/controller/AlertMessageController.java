@@ -1,12 +1,11 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.util.FXMLRender;
+import fr.cda.campingcar.util.render.FXMLWindow;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,10 +18,12 @@ import java.util.ResourceBundle;
  * Formation CDA
  * Greta Vannes
  */
-public class AlertMessageController implements Initializable
+public class AlertMessageController extends FXMLWindow
 {
     @FXML
     private Pane alertMessagePane;
+    @FXML
+    private ProgressIndicator progressIndicator;
     @FXML
     private Pane warningIcon;
     @FXML
@@ -33,23 +34,29 @@ public class AlertMessageController implements Initializable
     private Label messageLabel;
     @FXML
     private Button closeButton;
+    private boolean buttonActived;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
+        this.mainPane = alertMessagePane;
+        super.initialize(url, resourceBundle);
         this.disableIcon();
     }
 
-    @FXML
+    @Override
     public void closeWindow()
     {
-        FXMLRender.closeWindow("window/alertMessage.fxml");
+        super.closeWindow();
     }
 
     public void setMessage(String message, String icon)
     {
         this.disableIcon();
         this.messageLabel.setText(message);
+        this.closeButton.setDisable(false);
+        this.closeButton.setVisible(true);
 
         switch (icon) {
             case "valid":
@@ -61,13 +68,16 @@ public class AlertMessageController implements Initializable
             case "error":
                 this.errorIcon.setVisible(true);
                 break;
+            case "load":
+                this.progressIndicator.setVisible(true);
+                this.closeButton.setVisible(false);
+                break;
             default:
                 this.errorIcon.setVisible(true);
                 this.messageLabel.setText(this.messageLabel.getText() + "\n Le parametre icon de la methode est inconnu !");
                 break;
         }
-        Stage stage = (Stage) this.alertMessagePane.getScene().getWindow();
-        stage.sizeToScene();
+        this.refreshWindow();
     }
 
     private void disableIcon()
@@ -75,5 +85,7 @@ public class AlertMessageController implements Initializable
         this.warningIcon.setVisible(false);
         this.errorIcon.setVisible(false);
         this.validIcon.setVisible(false);
+        this.progressIndicator.setVisible(false);
     }
+
 }

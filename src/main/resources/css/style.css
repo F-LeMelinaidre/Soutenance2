@@ -57,18 +57,6 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 2, 0.4, 1, 1);
 }
 
-.label.hint-error {
-    -fx-text-fill: #cf0000;
-    -fx-alignment: CENTER;
-    -fx-text-alignment: CENTER;
-}
-
-.label.hint-warning {
-    -fx-text-fill: #ff9b00;
-    -fx-alignment: CENTER;
-    -fx-text-alignment: CENTER;
-}
-
 .combo-box,
 .combo-box-base,
 .date-picker,
@@ -98,20 +86,6 @@
     -fx-control-inner-background: #777777;
 }
 
-.textfield-error {
-    -fx-border-width: 1px;
-    -fx-border-color: #ac0000;
-}
-
-.textfield-warning {
-    -fx-border-width: 1px;
-    -fx-border-color: #ff9b00;
-}
-
-.textfield-valid {
-    -fx-border-width: 1px;
-    -fx-border-color: #A3FF00;
-}
 /* --- COMBOBOX --- */
 .combo-box,
 .combo-box-base .arrow-button {
@@ -413,13 +387,6 @@
     -fx-text-fill: #777777;
 }
 
-.window .hint-error {
-    -fx-font-family: 'Poppins Medium';
-    -fx-text-fill: #cf0000;
-    -fx-alignment: CENTER;
-    -fx-text-alignment: CENTER;
-}
-
 .window .button {
     -fx-text-fill: #FFFFFF;
     -fx-background-color: #777777;
@@ -446,17 +413,38 @@
     -fx-background-color: #ac0000;
 }
 
+.text-field.validator-valid,
+.combo-box.validator-valid {
+    -fx-border-width: 1px;
+    -fx-border-color: #A3FF00;
+}
+.label.validator-valid,
 .valid {
+    -fx-font-family: 'Poppins Medium';
     -fx-text-fill: #37b502;
 }
-
+.combo-box.validator-error,
+.text-field.validator-error {
+    -fx-border-width: 1px;
+    -fx-border-color: #ac0000;
+}
+.label.validator-error,
 .invalid {
+    -fx-font-family: 'Poppins Medium';
     -fx-text-fill: #ac0000;
 }
-
+.combo-box.validator-warning,
+.text-field.validator-warning {
+    -fx-border-width: 1px;
+    -fx-border-color: #ff9b00;
+}
+.label.validator-warning,
 .warning {
+    -fx-font-family: 'Poppins Medium';
     -fx-text-fill: #ff9b00;
 }
+
+
 @font-face {
     font-family: 'Poppins Medium';
     src: url('../fonts/poppins-medium.ttf');

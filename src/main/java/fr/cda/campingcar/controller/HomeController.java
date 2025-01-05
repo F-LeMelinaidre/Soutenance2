@@ -12,8 +12,8 @@ package fr.cda.campingcar.controller;
 import fr.cda.campingcar.model.Recherche;
 import fr.cda.campingcar.scraping.ScrapingManager;
 import fr.cda.campingcar.scraping.ScrapingModelInt;
-import fr.cda.campingcar.util.FXMLRender;
-import javafx.application.Platform;
+import fr.cda.campingcar.util.render.FXMLRender;
+import fr.cda.campingcar.util.file.tamplate.word.RechercheXDOC;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,8 +21,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class HomeController
 {
@@ -46,6 +47,7 @@ public class HomeController
     private LoaderController loaderController;
     private ResultatController resultatController;
     private List<ScrapingModelInt<Object>> resultats;
+    private Recherche<ScrapingModelInt<Object>> recherche;
     private SearchController searchController;
 
     @FXML
@@ -56,15 +58,19 @@ public class HomeController
     }
 
     @FXML
-    public void handlerMenuBar(ActionEvent event)
+    public void handlerMenuBar(ActionEvent event) throws IOException
     {
         MenuItem item = (MenuItem) event.getSource();
 
         switch (item.getId()) {
             case "saveFile":
-                FileChooser fileDialog = new FileChooser();
-                fileDialog.setTitle("Save file");
-                fileDialog.showSaveDialog(this.homePane.getScene().getWindow());
+                this.saveREcherche();
+                /*System.out.println(Config.CYAN + " Resultats :");
+                if(this.resultats != null) {
+                    for(ScrapingModelInt<Object> model : this.resultats) {
+                        System.out.println(Config.YELLOW + model.getSite().getName());
+                    }
+                }*/
                 break;
             case "saveInDataBase":
                 FXMLRender.openNewWindow("window/transmissionDB.fxml", "Sauvegarder En Base de Donnée");
@@ -81,11 +87,42 @@ public class HomeController
         }
     }
 
+    private void saveREcherche() {
+        FileChooser fileDialog = new FileChooser();
+        fileDialog.setTitle("Save file");
+        File file = fileDialog.showSaveDialog(this.homePane.getScene().getWindow());
+
+        if (file != null) {
+            String filePath = file.getAbsolutePath();
+            Task<Void> saveDocumentTask = new RechercheXDOC(this.recherche, filePath).save();
+
+            AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde");
+
+            saveDocumentTask.setOnScheduled(event -> {
+                alertMessageController.setMessage("Enregistrement du fichier:\n" + filePath + " en cours.", "load");
+            });
+
+            saveDocumentTask.setOnSucceeded(event -> {
+                alertMessageController.setMessage("Succès de l'enregistrement du fichier:\n" + filePath, "valid");
+            });
+
+            saveDocumentTask.setOnFailed(event -> {
+                alertMessageController.setMessage("Échec de l'enregistrement du fichier:\n" + filePath, "error");
+            });
+
+            Thread saveThread = new Thread(saveDocumentTask);
+            saveThread.setDaemon(true);
+            saveThread.start();
+        }
+    }
+
 
     public void startScrapping(Recherche<ScrapingModelInt<Object>> recherche)
     {
+        this.recherche = recherche;
 
         if (this.resultatController == null) this.resultatController = this.fxmlRender.loadFXML("resultat.fxml", this.mainContainer);
+        this.resultatController.clear();
 
         Task<Void> scrapingTask = new ScrapingManager(recherche).scrapTask();
 
@@ -97,16 +134,15 @@ public class HomeController
         });
 
         scrapingTask.setOnSucceeded(event -> {
-            CompletableFuture.runAsync(() -> {
-                // Travail du second thread
-                System.out.println("Traitement des résultats...");
-            }).thenRun(() -> {
-                // Action à exécuter une fois le travail terminé
-            });
             this.loaderController.setTitleMainCounter("du chargement", "Annonce");
-            this.resultats = recherche.getResultats();
+            this.resultats = this.recherche.getResultats();
             this.resultatController.loadAndShow(this.resultats, () -> this.searchController.toggleDisableForm());
+        });
 
+        scrapingTask.setOnFailed(event -> {
+            AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde");
+            alertMessageController.setMessage("Échec de la recherche", "error");
+            this.searchController.toggleDisableForm();
         });
 
         Thread scrapingThread = new Thread(scrapingTask);
@@ -118,6 +154,7 @@ public class HomeController
     public void clearResultat() {
         if(this.resultatController != null) {
             this.resultatController.clear();
+
         }
     }
 }

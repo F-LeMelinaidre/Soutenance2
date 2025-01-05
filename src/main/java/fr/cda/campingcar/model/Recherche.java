@@ -32,12 +32,12 @@ public class Recherche<Location extends ScrapingModelInt<Object>>
 
     public List<Site> getListSites()
     {
-        return sites;
+        return this.sites;
     }
 
     public Map<String, ?> getCritereRecherche()
     {
-        return critereRecherche;
+        return this.critereRecherche;
     }
 
     public void addResultats(List<Location> resultats)
@@ -47,7 +47,7 @@ public class Recherche<Location extends ScrapingModelInt<Object>>
 
     public Location createAndAddScrapingSupplier()
     {
-        Location resultat = scrapingSupplier.get();
+        Location resultat = this.scrapingSupplier.get();
         this.resultats.add(resultat);
         return resultat;
     }
@@ -61,4 +61,5 @@ public class Recherche<Location extends ScrapingModelInt<Object>>
     {
         return this.resultats;
     }
+
 }

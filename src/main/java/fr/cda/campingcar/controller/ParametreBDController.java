@@ -2,10 +2,11 @@ package fr.cda.campingcar.controller;
 
 import fr.cda.campingcar.model.BaseDonneeParam;
 import fr.cda.campingcar.util.DebugHelper;
-import fr.cda.campingcar.util.FXMLRender;
+import fr.cda.campingcar.util.render.FXMLRender;
 import fr.cda.campingcar.util.LoggerConfig;
 import fr.cda.campingcar.util.file.BinarieFile;
 import fr.cda.campingcar.util.Validator;
+import fr.cda.campingcar.util.render.FXMLWindow;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -33,7 +34,7 @@ import java.util.ResourceBundle;
  */
 
 
-public class ParametreBDController implements Initializable
+public class ParametreBDController extends FXMLWindow implements Initializable
 {
 
     @FXML
@@ -71,6 +72,8 @@ public class ParametreBDController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
+        this.mainPane = this.parametreDBPane;
+        super.initialize(url, resourceBundle);
 
         try {
             this.parametreDB = paramDBBinarieFile.readFile();
@@ -98,11 +101,10 @@ public class ParametreBDController implements Initializable
         this.updateValidateButton();
     }
 
-    @FXML
-    private void closeWindow()
+    @Override
+    public void closeWindow()
     {
-        String fxml = "window/parameterDB.fxml";
-        FXMLRender.closeWindow(fxml);
+        super.closeWindow();
     }
 
     @FXML
@@ -146,22 +148,24 @@ public class ParametreBDController implements Initializable
     private void validTextField(KeyEvent event)
     {
         TextField textField = (TextField) event.getSource();
-        Integer   rowId     = GridPane.getRowIndex(textField);
-        String    fxId      = textField.getId();
-        String    value     = textField.getText();
+        Integer rowId = GridPane.getRowIndex(textField);
+        String fxId = textField.getId();
+        String value = textField.getText();
+
+        Validator.clearClass(textField);
 
         boolean isValid;
 
         // Validation basée sur l'ID du champ de texte
         switch (fxId) {
             case "serveurField":
-                isValid = Validator.isValidServerName(value);
+                isValid = Validator.isNotEmpty(value) && Validator.isValidServerName(value);
                 break;
             case "baseDeDonneeField":
-                isValid = Validator.isValidDatabaseName(value);
+                isValid = Validator.isNotEmpty(value) && Validator.isValidDatabaseName(value);
                 break;
             case "portField":
-                if ( Validator.isNumeric(value) ) {
+                if ( Validator.isNotEmpty(value) && Validator.isNumeric(value) ) {
                     int port = Integer.parseInt(value);
                     isValid = Validator.isValidPort(port);
                 } else {
@@ -169,57 +173,41 @@ public class ParametreBDController implements Initializable
                 }
                 break;
             case "loginField":
-                isValid = Validator.isValidMySQLLogin(value);
+                isValid = Validator.isNotEmpty(value) && Validator.isValidMySQLLogin(value);
                 break;
             case "passwordField":
-                isValid = Validator.isValidMySQLPassword(value);
+                isValid = Validator.isNotEmpty(value) && Validator.isValidMySQLPassword(value);
                 break;
             default:
                 isValid = false;
         }
 
-        this.updateTextFieldStyle(textField, isValid);
-        this.updateErrorLabel(fxId, isValid, rowId);
+        String style = Validator.getValidatorStyle();
+        textField.getStyleClass().add(style);
+
+        this.updateErrorLabel(fxId, rowId, isValid);
 
         this.validateButton.setDisable(!erreursMap.isEmpty());
     }
 
-    private void updateTextFieldStyle(TextField textField, boolean isValid)
-    {
-        textField.getStyleClass().remove("textfield-error");
-        textField.getStyleClass().remove("textfield-warning");
-        textField.getStyleClass().remove("textfield-valid");
-
-        if ( textField.getText() == null || textField.getText().isEmpty() ) {
-            textField.getStyleClass().add("textfield-warning");
-        } else if ( !isValid ) {
-            textField.getStyleClass().add("textfield-error");
-        } else {
-            textField.getStyleClass().add("textfield-valid");
-        }
-    }
-
-    // TODO DEPLACER DANS UNE CLASS HINTMESSAGE
-    private void updateErrorLabel(String fxId, boolean isValid, Integer rowId)
+    private void updateErrorLabel(String fxId, Integer rowId, boolean isValid)
     {
         TextField textField = (TextField) this.gridPane.lookup("#" + fxId);
+
+
+        Label current = this.erreursMap.get(fxId);
+        if ( current != null ) {
+            this.gridPane.getChildren().remove(current);
+            this.erreursMap.remove(fxId);
+        }
+
         if ( !isValid ) {
-
             Label hint = Validator.getHintLabel();
-            if ( !this.erreursMap.containsKey(fxId) ) {
-                this.erreursMap.put(fxId, hint);
-                GridPane.setRowIndex(hint, rowId + 1);
-                GridPane.setColumnIndex(hint, 0);
-                GridPane.setColumnSpan(hint, this.gridPane.getColumnCount());
-                this.gridPane.getChildren().add(hint);
-            }
-        } else {
-
-            if ( this.erreursMap.containsKey(fxId) ) {
-                Label existingErrorLabel = this.erreursMap.get(fxId);
-                this.gridPane.getChildren().remove(existingErrorLabel);
-                this.erreursMap.remove(fxId);
-            }
+            this.erreursMap.put(fxId, hint);
+            GridPane.setRowIndex(hint, rowId + 1);
+            GridPane.setColumnIndex(hint, 0);
+            GridPane.setColumnSpan(hint, this.gridPane.getColumnCount());
+            this.gridPane.getChildren().add(hint);
         }
     }
 

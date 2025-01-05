@@ -3,9 +3,10 @@ package fr.cda.campingcar.controller;
 import fr.cda.campingcar.model.BaseDonneeParam;
 import fr.cda.campingcar.model.Location;
 import fr.cda.campingcar.util.DebugHelper;
-import fr.cda.campingcar.util.FXMLRender;
+import fr.cda.campingcar.util.render.FXMLRender;
 import fr.cda.campingcar.util.LoggerConfig;
 import fr.cda.campingcar.util.file.BinarieFile;
+import fr.cda.campingcar.util.render.FXMLWindow;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,7 +28,7 @@ import java.util.ResourceBundle;
  * Formation CDA
  * Greta Vannes
  */
-public class SaveDataController implements Initializable
+public class SaveDataController extends FXMLWindow implements Initializable
 {
 
     @FXML
@@ -47,6 +48,10 @@ public class SaveDataController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
+
+        this.mainPane = this.saveDataPane;
+        super.initialize(url, resourceBundle);
+
         Platform.runLater(() -> {
             try {
 
@@ -56,7 +61,7 @@ public class SaveDataController implements Initializable
                     this.closeWindow();
 
                     AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde");
-                    alertMessageController.setMessage("Les paramètres de connexion à la base de données ne sont pas définis.\nVeuillez les configurer avant de continuer.", "warning");
+                    alertMessageController.setMessage("Les paramètres de connexion à la base de données ne sont pas définis.\nVeuillez les configurer.", "warning");
 
                 } else {
                     DebugHelper.debug("Ouverture Binaire file", this.parametreDB.toString(), true);
@@ -79,10 +84,9 @@ public class SaveDataController implements Initializable
 
     }
 
-    @FXML
-    private void closeWindow()
+    @Override
+    public void closeWindow()
     {
-        String fxml = "window/transmissionDB.fxml";
-        FXMLRender.closeWindow(fxml);
+        super.closeWindow();
     }
 }

@@ -92,8 +92,6 @@ public class ScrapingManager
             @Override
             protected Void call()
             {
-                // counterTask set total mainCounter
-
 
                 Platform.runLater(() -> {
                     counterTask.setMainCounterTotal(sites.size());
@@ -113,7 +111,7 @@ public class ScrapingManager
                     }
                 });
 
-                pauseExecution(200);
+                pauseExecution(500);
                 executor.shutdown();
                 return null;
             }
@@ -155,7 +153,6 @@ public class ScrapingManager
      */
     private Callable<Void> scrapCards(Site site)
     {
-        // TODO FACTORISER
         List<Future<Void>> futures = new ArrayList<>();
         String url = site.getUrlRecherche();
 
@@ -168,6 +165,7 @@ public class ScrapingManager
                 Dom domCard = site.getDomMap().get("card");
                 List<Dom> childrensDom = domCard.geChildrensList();
                 List<HtmlElement> cards = page.getByXPath(domCard.getXPath());
+
 
                 this.counterTask.addSubCounter(site.getName(), cards.size());
 
@@ -186,7 +184,8 @@ public class ScrapingManager
                 });
 
             } else {
-                this.counterTask.decrementMainCounterTotal();
+                this.counterTask.incrementMainCounterTotal();
+                this.counterTask.addSubCounter(site.getName(), 0);
                 debug("ScrapingManager", "ScrapCards", "openPage = null", null, false);
             }
 
@@ -236,7 +235,9 @@ public class ScrapingManager
 
                     this.scrapElements(conteneur, childrensDom, model);
 
+
                     this.counterTask.incrementSubCounterEnded(model.getSite().getName());
+
 
                 } catch ( HTMLElementException e ) {
                     this.counterTask.decrementSubContentTotal(model.getSite().getName());
@@ -247,14 +248,12 @@ public class ScrapingManager
                 }
 
             } else {
+                this.recherche.removeResultat(model);
+                this.counterTask.decrementSubCounterEnded(model.getSite().getName());
                 this.counterTask.decrementSubContentTotal(model.getSite().getName());
                 debug("ScrapingManager", "ScrapCards", "openPage = null", null, false);
             }
 
-/*
-            Map<String, String> result = new HashMap<>();
-            result.put("counterName", "subCounter");
-            result.put("subCounterName", model.getSite().getName());*/
             return null;
         };
     }

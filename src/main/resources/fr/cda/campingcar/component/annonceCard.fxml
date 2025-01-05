@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<VBox id="annonceCard" fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="350.0" stylesheets="@../../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.AnnonceCardController">
+<VBox id="annonceCard" fx:id="annoncePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="350.0" stylesheets="@../../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.AnnonceCardController">
    <children>
       <AnchorPane maxHeight="150.0" maxWidth="350.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="350.0">
          <children>
@@ -39,7 +39,7 @@
             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" valignment="CENTER" vgrow="NEVER" />
          </rowConstraints>
          <children>
-            <Label fx:id="titreLabelValue" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" text="Label" GridPane.columnSpan="4" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+            <Label fx:id="titreLabelValue" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onMouseClicked="#showDetail" text="Label" GridPane.columnSpan="4" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
                <styleClass>
                   <String fx:value="title-rent" />
                   <String fx:value="feature-value" />

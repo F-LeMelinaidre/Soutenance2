@@ -14,14 +14,17 @@ import fr.cda.campingcar.dao.DAOFactory;
 import fr.cda.campingcar.model.*;
 import fr.cda.campingcar.api.GeoApiService;
 import fr.cda.campingcar.model.Dom;
+import fr.cda.campingcar.util.Validator;
 import javafx.animation.PauseTransition;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -32,7 +35,9 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO
 //  MERITE D ÊTRE FACTORISE
@@ -40,13 +45,6 @@ import java.util.*;
 //  - VERIF FORMAT DE LA DATE - SI LE FORMAT EST BON ATTRIBUER ET SELECTIONNER LA DATE,
 //    POUR NE PAS ETRE OBLIGé DE TAPER ENTRER
 //  - VERIF CHAMP BUDGET EST UN INT
-/*Utiliser pour les dates
-/*numberField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-        // Si l'entrée n'est pas un chiffre ou une touche de navigation (flèches, suppr, etc.)
-        if (!event.getText().matches("[0-9]") && !event.getCode().isNavigationKey()) {
-        event.consume();  // Empêche l'entrée d'un caractère non numérique
-    }
-            });*/
 // TODO
 //  - HELPER/HINT MESSAGE
 
@@ -82,6 +80,7 @@ public class SearchController implements Initializable, ControllerRegistry
     private final DAOFactory daoFactory;
     private final GeoApiService geoApiService;
     private final LocalDate dateCourante;
+
     private boolean disable = false;
 
     public SearchController()
@@ -114,15 +113,15 @@ public class SearchController implements Initializable, ControllerRegistry
     private void reseach() throws SQLException
     {
 
-        List<Site>         sitesSelected         = this.siteComboBox.getCheckModel().getCheckedItems();
+        List<Site> sitesSelected = this.siteComboBox.getCheckModel().getCheckedItems();
         List<TypeVehicule> typeVehiculesSelected = this.typeVehiculeComboBox.getCheckModel().getCheckedItems();
-        String             budgetMax             = this.budgetMax.getText();
-        String             budgetMin             = this.budgetMin.getText();
-        Ville              villeDep              = this.villeDepartField.getSelectionModel().getSelectedItem();
-        Ville              villeArr              = this.villeArriveeField.getSelectionModel().getSelectedItem();
-        String             date                  = this.dateCourante.toString();
-        LocalDate          dateDepart            = this.periodeDebutDatePicker.getValue();
-        LocalDate          dateArrivee           = this.periodeFinDatePicker.getValue();
+        String budgetMax = this.budgetMax.getText();
+        String budgetMin = this.budgetMin.getText();
+        Ville villeDep = this.villeDepartField.getSelectionModel().getSelectedItem();
+        Ville villeArr = this.villeArriveeField.getSelectionModel().getSelectedItem();
+        String date = this.dateCourante.toString();
+        LocalDate dateDepart = this.periodeDebutDatePicker.getValue();
+        LocalDate dateArrivee = this.periodeFinDatePicker.getValue();
 
         Map<String, Object> critereRecherche = new HashMap<>()
         {{
@@ -134,6 +133,7 @@ public class SearchController implements Initializable, ControllerRegistry
             put("Ville Arrivée", villeArr);
             put("Date Départ", dateDepart);
             put("Date Retour", dateArrivee);
+
             put("Date de Recherche", date);
         }};
 
@@ -162,14 +162,18 @@ public class SearchController implements Initializable, ControllerRegistry
         this.typeVehiculeComboBox.getCheckModel().clearChecks();
 
         this.villeDepartField.setValue(null);
+        Validator.clearClass(this.villeDepartField);
         this.villeArriveeField.setValue(null);
+        Validator.clearClass(this.villeArriveeField);
 
         this.periodeDebutDatePicker.setValue(null);
         this.periodeFinDatePicker.setValue(null);
         this.initializeDatePicker();
 
         this.budgetMin.clear();
+        Validator.clearClass(this.budgetMin);
         this.budgetMax.clear();
+        Validator.clearClass(this.budgetMax);
 
         this.updateRechercherBoutonState();
         this.homeController.clearResultat();
@@ -218,33 +222,6 @@ public class SearchController implements Initializable, ControllerRegistry
     }
 
     /**
-     * Vérifie si la valeur saisie dans le {@link TextField} est un entier.<br>
-     * Si le texte ne correspond pas, un message d'indication est affiché et le champ de texte est vidé.<br>
-     * Si le texte est valide, appel la méthode de mise à jour d'état du bouton de recherche.
-     *
-     * @param event l'événement {@link KeyEvent}
-     */
-    @FXML
-    private void isInteger(KeyEvent event)
-    {
-        this.clearHintLabel();
-
-        TextField textField = (TextField) event.getSource();
-
-        String currentValue = textField.getText();
-        if ( !currentValue.matches("\\d*") ) {
-            String msg = "Budget journalier: Veuillez saisir une valeur numérique!";
-            this.setHintLabel(msg, "error");
-
-            textField.getStyleClass().add("textfield-error");
-            textField.clear();
-        } else {
-            updateRechercherBoutonState();
-            textField.getStyleClass().remove("textfield-error");
-        }
-    }
-
-    /**
      * Gère l'autocomplétion dans un ComboBox pour la recherche de villes. <br>
      * Si la saisie est supérieure ou égale à 3 caractères, <br>
      * lance une recherche après un délai 300 ms. <br>
@@ -255,9 +232,11 @@ public class SearchController implements Initializable, ControllerRegistry
     @FXML
     private void autocompleteVilleField(KeyEvent keyEvent)
     {
-        ComboBox<Ville> item             = (ComboBox<Ville>) keyEvent.getSource();
-        String          communeRecherche = item.getEditor().getText();
-        int             minLength        = 3;
+        this.validTextField(keyEvent);
+
+        ComboBox<Ville> item = (ComboBox<Ville>) keyEvent.getSource();
+        String communeRecherche = item.getEditor().getText();
+        int minLength = 3;
 
         if ( communeRecherche.length() >= minLength ) {
 
@@ -297,8 +276,8 @@ public class SearchController implements Initializable, ControllerRegistry
     @FXML
     private void onStartDateSelected(ActionEvent event)
     {
-        DatePicker date       = (DatePicker) event.getSource();
-        LocalDate  departDate = date.getValue();
+        DatePicker date = (DatePicker) event.getSource();
+        LocalDate departDate = date.getValue();
 
         if ( date.getValue() != null ) {
             this.periodeFinDatePicker.setDayCellFactory(getDateCellFactory(departDate.plusDays(1), null));
@@ -318,8 +297,8 @@ public class SearchController implements Initializable, ControllerRegistry
     @FXML
     private void onEndDateSelected(ActionEvent event)
     {
-        DatePicker date    = (DatePicker) event.getSource();
-        LocalDate  dateFin = date.getValue();
+        DatePicker date = (DatePicker) event.getSource();
+        LocalDate dateFin = date.getValue();
 
         if ( date.getValue() != null ) {
             this.periodeDebutDatePicker.setDayCellFactory(
@@ -328,7 +307,60 @@ public class SearchController implements Initializable, ControllerRegistry
         }
     }
 
-    // TODO AJOUTER EVENT POUR RETIRER LE MESSAGE DE DEMANDE DE VALIDATION PAR ENTRER POUR LES DATEPICKERS
+
+    @FXML
+    private void validTextField(KeyEvent event)
+    {
+        String fxId = null;
+        Node node = (Node) event.getSource();
+
+        Integer rowId;
+        String value = null;
+
+        if ( node instanceof ComboBox<?> comboBox ) {
+            value = comboBox.getEditor().getText();
+        } else if ( node instanceof TextField textField ) {
+            value = textField.getText();
+        }
+        fxId  = node.getId();
+        rowId = GridPane.getRowIndex(node);
+
+        boolean isValid;
+
+        switch (fxId) {
+            case "villeDepartField":
+            case "villeArriveeField":
+                isValid = Validator.isNotEmpty(value) && Validator.isValidCityName(value);
+                break;
+            case "periodeDebutDatePicker":
+            case "periodeFinDatePicker":
+                break;
+            case "budgetMin":
+                isValid = Validator.isNotEmpty(value) && Validator.isNumeric(value);
+                break;
+            case "budgetMax":
+                isValid = Validator.isNumeric(value);
+                if ( value.isEmpty() ) {
+                    fxId = null;
+                    this.hintLabel.setText("");
+                }
+                break;
+        }
+
+        String style = Validator.getValidatorStyle();
+        String message = Validator.getValidatorMessage();
+
+        Validator.clearClass(node);
+        Validator.clearClass(this.hintLabel);
+
+        if ( fxId != null ) {
+
+            node.getStyleClass().add(style);
+            this.hintLabel.setText(message);
+            this.hintLabel.getStyleClass().add(style);
+        }
+    }
+
     private void initializeEventListener()
     {
         this.siteComboBox.getCheckModel().getCheckedItems().addListener(
@@ -341,12 +373,6 @@ public class SearchController implements Initializable, ControllerRegistry
                 (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
         this.villeArriveeField.valueProperty().addListener(
                 (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
-
-        // Vérifie et indique si le format de la date saisi manuellement est valide
-        this.periodeDebutDatePicker.getEditor().textProperty().addListener(
-                (observable, oldValue, newValue) -> this.isDate(newValue, this.periodeDebutDatePicker));
-        this.periodeFinDatePicker.getEditor().textProperty().addListener(
-                (observable, oldValue, newValue) -> this.isDate(newValue, this.periodeFinDatePicker));
 
     }
 
@@ -427,33 +453,6 @@ public class SearchController implements Initializable, ControllerRegistry
         this.periodeFinDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now().plusDays(1), null));
     }
 
-    private void isDate(String date, DatePicker datePicker)
-    {
-        this.clearHintLabel();
-        datePicker.getStyleClass().remove("textfield-error");
-
-        String dateFormatRegex = "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/(\\d{4})$";// '?' pour rendre l'année optionnelle
-        String msg             = "Période: Valider votre saisi par Entrer!";
-
-        // Vérifier si la saisie contient des caractères alpha
-        if ( date.matches(".*[a-zA-Z]+.*") || !date.matches(dateFormatRegex) ) {
-            msg = "Période: Veuillez saisir une date au format jj/mm/aaaa!";
-            this.setHintLabel(msg, "error");
-            datePicker.getStyleClass().add("textfield-error");
-        } else {
-            DateTimeFormatter formatter    = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate         formatedDate = LocalDate.parse(date, formatter);
-
-            if ( formatedDate.isBefore(this.dateCourante) ) {
-                msg = "Période: Veuillez saisir une date supérieur à la date du jour!";
-                this.setHintLabel(msg, "error");
-                datePicker.getStyleClass().add("textfield-error");
-            } else if ( datePicker.getValue() == null ) {
-                this.setHintLabel(msg, "warning");
-            }
-        }
-
-    }
 
     /**
      * {@link Callback} utilisé par un {@link DatePicker} pour personnaliser les cellules de date. <br>
@@ -488,24 +487,6 @@ public class SearchController implements Initializable, ControllerRegistry
         };
     }
 
-    private void setHintLabel(String msg, String style)
-    {
-        this.hintLabel.setText(msg);
-        if ( style.equals("error") ) {
-            this.hintLabel.getStyleClass().remove("hint-warning");
-            this.hintLabel.getStyleClass().add("hint-error");
-        } else if ( style.equals("warning") ) {
-            this.hintLabel.getStyleClass().remove("hint-error");
-            this.hintLabel.getStyleClass().add("hint-warning");
-        }
-    }
-
-    private void clearHintLabel()
-    {
-        this.hintLabel.setText("");
-        this.hintLabel.getStyleClass().remove("hint-warning");
-        this.hintLabel.getStyleClass().remove("hint-error");
-    }
 
     private void updateRechercherBoutonState()
     {
@@ -514,8 +495,8 @@ public class SearchController implements Initializable, ControllerRegistry
                           || this.villeDepartField.getValue() == null
                           || this.villeArriveeField.getValue() == null
                           || this.periodeDebutDatePicker.getValue() == null
-                          || this.periodeFinDatePicker.getValue() == null;
-
+                          || this.periodeFinDatePicker.getValue() == null
+                          || !this.hintLabel.getText().isEmpty();
         this.rechercherBouton.setDisable(disable);
     }
 

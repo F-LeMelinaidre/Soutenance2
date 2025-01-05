@@ -21,5 +21,4 @@ public interface CounterListenerInt
     void onSubCounterUpdateEnded(String key, int endedCount);
     void onSubCounterUpdateTotal(String key, int total);
     void onProgressBarUpdated(double value);
-
 }

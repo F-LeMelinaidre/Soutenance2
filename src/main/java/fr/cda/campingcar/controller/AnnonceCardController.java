@@ -1,9 +1,10 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.Location;
 import fr.cda.campingcar.settings.Config;
-import fr.cda.campingcar.util.FXMLRender;
+import fr.cda.campingcar.util.render.FXMLRender;
+import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -19,31 +20,22 @@ import java.util.ResourceBundle;
  */
 public class AnnonceCardController extends AnnonceController
 {
+
     @FXML
-    private VBox cardPane;
+    public void showDetail()
+    {
+        AnnonceDetailController annonceDetailController = FXMLRender.openNewWindow("window/annonceDetail.fxml", "Detail");
+        annonceDetailController.setData(this.annonce);
+    }
 
     @Override
     protected void setImage(String path)
     {
         super.setImage(path);
-        if(path != null) {
+        if ( path != null ) {
             this.resizeImage(350, 150);
         }
 
-    }
-
-    @Override
-    protected void setTitreLabelValue(String titre)
-    {
-        super.setTitreLabelValue(titre);
-        this.titreLabelValue.setOnMouseClicked(event -> {
-            System.out.println(Config.CYAN + "setTitre MouseClique: " + titre + Config.RESET + "\n" + this.annonce.toString());
-            AnnonceDetailController annonceDetailController = FXMLRender.openNewWindow("window/annonceDetail.fxml", "Detail");
-            if (annonceDetailController != null) {
-
-                annonceDetailController.setData(this.annonce);
-            }
-        });
     }
 
 }

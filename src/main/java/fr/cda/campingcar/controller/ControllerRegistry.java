@@ -9,6 +9,8 @@ package fr.cda.campingcar.controller;
  * Greta Vannes
  */
 
+import javafx.scene.Parent;
+
 public interface ControllerRegistry {
 
     void setMainController(Object parentController);

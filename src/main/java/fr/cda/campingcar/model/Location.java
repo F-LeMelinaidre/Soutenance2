@@ -70,7 +70,7 @@ public class Location implements ScrapingModelInt<Object>
         return this.ville;
     }
 
-    public Integer getTarif()
+    public int getTarif()
     {
         return this.tarif;
     }

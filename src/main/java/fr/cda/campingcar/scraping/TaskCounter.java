@@ -48,9 +48,6 @@ public class TaskCounter
                                                     "total", new AtomicInteger(0)));
 
         this.notifyMainCounter();
-        /*this.mainTaskNames = mainTaskNames;
-        this.initMainTaskCounter(this.mainTaskNames.size());
-        this.initSubTasksCounter(this.mainTaskNames);*/
     }
 
 
@@ -75,15 +72,20 @@ public class TaskCounter
 
     public void decrementMainCounterTotal()
     {
-        int count = this.mainTaskCounter.get("total").decrementAndGet();
-        this.notifyMainCounterTotal(count);
+
+        int count = this.mainTaskCounter.get("total").get();
+        if( count > 0 ) {
+            count = this.mainTaskCounter.get("total").decrementAndGet();
+            this.notifyMainCounterTotal(count);
+        }
     }
 
-    private void checkAndIncrementMainCounter(String counterName) {
+    private void checkMainCounter(String counterName)
+    {
         int current = this.subCounters.get(counterName).get("ended").get();
         int total = this.subCounters.get(counterName).get("total").get();
 
-        if (current == total) {
+        if ( current == total) {
             this.incrementMainCounterEnded();
         }
     }
@@ -96,6 +98,7 @@ public class TaskCounter
     private void notifyMainCounterEnded(int count)
     {
         _listener.onMainCounterUpdateEnded(count);
+
     }
 
     private void notifyMainCounterTotal(int count)
@@ -113,8 +116,10 @@ public class TaskCounter
         this.subCounters.put(name, subCounter);
         this.notifySubProgressBloc(name, subCounter);
 
+        if(size == 0) this.incrementMainCounterEnded();
         this.setProgressCounter(size);
         this.notifyProgressBarState();
+
     }
 
     public void decrementSubCounterEnded(String counterName)
@@ -133,14 +138,16 @@ public class TaskCounter
 
         if ( counters != null && counters.containsKey(target) ) {
             int counter = counters.get(target).decrementAndGet();
-            this.progressCounter.get(target).decrementAndGet();
+
 
             if ( target.equals("ended") ) {
+
                 this.notifySubCounterEnded(counterName, counter);
-                this.checkAndIncrementMainCounter(counterName);
+                this.checkMainCounter(counterName);
             } else if ( target.equals("total") ) {
                 this.notifySubCounterTotal(counterName, counter);
             }
+            this.progressCounter.get(target).decrementAndGet();
             this.notifyProgressBarState();
         }
     }
@@ -164,10 +171,9 @@ public class TaskCounter
             this.progressCounter.get(target).incrementAndGet();
 
 
-
-            if( target.equals("ended") ) {
+            if ( target.equals("ended") ) {
                 this.notifySubCounterEnded(counterName, counter);
-                this.checkAndIncrementMainCounter(counterName);
+                this.checkMainCounter(counterName);
             } else if ( target.equals("total") ) {
                 this.notifySubCounterTotal(counterName, counter);
             }
@@ -191,7 +197,8 @@ public class TaskCounter
         _listener.onSubCounterUpdateTotal(counterName, totalCount);
     }
 
-    public void setProgressCounter(int size) {
+    public void setProgressCounter(int size)
+    {
         this.progressCounter.get("total").addAndGet(size);
     }
 
@@ -204,10 +211,11 @@ public class TaskCounter
     {
         Map<String, AtomicInteger> counter = this.progressCounter;
 
-        if ( counter != null && counter.containsKey(target) ) {
+        if ( counter.containsKey(target) ) {
             counter.get(target).incrementAndGet();
             this.notifyProgressBarState();
         }
+        //if(counter.get("ended") == counter.get("total")) this.notifyCounter();
     }
 
     public void decrementGlobalCounterEnded()
@@ -224,7 +232,7 @@ public class TaskCounter
     {
         Map<String, AtomicInteger> counter = this.progressCounter;
 
-        if ( counter != null && counter.containsKey(target) ) {
+        if ( counter.containsKey(target) ) {
             counter.get(target).decrementAndGet();
             this.notifyProgressBarState();
         }

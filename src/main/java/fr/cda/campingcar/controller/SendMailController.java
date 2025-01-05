@@ -1,12 +1,13 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.util.FXMLRender;
 import fr.cda.campingcar.util.Validator;
+import fr.cda.campingcar.util.render.FXMLWindow;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -22,7 +23,7 @@ import java.util.ResourceBundle;
  * Greta Vannes
  */
 
-public class SendMailController implements Initializable
+public class SendMailController extends FXMLWindow implements Initializable
 {
 
     @FXML
@@ -43,6 +44,9 @@ public class SendMailController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
+
+        this.mainPane = this.sendMailPane;
+        super.initialize(url, resourceBundle);
         this.validButton.setDisable(true);
     }
 
@@ -50,18 +54,30 @@ public class SendMailController implements Initializable
     private void submitForm(MouseEvent event)
     {
         String email = emailField.getText();
-        hintLabel.setText("");
 
-        if (email.isEmpty()) {
-            hintLabel.setText("Veuillez entrer un email !");
-        } else if (!Validator.isMail(email)) {
-            hintLabel.setText("Votre email ne respecte pas la norme RFC2822 !");
-        }
+    }
+
+    @Override
+    public void closeWindow()
+    {
+        super.closeWindow();
     }
 
     @FXML
-    private void closeWindow()
+    public void validTextField(KeyEvent event)
     {
-        FXMLRender.closeWindow("window/sendMail.fxml");
+        String    value     =  this.emailField.getText();
+
+        Validator.clearClass(this.emailField);
+        Validator.clearClass(this.hintLabel);
+
+        boolean isValid = Validator.isNotEmpty(value) && Validator.isMail(value);
+
+        validButton.setDisable(!isValid);
+
+        String style = Validator.getValidatorStyle();
+        this.emailField.getStyleClass().add(style);
+        this.hintLabel.getStyleClass().add(style);
+        this.hintLabel.setText(Validator.getValidatorMessage());
     }
 }

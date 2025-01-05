@@ -10,12 +10,15 @@ package fr.cda.campingcar.controller;
  */
 
 import fr.cda.campingcar.model.Location;
+import fr.cda.campingcar.util.render.FXMLWindow;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,8 +31,10 @@ import java.util.ResourceBundle;
  * Formation CDA
  * Greta Vannes
  */
-public abstract class AnnonceController implements Initializable {
+public abstract class AnnonceController extends FXMLWindow implements Initializable {
 
+    @FXML
+    protected Pane annoncePane;
     @FXML
     protected ImageView imageView;
     @FXML
@@ -55,8 +60,9 @@ public abstract class AnnonceController implements Initializable {
     protected Image imageOriginal;
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        
+    public void initialize(URL url, ResourceBundle resourceBundle)
+    {
+        super.initialize(url, resourceBundle);
     }
 
     public void setData(Location annonce) {

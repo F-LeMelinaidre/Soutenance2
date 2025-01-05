@@ -9,7 +9,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.FlowPane;
 
 import java.io.IOException;
@@ -90,6 +92,14 @@ public class ResultatController implements ControllerRegistry, Initializable
 
         loadResultsTask.setOnSucceeded(e -> {
             Platform.runLater(onComplete);
+            Scene scene = this.flowPane.getScene();
+            Node loader = scene.lookup("#loaderPane");
+            try {
+                Thread.sleep(500);
+                loader.setVisible(false);
+            } catch ( InterruptedException ex ) {
+                Thread.currentThread().interrupt();
+            }
         });
 
         Thread scrapingThread = new Thread(loadResultsTask);

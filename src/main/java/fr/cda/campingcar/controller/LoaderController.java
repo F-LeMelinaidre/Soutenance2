@@ -14,6 +14,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static fr.cda.campingcar.util.DebugHelper.debug;
+
 /*
  * Soutenance Scraping
  * 2024/déc.
@@ -42,8 +44,6 @@ public class LoaderController implements Initializable, CounterListenerInt
     @FXML
     private ProgressBar progressBar;
 
-    private boolean visible = false;
-
     private final Map<String, Map<String, Label>> subCounters = new HashMap<>();
 
 
@@ -54,16 +54,11 @@ public class LoaderController implements Initializable, CounterListenerInt
         this.upDateProgressBar(0);
     }
 
-    public void toggleVisibility() {
-        this.visible = !this.visible;
-        this.loaderPane.setVisible(this.visible);
-
-    }
     private void initMainProgressBloc(Map<String, AtomicInteger> counter)
     {
         this.mainCounterEnded.setText(counter.get("ended").toString());
         this.mainCounterTotal.setText(counter.get("total").toString());
-        this.toggleVisibility();
+        this.loaderPane.setVisible(true);
     }
 
     public void setTitleMainCounter(String title, String separator)
@@ -154,10 +149,9 @@ public class LoaderController implements Initializable, CounterListenerInt
 
     private void upDateProgressBar(double value)
     {
+        System.out.println(value);
         this.progressBar.setProgress(value);
-        if(value == 1 ) {
-            this.toggleVisibility();
-        }
+
     }
 
     @Override
@@ -209,7 +203,6 @@ public class LoaderController implements Initializable, CounterListenerInt
     @Override
     public void onProgressBarUpdated(double value)
     {
-
         Platform.runLater(() -> this.upDateProgressBar(value));
     }
 }
