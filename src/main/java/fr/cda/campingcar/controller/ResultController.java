@@ -1,7 +1,7 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.Location;
-import fr.cda.campingcar.scraping.ScrapingModelInt;
+import fr.cda.campingcar.model.Rent;
+import fr.cda.campingcar.scraping.ScrapingModel;
 import fr.cda.campingcar.scraping.TaskCounter;
 import fr.cda.campingcar.settings.Config;
 import javafx.application.Platform;
@@ -9,9 +9,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
 import java.io.IOException;
@@ -28,8 +28,12 @@ import java.util.ResourceBundle;
  * Greta Vannes
  */
 
-public class ResultatController implements ControllerRegistry, Initializable
+public class ResultController implements ControllerRegistry, Initializable
 {
+    @FXML
+    private AnchorPane resultAnchor;
+    @FXML
+    public ScrollPane resultScrollPane;
     @FXML
     private FlowPane flowPane;
 
@@ -48,37 +52,37 @@ public class ResultatController implements ControllerRegistry, Initializable
         this.homeController = (HomeController) parentController;
     }
 
-    public void loadAndShow(List<ScrapingModelInt<Object>> resultats, Runnable onComplete)
+    public void load(List<ScrapingModel<Object>> results)
     {
         Task<Void> loadResultsTask = new Task<Void>()
         {
             @Override
             protected Void call() throws Exception
             {
-                Parent view = null;
 
-                for ( Object annonce : resultats ) {
+                for ( Object annonce : results ) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(Config.FXML_ROOT_PATH + "component/annonceCard.fxml"));
 
                         try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource(Config.FXML_ROOT_PATH + "component/annonceCard.fxml"));
-                            view = loader.load();
-                            AnnonceCardController controller = loader.getController();
-                            controller.setData((Location) annonce);
+                            Parent view = loader.load();
+                            RentCardController controller = loader.getController();
+                            controller.setData((Rent) annonce);
 
                             counterTask.incrementMainCounterEnded();
                             counterTask.incrementGlobalCounterEnded();
 
+
+                            Platform.runLater(() -> {
+                                flowPane.getChildren().add(view);
+                            });
+
                         } catch ( IOException e ) {
+                            System.out.println("erreur recherche");
 
                             counterTask.decrementMainCounterTotal();
                             counterTask.decrementGlobalCounterTotal();
                             throw new RuntimeException(e);
                         }
-
-                    Parent finalView = view;
-                    Platform.runLater(() -> {
-                        flowPane.getChildren().add(finalView);
-                    });
 
                 }
 
@@ -86,20 +90,15 @@ public class ResultatController implements ControllerRegistry, Initializable
             }
         };
         loadResultsTask.setOnScheduled(e -> {
-            counterTask.setMainCounterTotal(resultats.size());
-            counterTask.setProgressCounter(resultats.size());
+            counterTask.setMainCounterTotal(results.size());
+            counterTask.setProgressCounter(results.size());
         });
 
         loadResultsTask.setOnSucceeded(e -> {
-            Platform.runLater(onComplete);
-            Scene scene = this.flowPane.getScene();
-            Node loader = scene.lookup("#loaderPane");
-            try {
-                Thread.sleep(500);
-                loader.setVisible(false);
-            } catch ( InterruptedException ex ) {
-                Thread.currentThread().interrupt();
-            }
+            Platform.runLater(() -> {
+                homeController.showResult(this.resultAnchor);
+            });
+
         });
 
         Thread scrapingThread = new Thread(loadResultsTask);

@@ -11,7 +11,7 @@ package fr.cda.campingcar.dao.vehicule;
 
 
 import fr.cda.campingcar.dao.DAOFactory;
-import fr.cda.campingcar.model.TypeVehicule;
+import fr.cda.campingcar.model.VehicleType;
 import fr.cda.campingcar.util.DebugHelper;
 import fr.cda.campingcar.util.LoggerConfig;
 import org.apache.logging.log4j.Logger;
@@ -23,13 +23,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeVehiculeDAO implements TypeVehiculeDAOInt
+public class VehicleTypeDAO implements VehiculeTypeDAOInt
 {
 
     protected Connection conn;
     private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
 
-    public TypeVehiculeDAO(DAOFactory daoFactory) throws SQLException {
+    public VehicleTypeDAO(DAOFactory daoFactory) throws SQLException {
         try {
             this.conn = daoFactory.getConnection();
         } catch (SQLException e) {
@@ -40,23 +40,23 @@ public class TypeVehiculeDAO implements TypeVehiculeDAOInt
 
 
     @Override
-    public TypeVehicule find(int id) {
+    public VehicleType find(int id) {
         return null;
     }
 
     @Override
-    public List<TypeVehicule> findAll() {
+    public List<VehicleType> findAll() {
 
         return List.of();
     }
 
     @Override
-    public List<TypeVehicule> findBySite(int siteId) {
+    public List<VehicleType> findBySite(int siteId) {
         String sql = "SELECT * FROM vehicule_type AS vt " +
                      "INNER JOIN site_has_vehicule_type AS svt ON svt.vehicule_type_id = vt.id " +
                      "WHERE site_id = ?";
 
-        List<TypeVehicule> list = new ArrayList<TypeVehicule>();
+        List<VehicleType> list = new ArrayList<VehicleType>();
 
         try (Connection conn = this.conn;
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -66,7 +66,7 @@ public class TypeVehiculeDAO implements TypeVehiculeDAOInt
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String type = rs.getString("type");
-                TypeVehicule typeVehicule = new TypeVehicule(id, type);
+                VehicleType typeVehicule = new VehicleType(id, type);
 
                 list.add(typeVehicule);
             }

@@ -62,11 +62,11 @@ public class DomDAO implements DomDAOInt
                 String path      = rs.getString("path");
                 int    domParentId = rs.getInt("dom_path_parent_id");
                 Boolean withTag = rs.getBoolean("with_tag");
-                String nom       = rs.getString("nom");
+                String name       = rs.getString("nom");
 
                 Dom dom = domMap.get(id);
                 if ( dom == null ) {
-                    dom = new Dom(id, siteId, domElementId, nom, path, domParentId, withTag);
+                    dom = new Dom(id, siteId, domElementId, name, path, domParentId, withTag);
                     domMap.put(id, dom);
                 }
 
@@ -90,7 +90,7 @@ public class DomDAO implements DomDAOInt
                  (parentId != null && dom.getDomParentId().equals(parentId))) {
 
                 // Ajouter l'élément au niveau actuel
-                hierarchy.put(dom.getNom(), dom);
+                hierarchy.put(dom.getName(), dom);
 
                 // Appel récursif pour construire les enfants
                 dom.setChildrensList(new ArrayList<>(buildHierarchy(domList, dom.getDomElementId()).values()));

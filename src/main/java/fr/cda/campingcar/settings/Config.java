@@ -9,7 +9,7 @@ package fr.cda.campingcar.settings;
  * Greta Vannes
  */
 
-import fr.cda.campingcar.model.Ville;
+import fr.cda.campingcar.model.City;
 
 import java.util.*;
 import java.util.function.Function;
@@ -31,17 +31,6 @@ public class Config
     public static final String BINARIE_EXT = "bin";
 
     /**
-     * non utilisé pour le moment
-     */
-    public static final Map<Integer, String> STEP_MAP;
-    static {
-        Map<Integer, String> map = new HashMap<>();
-        map.put(1, "card");
-        map.put(2, "page");
-        STEP_MAP = Collections.unmodifiableMap(map);
-    }
-
-    /**
      * Les urls des sites enregistré sont celle de recherche
      * Ce pattern permet de recuperer la racine protocole + nom de domaine,
      * pour les liens d'annonces sans protocole et nom de domaine
@@ -49,14 +38,25 @@ public class Config
     public static final Pattern HTTPS_WWW_PATTERN = Pattern.compile("(^https:\\/\\/www\\.[^\\/]+)");
 
     /**
+     * CSS
+     */
+    public static final String VALID_CSS = "valid";
+    public static final String INVALID_CSS = "invalid";
+    public static final String WARNING_CSS = "warning";
+    public static final String ERROR_CSS = "error";
+    public static final String INPROGRESS_CSS = "in-progress";
+    public static final String COMPLETED_CSS = "completed";
+    public static final String STATE_CSS = "state";
+
+    /**
      * Utilisé dans les methodes getFormated() de la class Ville pour retourner le nom de la ville en fonction d'un pattern
      * {ville} ( {numDep} ) retournera Vannes ( 56 )
      */
-    public static final Map<String, Function<Ville, String>> VILLE_PATTERN = Map.of(
-            "ville", Ville::getNom,
-            "numDep", ville -> String.valueOf(ville.getDepartement().getNumero()),
+    public static final Map<String, Function<City, String>> VILLE_PATTERN = Map.of(
+            "ville", City::getName,
+            "numDep", ville -> String.valueOf(ville.getDepartement().getNumber()),
             "region", ville -> ville.getDepartement().getRegion()
-                                                                                   );
+                                                                                  );
 
     /**
      * Mise en couleur du texte console
@@ -69,4 +69,5 @@ public class Config
     public static final String PURPLE = "\u001B[35m";
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
+
 }

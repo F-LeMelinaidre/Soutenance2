@@ -9,22 +9,35 @@ package fr.cda.campingcar.util.file.tamplate.word;
  * Greta Vannes
  */
 
-import fr.cda.campingcar.model.Recherche;
-import fr.cda.campingcar.scraping.ScrapingModelInt;
+import fr.cda.campingcar.model.Search;
+import fr.cda.campingcar.scraping.ScrapingModel;
+import fr.cda.campingcar.util.file.WordFile;
 import javafx.concurrent.Task;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 import java.util.Random;
 
 import static fr.cda.campingcar.util.DebugHelper.debug;
 
-public class RechercheXDOC
+public class RechercheXDOC extends WordFile
 {
+    private final Search<ScrapingModel<Object>> recherche;
 
-    public RechercheXDOC(Recherche<ScrapingModelInt<Object>> recherche, String filePath)
+    public RechercheXDOC(Search<ScrapingModel<Object>> recherche, String filePath)
     {
+        super(filePath);
 
+        this.recherche = recherche;
+        this.newDocument();
+    }
 
+    private void header()
+    {
+        XWPFParagraph paragraph = document.createParagraph();
+        XWPFRun run = paragraph.createRun();
 
+        run.setText("Recherche du " + this.recherche);
     }
 
     public Task<Void> save() {

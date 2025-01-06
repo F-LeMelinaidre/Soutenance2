@@ -11,7 +11,7 @@ package fr.cda.campingcar.dao;
 
 
 import fr.cda.campingcar.dao.site.SiteDAO;
-import fr.cda.campingcar.dao.vehicule.TypeVehiculeDAO;
+import fr.cda.campingcar.dao.vehicule.VehicleTypeDAO;
 import fr.cda.campingcar.dao.dom.DomDAO;
 import fr.cda.campingcar.settings.Config;
 import fr.cda.campingcar.util.DebugHelper;
@@ -90,8 +90,8 @@ public class DAOFactory {
         return new SiteDAO(this);
     }
 
-    public TypeVehiculeDAO getTypeVehiculeDAO() throws SQLException {
-        return new TypeVehiculeDAO(this);
+    public VehicleTypeDAO getTypeVehiculeDAO() throws SQLException {
+        return new VehicleTypeDAO(this);
     }
 
     public DomDAO getDomDAO() throws SQLException {

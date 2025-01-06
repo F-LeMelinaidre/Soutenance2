@@ -11,43 +11,43 @@ package fr.cda.campingcar.model;
 
 import java.io.Serializable;
 
-public class BaseDonneeParam implements Serializable
+public class DataBaseParameter implements Serializable
 {
-    private String serveur;
-    private String baseDonnee;
+    private String server;
+    private String dataBase;
     private Integer port;
     private String login;
     private String password;
 
-    public BaseDonneeParam(){}
+    public DataBaseParameter(){}
 
-    public BaseDonneeParam(String serveur, String baseDonnee, Integer port, String login, String password)
+    public DataBaseParameter(String server, String dataBase, Integer port, String login, String password)
     {
-        this.serveur    = serveur;
-        this.baseDonnee = baseDonnee;
+        this.server     = server;
+        this.dataBase = dataBase;
         this.port       = port;
         this.login      = login;
         this.password   = password;
     }
 
-    public String getServeur()
+    public String getServer()
     {
-        return this.serveur;
+        return this.server;
     }
 
-    public void setServeur(String serveur)
+    public void setServer(String server)
     {
-        this.serveur = serveur;
+        this.server = server;
     }
 
-    public String getBaseDonnee()
+    public String getDataBase()
     {
-        return this.baseDonnee;
+        return this.dataBase;
     }
 
-    public void setBaseDonnee(String baseDonnee)
+    public void setDataBase(String dataBase)
     {
-        this.baseDonnee = baseDonnee;
+        this.dataBase = dataBase;
     }
 
     public Integer getPort()
@@ -84,11 +84,11 @@ public class BaseDonneeParam implements Serializable
     public String toString()
     {
         return "ParametreDB{" +
-               "serveur='" + serveur + '\'' +
-               ", baseDonnee='" + baseDonnee + '\'' +
-               ", port=" + port +
-               ", login='" + login + '\'' +
-               ", password='" + password + '\'' +
+               "serveur='" + this.server + '\'' +
+               ", baseDonnee='" + this.dataBase + '\'' +
+               ", port=" + this.port +
+               ", login='" + this.login + '\'' +
+               ", password='" + this.password + '\'' +
                '}';
     }
 }

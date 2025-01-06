@@ -14,8 +14,8 @@
             <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="message" text="Cliquez sur Valider pour lancer la transmission :" />
             <HBox alignment="TOP_CENTER" spacing="32.0">
                <children>
-                  <Button fx:id="validerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#submitForm" prefHeight="30.0" text="Valider" />
-                  <Button fx:id="annulerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" text="Annuler" />
+                  <Button fx:id="validButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#submitForm" prefHeight="30.0" text="Valider" />
+                  <Button fx:id="cancelButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" text="Annuler" />
                </children>
                <VBox.margin>
                   <Insets top="16.0" />

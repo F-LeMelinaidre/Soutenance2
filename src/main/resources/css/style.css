@@ -455,15 +455,76 @@
     src: url('../fonts/poppins-bold.ttf');
 }
 
-
 * {
+}
+
+.root {
+    -fx-secondary-color-bg: #333333;
+
+    -fx-primary-color-txt: #DCDCDC;
+    -fx-secondary-color-txt: #A3FF00;
+
+    -fx-in-progress-color-txt: #ffcc00;
+
+    -fx-grey-80: #333333;
+    -fx-grey-70: #4c4c4c;
+    -fx-grey-60: #676767;
+    -fx-grey-55: #777777;
+    -fx-grey-40: #999999;
+    -fx-grey-30: #B2B2B2;
+    -fx-grey-25: #bfbfbf;
+    -fx-grey-20: #cccccc;
+
+    -fx-blue-color: #0099cc;
+}
+
+.progress-bar .track {
+    -fx-margin: 0;
+    -fx-padding: 0;
+    -fx-border: none;
+    -fx-background-color: -fx-grey-70;
+    -fx-background-radius: 0;
+}
+
+.progress-bar .bar {
+    -fx-pref-height: 16px;
+    -fx-margin: 0;
+    -fx-padding: 0;
+    -fx-border: none;
+    -fx-background-color: linear-gradient(to right, -fx-in-progress-color-txt, -fx-secondary-color-txt);
 }
 
 #loaderPane {
     -fx-padding: 10px 18px 14px 16px;
     -fx-spacing: 4px;
     -fx-font-family: 'Poppins Medium';
-    -fx-background-color: #BBBBBB;
+    -fx-background-color: -fx-secondary-color-bg;
+}
+
+#loaderPane .label {
+    -fx-text-fill: -fx-primary-color-txt;
+}
+
+#loaderPane .in-progress .label {
+    -fx-text-fill: -fx-in-progress-color-txt;
+}
+
+#Main-Counter .completed .label,
+#loaderPane .completed .label {
+    -fx-text-fill: -fx-secondary-color-txt;
+}
+
+#loaderPane #Main-Counter .title {
+    -fx-text-fill: -fx-primary-color-txt;
+}
+
+#loaderPane .sub-counter .title,
+#loaderPane .sub-counter .label.separator {
+    -fx-text-fill: -fx-grey-25;
+}
+
+#loaderPane .label.separator {
+    -fx-text-fill: -fx-primary-color-txt;
 }
 
 #loaderPane .title {
@@ -474,7 +535,9 @@
     -fx-alignment: CENTER_RIGHT;
 }
 
-
+#loaderPane .number {
+    -fx-text-fill: -fx-blue-color;
+}
 
 #Main-Counter,
 #Main-Counter .label {
@@ -496,13 +559,14 @@
     -fx-min-width: 63px;
     -fx-pref-width: 63px;
     -fx-max-width: 63px;
-    -fx-text-fill: #0095ff;
     -fx-effect: none !important;
 }
+
 #Main-Counter .number.ended {
     -fx-padding: 0 8px 0 0;
     -fx-alignment: CENTER_RIGHT;
 }
+
 #Main-Counter .number.total {
     -fx-padding: 0 0 0 8px;
 }
@@ -516,7 +580,6 @@
 
 #loaderPane .sub-counter .label {
     -fx-font-size: 12px;
-    -fx-text-fill: #0095ff;
 }
 
 #loaderPane .sub-counter .number {

@@ -18,7 +18,7 @@ public class Url
 {
     private final int site_id;
     private final String url;
-    private String urlRecherche = null;
+    private String searchUrl = null;
     private final Map<String, UrlParam> params = new HashMap<>() {};
     private final Map<String, Dom> xpath = new HashMap<>();
 
@@ -34,8 +34,8 @@ public class Url
         return (matcher.find()) ? matcher.group(1) : this.url;
     }
 
-    public String getUrlRecherche() {
-        return this.url + this.urlRecherche;
+    public String getSearchUrl() {
+        return this.url + this.searchUrl;
     }
 
     public void putParam(String key, UrlParam urlParam)
@@ -45,7 +45,7 @@ public class Url
 
     private void buildUrlRecherche(Map<Integer, String> urlParams) {
         List<String> params = new ArrayList<>(urlParams.values());
-        this.urlRecherche = String.join("&", params);
+        this.searchUrl = String.join("&", params);
     }
 
     /**
@@ -53,23 +53,23 @@ public class Url
      * La paire clé valeur est enregistré en bd, avec pour certain un format
      * Formate les parametres
      */
-    public void setValueParams(List<TypeVehicule> typeVehiculesSelected, Ville villeDep, Ville villeArr,
-                               LocalDate dateDepart, LocalDate dateArrivee, String budgetMin, String budgetMax)
+    public void setValueParams(List<VehicleType> vehiclesTypeSelected, City cityDep, City cityArr,
+                               LocalDate dateStart, LocalDate dateEnd, String budgetMin, String budgetMax)
     {
 
         String critere;
         Map<Integer, String> urlParams = new HashMap<>();
 
         for ( UrlParam urlParam : this.params.values() ) {
-            critere = urlParam.getCritere();
+            critere = urlParam.getCriteria();
 
-            switch (urlParam.getGroupe()) {
+            switch (urlParam.getGroup()) {
                 case "localisation":
-                    Ville ville = (critere.equals("depart")) ? villeDep : villeArr;
+                    City ville = (critere.equals("depart")) ? cityDep : cityArr;
                     urlParam.setValue(ville);
                     break;
                 case "periode":
-                    LocalDate date = (critere.equals("depart")) ? dateDepart : dateArrivee;
+                    LocalDate date = (critere.equals("depart")) ? dateStart : dateEnd;
                     urlParam.setValue(date);
                     break;
                 case "budget":
@@ -78,13 +78,13 @@ public class Url
                     break;
             }
 
-            if ( !urlParam.getGroupe().equals("vehicule") )
+            if ( !urlParam.getGroup().equals("vehicule") )
                 urlParams.put(urlParam.getPosition(),urlParam.getKeyValueParam());
         }
 
 
         int position = urlParams.size()+1;
-        this.resolveTypeVehiculeParams(position, typeVehiculesSelected, urlParams);
+        this.resolvevehicleTypeParams(position, vehiclesTypeSelected, urlParams);
 
         this.buildUrlRecherche(urlParams);
     }
@@ -93,10 +93,10 @@ public class Url
      * Ajoute les vehicules à la map urlParams en fonction de la selection et des vehicules propsoé par le site
      * @param position position du parametre dans l url
      */
-    private void resolveTypeVehiculeParams(int position, List<TypeVehicule> typeVehiculesSelected, Map<Integer, String> urlParams) {
-        for (TypeVehicule typeVehicule : typeVehiculesSelected) {
-            int id = typeVehicule.getId();
-            String type = typeVehicule.getType();
+    private void resolvevehicleTypeParams(int position, List<VehicleType> vehiclesTypeSelected, Map<Integer, String> urlParams) {
+        for ( VehicleType vehicleType : vehiclesTypeSelected) {
+            int id = vehicleType.getId();
+            String type = vehicleType.getType();
             String key = this.site_id + type + id;
 
             if(this.params.get(key) != null) {

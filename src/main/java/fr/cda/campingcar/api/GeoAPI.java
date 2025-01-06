@@ -11,7 +11,7 @@ package fr.cda.campingcar.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.cda.campingcar.model.Ville;
+import fr.cda.campingcar.model.City;
 import fr.cda.campingcar.model.Departement;
 
 import java.io.IOException;
@@ -39,8 +39,8 @@ public class GeoAPI {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    public List<Ville> rechercheCommune(String villeRecherche) throws IOException, InterruptedException {
-        List<Ville> villes = new ArrayList<>();
+    public List<City> rechercheCommune(String villeRecherche) throws IOException, InterruptedException {
+        List<City> villes = new ArrayList<>();
 
         String url = String.format(_api_url, villeRecherche);
         HttpRequest request = HttpRequest.newBuilder()
@@ -66,7 +66,7 @@ public class GeoAPI {
                 String nomRegion = node.path("region").path("nom").asText();
 
                 Departement departement = new Departement(codeDepartement, nomDepartement, nomRegion);
-                Ville commune = new Ville(codeCommune, nomCommune, lat, lng, codePostal, departement);
+                City commune = new City(codeCommune, nomCommune, lat, lng, codePostal, departement);
                 villes.add(commune);
             }
 

@@ -17,7 +17,7 @@
                   <String fx:value="number" />
                   <String fx:value="ended" />
                </styleClass></Label>
-            <Label fx:id="mainCounterSeparator" text="Sites sur" HBox.hgrow="NEVER" />
+            <Label fx:id="mainCounterSeparator" styleClass="separator" text="Sites sur" HBox.hgrow="NEVER" />
             <Label fx:id="mainCounterTotal" text="20" HBox.hgrow="NEVER">
                <styleClass>
                   <String fx:value="number" />

@@ -40,27 +40,27 @@
                 <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="10.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                     <children>
                         <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="RIGHT_TO_LEFT" text="Type de véhicule :" />
-                        <CheckComboBox fx:id="typeVehiculeComboBox" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="150.0" prefHeight="30.0" prefWidth="150.0" />
+                        <CheckComboBox fx:id="vehicleTypeComboBox" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="150.0" prefHeight="30.0" prefWidth="150.0" />
                     </children>
                 </HBox>
                 <Label alignment="TOP_CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" text="Budget journalier" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
                 <TextField fx:id="budgetMin" focusTraversable="false" minHeight="-Infinity" minWidth="150.0" onKeyTyped="#validTextField" prefHeight="30.0" prefWidth="150.0" promptText="Min / Jours" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                 <TextField fx:id="budgetMax" focusTraversable="false" layoutX="463.0" layoutY="48.0" minHeight="-Infinity" minWidth="150.0" onKeyTyped="#validTextField" prefHeight="30.0" prefWidth="150.0" promptText="Max / Jours" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                 <Label alignment="TOP_CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" text="Lieu" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
-                <ComboBox fx:id="villeDepartField" editable="true" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" onKeyReleased="#autocompleteVilleField" prefHeight="30.0" prefWidth="150.0" promptText="Ville de Départ" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                <ComboBox fx:id="villeArriveeField" editable="true" focusTraversable="false" layoutX="392.0" layoutY="46.0" maxHeight="-Infinity" minHeight="-Infinity" onKeyReleased="#autocompleteVilleField" prefHeight="30.0" prefWidth="150.0" promptText="Ville d'Arrivée" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                <ComboBox fx:id="departureCityField" editable="true" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" onKeyReleased="#autocompleteVilleField" prefHeight="30.0" prefWidth="150.0" promptText="Ville de Départ" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <ComboBox fx:id="arrivalCityField" editable="true" focusTraversable="false" layoutX="392.0" layoutY="46.0" maxHeight="-Infinity" minHeight="-Infinity" onKeyReleased="#autocompleteVilleField" prefHeight="30.0" prefWidth="150.0" promptText="Ville d'Arrivée" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                 <Label alignment="TOP_CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" text="Période de location" GridPane.columnIndex="4" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
-                <DatePicker fx:id="periodeDebutDatePicker" editable="false" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="150.0" onAction="#onStartDateSelected" onKeyTyped="#validTextField" prefHeight="30.0" prefWidth="150.0" promptText="Date de Début" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                <DatePicker fx:id="periodeFinDatePicker" editable="false" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="150.0" onAction="#onEndDateSelected" onKeyTyped="#validTextField" prefHeight="30.0" prefWidth="150.0" promptText="Date de Fin" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                <DatePicker fx:id="periodStartDatePicker" editable="false" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="150.0" onAction="#onStartDateSelected" onKeyTyped="#validTextField" prefHeight="30.0" prefWidth="150.0" promptText="Date de Début" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                <DatePicker fx:id="periodEndDatePicker" editable="false" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="150.0" onAction="#onEndDateSelected" onKeyTyped="#validTextField" prefHeight="30.0" prefWidth="150.0" promptText="Date de Fin" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                 <HBox alignment="BOTTOM_LEFT" minHeight="-Infinity" prefHeight="30.0" spacing="16.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="BOTTOM">
                     <children>
-                        <Button fx:id="effacerBouton" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#effacer" prefHeight="30.0" text="Effacer">
+                        <Button fx:id="clearButton" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#effacer" prefHeight="30.0" text="Effacer">
                             <styleClass>
                                 <String fx:value="clear-btn" />
                                 <String fx:value="btn" />
                             </styleClass>
                         </Button>
-                        <Button fx:id="rechercherBouton" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#reseach" prefHeight="30.0" text="Rechercher">
+                        <Button fx:id="searchButton" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#reseach" prefHeight="30.0" text="Rechercher">
                             <styleClass>
                                 <String fx:value="search-btn" />
                                 <String fx:value="btn" />

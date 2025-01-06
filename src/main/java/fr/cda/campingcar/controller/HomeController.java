@@ -9,11 +9,12 @@
 
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.Recherche;
+import fr.cda.campingcar.model.Search;
 import fr.cda.campingcar.scraping.ScrapingManager;
-import fr.cda.campingcar.scraping.ScrapingModelInt;
+import fr.cda.campingcar.scraping.ScrapingModel;
 import fr.cda.campingcar.util.render.FXMLRender;
 import fr.cda.campingcar.util.file.tamplate.word.RechercheXDOC;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -45,10 +46,11 @@ public class HomeController
 
     private FXMLRender fxmlRender;
     private LoaderController loaderController;
-    private ResultatController resultatController;
-    private List<ScrapingModelInt<Object>> resultats;
-    private Recherche<ScrapingModelInt<Object>> recherche;
+    private ResultController resultController;
+    private List<ScrapingModel<Object>> results;
     private SearchController searchController;
+    private Search<ScrapingModel<Object>> search;
+    private Pane currentResultView;
 
     @FXML
     public void initialize()
@@ -64,7 +66,7 @@ public class HomeController
 
         switch (item.getId()) {
             case "saveFile":
-                this.saveREcherche();
+                this.saveSearch();
                 /*System.out.println(Config.CYAN + " Resultats :");
                 if(this.resultats != null) {
                     for(ScrapingModelInt<Object> model : this.resultats) {
@@ -87,14 +89,14 @@ public class HomeController
         }
     }
 
-    private void saveREcherche() {
+    private void saveSearch() {
         FileChooser fileDialog = new FileChooser();
         fileDialog.setTitle("Save file");
         File file = fileDialog.showSaveDialog(this.homePane.getScene().getWindow());
 
         if (file != null) {
             String filePath = file.getAbsolutePath();
-            Task<Void> saveDocumentTask = new RechercheXDOC(this.recherche, filePath).save();
+            Task<Void> saveDocumentTask = new RechercheXDOC(this.search, filePath).save();
 
             AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde");
 
@@ -117,12 +119,12 @@ public class HomeController
     }
 
 
-    public void startScrapping(Recherche<ScrapingModelInt<Object>> recherche)
+    public void startScrapping(Search<ScrapingModel<Object>> recherche)
     {
-        this.recherche = recherche;
+        this.search = recherche;
 
-        if (this.resultatController == null) this.resultatController = this.fxmlRender.loadFXML("resultat.fxml", this.mainContainer);
-        this.resultatController.clear();
+        if ( this.resultController == null) this.resultController = this.fxmlRender.loadFXML("resultat.fxml", this.mainContainer);
+        this.resultController.clear();
 
         Task<Void> scrapingTask = new ScrapingManager(recherche).scrapTask();
 
@@ -135,8 +137,8 @@ public class HomeController
 
         scrapingTask.setOnSucceeded(event -> {
             this.loaderController.setTitleMainCounter("du chargement", "Annonce");
-            this.resultats = this.recherche.getResultats();
-            this.resultatController.loadAndShow(this.resultats, () -> this.searchController.toggleDisableForm());
+            this.results = this.search.getResults();
+            this.resultController.load(this.results);
         });
 
         scrapingTask.setOnFailed(event -> {
@@ -151,10 +153,14 @@ public class HomeController
 
     }
 
-    public void clearResultat() {
-        if(this.resultatController != null) {
-            this.resultatController.clear();
+    public void showResult(Pane view) {
+        this.searchController.toggleDisableForm();
+        this.loaderController.hide();
+    }
 
+    public void clearScrapResult() {
+        if( this.resultController != null) {
+            this.resultController.clear();
         }
     }
 }

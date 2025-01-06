@@ -18,35 +18,35 @@ public class UrlParam
 {
     private final int site_id;
     private final int position;
-    private final String groupe;
+    private final String group;
     private final String type;
-    private final String critere;
+    private final String criteria;
     private final String key;
     private final String defaultValue;
     private String value;
     private String format;
 
-    public UrlParam(int site_id, int position, String groupe, String type, String critere, String key, String defaultValue, String format)
+    public UrlParam(int site_id, int position, String group, String type, String criteria, String key, String defaultValue, String format)
     {
-        //System.out.println(Config.CYAN + "URLParam: " + site_id + " " + groupe + " " + reference + " " + paramKey + " " + format + Config.RESET);
+        //System.out.println(Config.CYAN + "URLParam: " + site_id + " " + group + " " + reference + " " + paramKey + " " + format + Config.RESET);
         this.site_id      = site_id;
         this.position     = position;
-        this.groupe       = groupe;
+        this.group       = group;
         this.type         = type;
-        this.critere      = critere;
+        this.criteria      = criteria;
         this.key          = key;
         this.defaultValue = defaultValue;
         this.format       = format;
     }
 
-    public UrlParam(int site_id, int position, String groupe, String type, String critere, String key, String value)
+    public UrlParam(int site_id, int position, String group, String type, String criteria, String key, String value)
     {
-        //System.out.println(Config.CYAN + "URLParam: " + site_id + " " + groupe + " " + reference + " " + paramKey + " " + format + Config.RESET);
+        //System.out.println(Config.CYAN + "URLParam: " + site_id + " " + group + " " + reference + " " + paramKey + " " + format + Config.RESET);
         this.site_id      = site_id;
         this.position     = position;
-        this.groupe       = groupe;
+        this.group       = group;
         this.type         = type;
-        this.critere      = critere;
+        this.criteria      = criteria;
         this.key          = key;
         this.defaultValue = value;
     }
@@ -56,9 +56,9 @@ public class UrlParam
         return this.position;
     }
 
-    public String getGroupe()
+    public String getGroup()
     {
-        return this.groupe;
+        return this.group;
     }
 
     public String getType()
@@ -66,15 +66,15 @@ public class UrlParam
         return this.type;
     }
 
-    public String getCritere()
+    public String getCriteria()
     {
-        return this.critere;
+        return this.criteria;
     }
 
     public <T> void setValue(T value)
     {
-        if ( value instanceof Ville ) {
-            this.setLocalisationParam((Ville) value);
+        if ( value instanceof City ) {
+            this.setLocalisationParam((City) value);
         } else if ( value instanceof LocalDate ) {
             this.setFormateDate((LocalDate) value);
         } else if ( value instanceof String ) {
@@ -88,14 +88,14 @@ public class UrlParam
         return this.key + "=" + value;
     }
 
-    private void setLocalisationParam(Ville ville)
+    private void setLocalisationParam(City city)
     {
         switch (this.type) {
             case "latitude":
-                this.value = ville.getLat();
+                this.value = city.getLat();
                 break;
             case "longitude":
-                this.value = ville.getLng();
+                this.value = city.getLng();
                 break;
             case "code_pays":
             case "pays":
@@ -104,9 +104,9 @@ public class UrlParam
                 break;
 
             default:
-                String val = ville.getNom();
+                String val = city.getName();
                 if ( format != null ) {
-                    val = this.encodeUTF8(ville.getFormated(format));
+                    val = this.encodeUTF8(city.getFormated(format));
                 }
 
                 this.value = val;
@@ -133,15 +133,15 @@ public class UrlParam
     public String toString()
     {
         return "UrlParam{" +
-               "site_id=" + site_id +
-               ", position=" + position +
-               ", groupe='" + groupe + '\'' +
-               ", type='" + type + '\'' +
-               ", critere='" + critere + '\'' +
-               ", key='" + key + '\'' +
-               ", value='" + value + '\'' +
-               ", defaultValue=" + defaultValue +
-               ", format='" + format + '\'' +
+               "site_id=" + this.site_id +
+               ", position=" + this.position +
+               ", group='" + this.group + '\'' +
+               ", type='" + this.type + '\'' +
+               ", criteria='" + this.criteria + '\'' +
+               ", key='" + this.key + '\'' +
+               ", value='" + this.value + '\'' +
+               ", defaultValue=" + this.defaultValue +
+               ", format='" + this.format + '\'' +
                '}';
     }
 }

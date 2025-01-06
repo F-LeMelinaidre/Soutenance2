@@ -1,11 +1,8 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.Location;
+import fr.cda.campingcar.model.Rent;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -21,7 +18,7 @@ import java.util.ResourceBundle;
  * Greta Vannes
  */
 
-public class AnnonceDetailController extends AnnonceController
+public class RentDetailController extends RentController
 {
     @FXML
     private WebView descriptionTextArea;
@@ -29,15 +26,15 @@ public class AnnonceDetailController extends AnnonceController
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
-        this.mainPane = this.annoncePane;
+        this.mainPane = this.rentPane;
         super.initialize(url, resourceBundle);
     }
 
     @Override
-    public void setData(Location annonce)
+    public void setData(Rent rent)
     {
-        super.setData(annonce);
-        this.setDescription(annonce.getDescription());
+        super.setData(rent);
+        this.setDescription(rent.getDescription());
     }
 
     @Override

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="parametreDBPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.ParametreBDController">
+<VBox fx:id="parameterDataBasePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.ParameterDataBaseController">
    <children>
       <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="form">
          <children>
@@ -36,7 +36,7 @@
               </rowConstraints>
                <children>
                   <TextField fx:id="serveurField" focusTraversable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyTyped="#validTextField" promptText="Nom d'host ou adresse IP" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="0" />
-                  <TextField fx:id="baseDeDonneeField" focusTraversable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyTyped="#validTextField" promptText="Nom de la Base de données" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" />
+                  <TextField fx:id="dataBaseField" focusTraversable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyTyped="#validTextField" promptText="Nom de la Base de données" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" />
                   <TextField fx:id="portField" focusTraversable="false" maxWidth="64.0" minWidth="-Infinity" onKeyTyped="#validTextField" prefWidth="64.0" promptText="ex:3306" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <TextField fx:id="loginField" focusTraversable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyTyped="#validTextField" promptText="Nom du login utilisateur" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6" />
                   <TextField fx:id="passwordField" focusTraversable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyTyped="#validTextField" promptText="Mot de passe utilisateur" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="8" />
@@ -48,7 +48,7 @@
                   <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="16.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="10">
                      <children>
                         <Button fx:id="validateButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="84.0" mnemonicParsing="false" onMouseClicked="#submitForm" prefHeight="30.0" styleClass="btn" text="Valider" />
-                        <Button fx:id="annulerBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="84.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" styleClass="btn" text="Annuler" />
+                        <Button fx:id="cancelBouton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="84.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" styleClass="btn" text="Annuler" />
                      </children>
                   </HBox>
                </children>

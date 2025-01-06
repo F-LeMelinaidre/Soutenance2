@@ -1,7 +1,7 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.BaseDonneeParam;
-import fr.cda.campingcar.model.Location;
+import fr.cda.campingcar.model.DataBaseParameter;
+import fr.cda.campingcar.model.Rent;
 import fr.cda.campingcar.util.DebugHelper;
 import fr.cda.campingcar.util.render.FXMLRender;
 import fr.cda.campingcar.util.LoggerConfig;
@@ -35,15 +35,15 @@ public class SaveDataController extends FXMLWindow implements Initializable
     private VBox saveDataPane;
 
     @FXML
-    private Button validerBouton;
+    private Button validButton;
 
     @FXML
-    private Button annulerBouton;
+    private Button cancelButton;
 
     private static final Logger LOGGER_FILE = LoggerConfig.getLoggerFile();
-    private final BinarieFile<BaseDonneeParam> paramDBBinarieFile = new BinarieFile<>("param_db");
-    private BaseDonneeParam parametreDB;
-    private List<Location> locationList;
+    private final BinarieFile<DataBaseParameter> dataBaseBinarie = new BinarieFile<>("param_db");
+    private DataBaseParameter dataBaseParameter;
+    private List<Rent> rentList;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
@@ -55,16 +55,16 @@ public class SaveDataController extends FXMLWindow implements Initializable
         Platform.runLater(() -> {
             try {
 
-                this.parametreDB = paramDBBinarieFile.readFile();
+                this.dataBaseParameter = dataBaseBinarie.readFile();
 
-                if (this.parametreDB == null) {
+                if ( this.dataBaseParameter == null) {
                     this.closeWindow();
 
                     AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde");
                     alertMessageController.setMessage("Les paramètres de connexion à la base de données ne sont pas définis.\nVeuillez les configurer.", "warning");
 
                 } else {
-                    DebugHelper.debug("Ouverture Binaire file", this.parametreDB.toString(), true);
+                    DebugHelper.debug("Ouverture Binaire file", this.dataBaseParameter.toString(), true);
                 }
 
             } catch (IOException e) {

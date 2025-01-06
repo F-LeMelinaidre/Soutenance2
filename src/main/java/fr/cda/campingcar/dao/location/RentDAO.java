@@ -10,7 +10,7 @@ package fr.cda.campingcar.dao.location;
  */
 
 import fr.cda.campingcar.dao.DAOFactory;
-import fr.cda.campingcar.model.Location;
+import fr.cda.campingcar.model.Rent;
 import fr.cda.campingcar.util.DebugHelper;
 import fr.cda.campingcar.util.LoggerConfig;
 import org.apache.logging.log4j.Logger;
@@ -19,13 +19,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class LocationDAO implements LocationDAOInt
+public class RentDAO implements RentDAOInt
 {
 
     private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
     protected Connection conn;
 
-    public LocationDAO(DAOFactory daoFactory) throws SQLException
+    public RentDAO(DAOFactory daoFactory) throws SQLException
     {
         try {
             this.conn = daoFactory.getConnection();
@@ -36,37 +36,37 @@ public class LocationDAO implements LocationDAOInt
     }
 
     @Override
-    public boolean save(Location location)
+    public boolean save(Rent location)
     {
         return false;
     }
 
     @Override
-    public boolean saveAll(List<Location> locations)
+    public boolean saveAll(List<Rent> locations)
     {
         return false;
     }
 
     @Override
-    public boolean update(Location location)
+    public boolean update(Rent location)
     {
         return false;
     }
 
     @Override
-    public Location findById(int id)
+    public Rent findById(int id)
     {
         return null;
     }
 
     @Override
-    public List<Location> findAll()
+    public List<Rent> findAll()
     {
         return List.of();
     }
 
     @Override
-    public boolean delete(Location location)
+    public boolean delete(Rent location)
     {
         return false;
     }

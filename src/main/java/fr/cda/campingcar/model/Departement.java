@@ -11,40 +11,40 @@ package fr.cda.campingcar.model;
 
 public class Departement
 {
-    private final int numero;
-    private String nom;
+    private final int number;
+    private String name;
     private final String region;
 
-    public Departement(int numero, String nom, String region)
+    public Departement(int number, String name, String region)
     {
-        this.numero = numero;
-        this.nom = nom;
+        this.number = number;
+        this.name   = name;
         this.region = region;
     }
 
-    public String getNumero()
+    public String getNumber()
     {
-        return String.format("%02d", this.numero);
+        return String.format("%02d", this.number);
     }
 
-    public String getNom()
+    public String getName()
     {
-        return nom;
+        return name;
     }
 
-    public void setNom(String nom)
+    public void setName(String name)
     {
-        this.nom = nom;
+        this.name = name;
     }
 
     public String getRegion()
     {
-        return region;
+        return this.region;
     }
 
     @Override
     public String toString()
     {
-        return "Departement: " + numero + " - " + nom;
+        return "Departement: " + this.number + " - " + this.name;
     }
 }

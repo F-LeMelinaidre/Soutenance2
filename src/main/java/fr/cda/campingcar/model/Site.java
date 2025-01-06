@@ -19,18 +19,18 @@ public class Site
 {
 
     private int id;
-    private String nom;
+    private String name;
     private final Url url;
     private Map<String, Dom> domMap;
-    private final Map<Integer, TypeVehicule> typeVehicules = new HashMap<>();
+    private final Map<Integer, VehicleType> vehiclesType = new HashMap<>();
 
 
     public Site(int id, String name, String url)
     {
         //System.out.println(Config.YELLOW + "Site: " + id + " " + name + Config.RESET);
-        this.id  = id;
-        this.nom = name;
-        this.url = new Url(id, url);
+        this.id   = id;
+        this.name = name;
+        this.url  = new Url(id, url);
     }
 
     public int getId()
@@ -45,12 +45,12 @@ public class Site
 
     public String getName()
     {
-        return this.nom;
+        return this.name;
     }
 
     public void setName(String name)
     {
-        this.nom = name;
+        this.name = name;
     }
 
     public Url getUrl()
@@ -63,16 +63,16 @@ public class Site
         return this.url.getUrlRoot();
     }
 
-    public String getUrlRecherche()
+    public String getSearchUrl()
     {
-        return this.url.getUrlRecherche();
+        return this.url.getSearchUrl();
     }
 
-    public void setUrlRecherche(List<TypeVehicule> typeVehiculesSelected, Ville villeDep,
-                                Ville villeArr, LocalDate dateDepart, LocalDate dateArrivee,
-                                String budgetMin, String budgetMax)
+    public void setUrlSearch(List<VehicleType> vehiclesTypeSelected, City cityDep,
+                             City cityArr, LocalDate dateStart, LocalDate dateEnd,
+                             String budgetMin, String budgetMax)
     {
-        this.url.setValueParams(typeVehiculesSelected, villeDep, villeArr, dateDepart, dateArrivee, budgetMin, budgetMax);
+        this.url.setValueParams(vehiclesTypeSelected, cityDep, cityArr, dateStart, dateEnd, budgetMin, budgetMax);
     }
 
     public void setDomMap(Map<String, Dom> domMap) {
@@ -83,36 +83,36 @@ public class Site
         return this.domMap;
     }
 
-    public void addTypeVehicule(TypeVehicule typeVehicule)
+    public void addTypeVehicule(VehicleType vehicleType)
     {
-        this.typeVehicules.put(typeVehicule.getId(), typeVehicule);
+        this.vehiclesType.put(vehicleType.getId(), vehicleType);
     }
 
-    public Map<Integer, TypeVehicule> getTypeVehicules()
+    public Map<Integer, VehicleType> getVehiculesType()
     {
-        return this.typeVehicules;
+        return this.vehiclesType;
     }
 
-    public boolean typeVehiculeExiste(int vehiculeTypeId)
+    public boolean typeVehiculeExiste(int vehicleTypeId)
     {
-        return this.typeVehicules.containsKey(vehiculeTypeId);
+        return this.vehiclesType.containsKey(vehicleTypeId);
     }
 
-    public List<TypeVehicule> filterVehicule(List<TypeVehicule> typeVehiculesSelected)
+    public List<VehicleType> filterVehicle(List<VehicleType> vehiclesTypeSelected)
     {
-        List<TypeVehicule> vehiculesParams = new ArrayList<>();
-        for ( TypeVehicule typeVehicule : typeVehiculesSelected ) {
-            int id = typeVehicule.getId();
-            if ( this.typeVehicules.containsKey(id) ) {
-                vehiculesParams.add(this.typeVehicules.get(id));
+        List<VehicleType> vehiclesParams = new ArrayList<>();
+        for ( VehicleType vehiculeType : vehiclesTypeSelected ) {
+            int id = vehiculeType.getId();
+            if ( this.vehiclesType.containsKey(id) ) {
+                vehiclesParams.add(this.vehiclesType.get(id));
             }
         }
 
-        return vehiculesParams;
+        return vehiclesParams;
     }
 
     public String toString()
     {
-        return this.nom;
+        return this.name;
     }
 }

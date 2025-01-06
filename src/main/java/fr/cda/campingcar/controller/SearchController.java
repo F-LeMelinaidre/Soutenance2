@@ -34,10 +34,7 @@ import org.controlsfx.control.CheckComboBox;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO
 //  MERITE D ÊTRE FACTORISE
@@ -56,30 +53,30 @@ public class SearchController implements Initializable, ControllerRegistry
     @FXML
     private CheckComboBox<Site> siteComboBox;
     @FXML
-    private CheckComboBox<TypeVehicule> typeVehiculeComboBox;
+    private CheckComboBox<VehicleType> vehicleTypeComboBox;
     @FXML
-    private ComboBox<Ville> villeDepartField;
+    private ComboBox<City> departureCityField;
     @FXML
-    private ComboBox<Ville> villeArriveeField;
+    private ComboBox<City> arrivalCityField;
     @FXML
-    private DatePicker periodeDebutDatePicker;
+    private DatePicker periodStartDatePicker;
     @FXML
-    private DatePicker periodeFinDatePicker;
+    private DatePicker periodEndDatePicker;
     @FXML
     private TextField budgetMin;
     @FXML
     private TextField budgetMax;
     @FXML
-    private Button rechercherBouton;
+    private Button searchButton;
     @FXML
-    private Button effacerBouton;
+    private Button clearButton;
     @FXML
     private Label hintLabel;
 
     private HomeController homeController = null;
     private final DAOFactory daoFactory;
     private final GeoApiService geoApiService;
-    private final LocalDate dateCourante;
+    private final LocalDate currentDate;
 
     private boolean disable = false;
 
@@ -87,20 +84,20 @@ public class SearchController implements Initializable, ControllerRegistry
     {
         this.daoFactory    = DAOFactory.getInstance();
         this.geoApiService = new GeoApiService(new GeoAPI());
-        this.dateCourante  = LocalDate.now();
+        this.currentDate   = LocalDate.now();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
         this.loadSiteComboBox();
-        this.configureVilleComboBox(this.villeDepartField);
-        this.configureVilleComboBox(this.villeArriveeField);
+        this.configureCityComboBox(this.departureCityField);
+        this.configureCityComboBox(this.arrivalCityField);
         this.initializeDatePicker();
         this.initializeEventListener();
 
 
-        this.rechercherBouton.setDisable(true);
+        this.searchButton.setDisable(true);
     }
 
     @Override
@@ -114,42 +111,45 @@ public class SearchController implements Initializable, ControllerRegistry
     {
 
         List<Site> sitesSelected = this.siteComboBox.getCheckModel().getCheckedItems();
-        List<TypeVehicule> typeVehiculesSelected = this.typeVehiculeComboBox.getCheckModel().getCheckedItems();
+        List<VehicleType> vehiclesTypeSelected = this.vehicleTypeComboBox.getCheckModel().getCheckedItems();
         String budgetMax = this.budgetMax.getText();
         String budgetMin = this.budgetMin.getText();
-        Ville villeDep = this.villeDepartField.getSelectionModel().getSelectedItem();
-        Ville villeArr = this.villeArriveeField.getSelectionModel().getSelectedItem();
-        String date = this.dateCourante.toString();
-        LocalDate dateDepart = this.periodeDebutDatePicker.getValue();
-        LocalDate dateArrivee = this.periodeFinDatePicker.getValue();
+        City cityDep = this.departureCityField.getSelectionModel().getSelectedItem();
+        City cityArr = this.arrivalCityField.getSelectionModel().getSelectedItem();
+        String currentDate = this.currentDate.toString();
+        LocalDate periodStart = this.periodStartDatePicker.getValue();
+        LocalDate periodeEnd = this.periodEndDatePicker.getValue();
 
-        Map<String, Object> critereRecherche = new HashMap<>()
+        Map<String, Object> criteriaSearch = new HashMap<>()
         {{
             put("Liste Sites", sitesSelected);
-            put("Liste Véhicules", typeVehiculesSelected);
+            put("Liste Véhicules", vehiclesTypeSelected);
             put("Budget Max", budgetMax);
             put("Budget Min", budgetMin);
-            put("Ville Départ", villeDep);
-            put("Ville Arrivée", villeArr);
-            put("Date Départ", dateDepart);
-            put("Date Retour", dateArrivee);
+            put("Ville Départ", cityDep);
+            put("Ville Arrivée", cityArr);
+            put("Date Départ", periodStart);
+            put("Date Retour", periodeEnd);
 
-            put("Date de Recherche", date);
+            put("Date de Recherche", currentDate);
         }};
 
 
         for ( Site site : sitesSelected ) {
-            List<TypeVehicule> typeVehiculesFiltred = site.filterVehicule(typeVehiculesSelected);
+            List<VehicleType> typeVehiclesFiltred = site.filterVehicle(vehiclesTypeSelected);
 
             Map<String, Dom> domMap = this.daoFactory.getDomDAO().findBySite(site.getId());
             site.setDomMap(domMap);
-            site.setUrlRecherche(typeVehiculesFiltred, villeDep, villeArr, dateDepart, dateArrivee, budgetMin, budgetMax);
+            site.setUrlSearch(typeVehiclesFiltred, cityDep, cityArr, periodStart, periodeEnd, budgetMin, budgetMax);
 
         }
 
-        Recherche recherche = new Recherche(sitesSelected, critereRecherche, Location::new);
+        Search search = new Search(Rent::new);
+        search.setDate(this.currentDate);
+        search.setSitesList(sitesSelected);
+        search.addCriteria("Liste des Véhicules", vehiclesTypeSelected);
 
-        this.homeController.startScrapping(recherche);
+        this.homeController.startScrapping(search);
 
         this.toggleDisableForm();
     }
@@ -159,15 +159,15 @@ public class SearchController implements Initializable, ControllerRegistry
     {
 
         this.siteComboBox.getCheckModel().clearChecks();
-        this.typeVehiculeComboBox.getCheckModel().clearChecks();
+        this.vehicleTypeComboBox.getCheckModel().clearChecks();
 
-        this.villeDepartField.setValue(null);
-        Validator.clearClass(this.villeDepartField);
-        this.villeArriveeField.setValue(null);
-        Validator.clearClass(this.villeArriveeField);
+        this.departureCityField.setValue(null);
+        Validator.clearClass(this.departureCityField);
+        this.arrivalCityField.setValue(null);
+        Validator.clearClass(this.arrivalCityField);
 
-        this.periodeDebutDatePicker.setValue(null);
-        this.periodeFinDatePicker.setValue(null);
+        this.periodStartDatePicker.setValue(null);
+        this.periodEndDatePicker.setValue(null);
         this.initializeDatePicker();
 
         this.budgetMin.clear();
@@ -175,49 +175,49 @@ public class SearchController implements Initializable, ControllerRegistry
         this.budgetMax.clear();
         Validator.clearClass(this.budgetMax);
 
-        this.updateRechercherBoutonState();
-        this.homeController.clearResultat();
+        this.updateSearchButtonState();
+        this.homeController.clearScrapResult();
     }
 
     /**
      * Rafraichi la liste des types de véhicules proposés par les sites sélectionnés.
      */
     @FXML
-    private void refreshTypeVehiculeComboBox()
+    private void refreshVehicleTypeComboBox()
     {
 
-        Set<TypeVehicule> typesVehicules = new HashSet<>();
+        Set<VehicleType> vehicleTypes = new HashSet<>();
 
         // Ajouter les types de véhicules du/des sites selectionnés dans le Set
         for ( Site site : this.siteComboBox.getCheckModel().getCheckedItems() ) {
-            typesVehicules.addAll(site.getTypeVehicules().values());
+            vehicleTypes.addAll(site.getVehiculesType().values());
         }
 
         // Sauvegarde des éléments selectionnés
-        List<TypeVehicule> selectedItems = new ArrayList<>(typeVehiculeComboBox.getCheckModel().getCheckedItems());
-        typeVehiculeComboBox.getCheckModel().clearChecks();
+        List<VehicleType> selectedItems = new ArrayList<>(vehicleTypeComboBox.getCheckModel().getCheckedItems());
+        vehicleTypeComboBox.getCheckModel().clearChecks();
 
         // Itérer les éléments actuels du ComboBox et ajuste la liste
-        Iterator<TypeVehicule> iterator = typeVehiculeComboBox.getItems().iterator();
+        Iterator<VehicleType> iterator = vehicleTypeComboBox.getItems().iterator();
         while ( iterator.hasNext() ) {
-            TypeVehicule type = iterator.next();
-            if ( !typesVehicules.contains(type) ) {
+            VehicleType type = iterator.next();
+            if ( !vehicleTypes.contains(type) ) {
                 // Suppression dans la liste du ComboBox si non present dans la nouvelle liste
                 iterator.remove();
             } else {
-                typesVehicules.remove(type);
+                vehicleTypes.remove(type);
                 // Suppression dans la nouvelle liste si présent dans le ComboBox
             }
         }
 
         // Ajoute les types restants dans la nouvelle liste au ComboBox
-        typeVehiculeComboBox.getItems().addAll(typesVehicules);
+        vehicleTypeComboBox.getItems().addAll(vehicleTypes);
         // Trie par ordre alphabétique après modification
-        typeVehiculeComboBox.getItems().sort(Comparator.comparing(TypeVehicule::getType));
+        vehicleTypeComboBox.getItems().sort(Comparator.comparing(VehicleType::getType));
 
         // Restaure la selection
-        for ( TypeVehicule type : selectedItems ) {
-            typeVehiculeComboBox.getCheckModel().check(type);
+        for ( VehicleType type : selectedItems ) {
+            vehicleTypeComboBox.getCheckModel().check(type);
         }
     }
 
@@ -234,20 +234,20 @@ public class SearchController implements Initializable, ControllerRegistry
     {
         this.validTextField(keyEvent);
 
-        ComboBox<Ville> item = (ComboBox<Ville>) keyEvent.getSource();
-        String communeRecherche = item.getEditor().getText();
+        ComboBox<City> item = (ComboBox<City>) keyEvent.getSource();
+        String searchCity = item.getEditor().getText();
         int minLength = 3;
 
-        if ( communeRecherche.length() >= minLength ) {
+        if ( searchCity.length() >= minLength ) {
 
             PauseTransition pause = new PauseTransition(Duration.millis(300));
             pause.setOnFinished(event -> {
-                Task<List<Ville>> task = geoApiService.rechercherCommune(communeRecherche);
+                Task<List<City>> task = geoApiService.searchCity(searchCity);
 
                 task.setOnSucceeded(e -> {
-                    List<Ville> communes = task.getValue();
+                    List<City> cities = task.getValue();
                     item.getItems().clear();
-                    item.getItems().setAll(communes);
+                    item.getItems().setAll(cities);
                     item.show();
                 });
 
@@ -277,11 +277,11 @@ public class SearchController implements Initializable, ControllerRegistry
     private void onStartDateSelected(ActionEvent event)
     {
         DatePicker date = (DatePicker) event.getSource();
-        LocalDate departDate = date.getValue();
+        LocalDate startDate = date.getValue();
 
         if ( date.getValue() != null ) {
-            this.periodeFinDatePicker.setDayCellFactory(getDateCellFactory(departDate.plusDays(1), null));
-            this.updateRechercherBoutonState();
+            this.periodEndDatePicker.setDayCellFactory(getDateCellFactory(startDate.plusDays(1), null));
+            this.updateSearchButtonState();
         }
     }
 
@@ -298,12 +298,12 @@ public class SearchController implements Initializable, ControllerRegistry
     private void onEndDateSelected(ActionEvent event)
     {
         DatePicker date = (DatePicker) event.getSource();
-        LocalDate dateFin = date.getValue();
+        LocalDate endDate = date.getValue();
 
         if ( date.getValue() != null ) {
-            this.periodeDebutDatePicker.setDayCellFactory(
-                    getDateCellFactory(this.dateCourante, dateFin.minusDays(1)));
-            this.updateRechercherBoutonState();
+            this.periodStartDatePicker.setDayCellFactory(
+                    getDateCellFactory(this.currentDate, endDate.minusDays(1)));
+            this.updateSearchButtonState();
         }
     }
 
@@ -328,12 +328,12 @@ public class SearchController implements Initializable, ControllerRegistry
         boolean isValid;
 
         switch (fxId) {
-            case "villeDepartField":
-            case "villeArriveeField":
+            case "departureCityField":
+            case "arrivalCityField":
                 isValid = Validator.isNotEmpty(value) && Validator.isValidCityName(value);
                 break;
-            case "periodeDebutDatePicker":
-            case "periodeFinDatePicker":
+            case "periodStartDatePicker":
+            case "periodEndDatePicker":
                 break;
             case "budgetMin":
                 isValid = Validator.isNotEmpty(value) && Validator.isNumeric(value);
@@ -364,15 +364,15 @@ public class SearchController implements Initializable, ControllerRegistry
     private void initializeEventListener()
     {
         this.siteComboBox.getCheckModel().getCheckedItems().addListener(
-                (ListChangeListener<Site>) change -> this.refreshTypeVehiculeComboBox());
-        this.typeVehiculeComboBox.getCheckModel().getCheckedItems().addListener(
-                (ListChangeListener<TypeVehicule>) change -> this.updateRechercherBoutonState());
+                (ListChangeListener<Site>) change -> this.refreshVehicleTypeComboBox());
+        this.vehicleTypeComboBox.getCheckModel().getCheckedItems().addListener(
+                (ListChangeListener<VehicleType>) change -> this.updateSearchButtonState());
         this.budgetMin.textProperty().addListener(
-                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
-        this.villeDepartField.valueProperty().addListener(
-                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
-        this.villeArriveeField.valueProperty().addListener(
-                (observable, oldValue, newValue) -> this.updateRechercherBoutonState());
+                (observable, oldValue, newValue) -> this.updateSearchButtonState());
+        this.departureCityField.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.updateSearchButtonState());
+        this.arrivalCityField.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.updateSearchButtonState());
 
     }
 
@@ -394,18 +394,18 @@ public class SearchController implements Initializable, ControllerRegistry
 
     /**
      * Personnalise l'affichage des villes dans un {@link ComboBox} en affichant le nom et le code du département.<br>
-     * Permet de retrouver l'objet {@link Ville} correspondant à la saisie de l'utilisateur.
+     * Permet de retrouver l'objet {@link City} correspondant à la saisie de l'utilisateur.
      *
      * @param comboBox Le {@link ComboBox} à configurer.
      */
-    private void configureVilleComboBox(ComboBox<Ville> comboBox)
+    private void configureCityComboBox(ComboBox<City> comboBox)
     {
 
         // Personnalise l'affichage dans la liste déroulante
         comboBox.setCellFactory(lv -> new ListCell<>()
         {
             @Override
-            protected void updateItem(Ville item, boolean empty)
+            protected void updateItem(City item, boolean empty)
             {
                 super.updateItem(item, empty);
                 if ( item != null && !empty ) {
@@ -420,20 +420,20 @@ public class SearchController implements Initializable, ControllerRegistry
         comboBox.setConverter(new StringConverter<>()
         {
             @Override
-            public String toString(Ville ville)
+            public String toString(City city)
             {
-                return ville == null ? "" : ville.getNom() + "(" + ville.getDepartement().getNumero() + ")";
+                return city == null ? "" : city.getFormated("{ville} ({numDep})");
             }
 
 
             // Rechercher une ville correspondant au formatage nom + numéro de département dans la liste du ComboBox
             @Override
-            public Ville fromString(String villeName)
+            public City fromString(String cityName)
             {
                 return comboBox.getItems().stream()
-                               .filter(ville -> (
-                                       ville.getNom() + "(" + ville.getDepartement().getNumero() + ")").equals(
-                                       villeName))
+                               .filter(city -> (
+                                       city.getFormated("{ville} ({numDep})")).equals(
+                                       cityName))
                                .findFirst()
                                .orElse(null);
             }
@@ -449,8 +449,8 @@ public class SearchController implements Initializable, ControllerRegistry
      */
     private void initializeDatePicker()
     {
-        this.periodeDebutDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now(), null));
-        this.periodeFinDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now().plusDays(1), null));
+        this.periodStartDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now(), null));
+        this.periodEndDatePicker.setDayCellFactory(this.getDateCellFactory(LocalDate.now().plusDays(1), null));
     }
 
 
@@ -488,16 +488,16 @@ public class SearchController implements Initializable, ControllerRegistry
     }
 
 
-    private void updateRechercherBoutonState()
+    private void updateSearchButtonState()
     {
-        boolean disable = this.typeVehiculeComboBox.getCheckModel().getCheckedItems().isEmpty()
+        boolean disable = this.vehicleTypeComboBox.getCheckModel().getCheckedItems().isEmpty()
                           || this.budgetMin.getText().isEmpty()
-                          || this.villeDepartField.getValue() == null
-                          || this.villeArriveeField.getValue() == null
-                          || this.periodeDebutDatePicker.getValue() == null
-                          || this.periodeFinDatePicker.getValue() == null
+                          || this.departureCityField.getValue() == null
+                          || this.arrivalCityField.getValue() == null
+                          || this.periodStartDatePicker.getValue() == null
+                          || this.periodEndDatePicker.getValue() == null
                           || !this.hintLabel.getText().isEmpty();
-        this.rechercherBouton.setDisable(disable);
+        this.searchButton.setDisable(disable);
     }
 
     public void toggleDisableForm()
@@ -505,15 +505,15 @@ public class SearchController implements Initializable, ControllerRegistry
         this.disable = !this.disable;
 
         this.siteComboBox.setDisable(this.disable);
-        this.typeVehiculeComboBox.setDisable(this.disable);
+        this.vehicleTypeComboBox.setDisable(this.disable);
         this.budgetMin.setDisable(this.disable);
         this.budgetMax.setDisable(this.disable);
-        this.villeDepartField.setDisable(this.disable);
-        this.villeArriveeField.setDisable(this.disable);
-        this.periodeDebutDatePicker.setDisable(this.disable);
-        this.periodeFinDatePicker.setDisable(this.disable);
+        this.departureCityField.setDisable(this.disable);
+        this.arrivalCityField.setDisable(this.disable);
+        this.periodStartDatePicker.setDisable(this.disable);
+        this.periodEndDatePicker.setDisable(this.disable);
 
-        this.effacerBouton.setDisable(this.disable);
-        this.rechercherBouton.setDisable(this.disable);
+        this.clearButton.setDisable(this.disable);
+        this.searchButton.setDisable(this.disable);
     }
 }

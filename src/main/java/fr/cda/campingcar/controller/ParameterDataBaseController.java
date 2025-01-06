@@ -1,6 +1,6 @@
 package fr.cda.campingcar.controller;
 
-import fr.cda.campingcar.model.BaseDonneeParam;
+import fr.cda.campingcar.model.DataBaseParameter;
 import fr.cda.campingcar.util.DebugHelper;
 import fr.cda.campingcar.util.render.FXMLRender;
 import fr.cda.campingcar.util.LoggerConfig;
@@ -34,11 +34,11 @@ import java.util.ResourceBundle;
  */
 
 
-public class ParametreBDController extends FXMLWindow implements Initializable
+public class ParameterDataBaseController extends FXMLWindow implements Initializable
 {
 
     @FXML
-    private VBox parametreDBPane;
+    private VBox parameterDataBasePane;
 
     @FXML
     private GridPane gridPane;
@@ -47,7 +47,7 @@ public class ParametreBDController extends FXMLWindow implements Initializable
     private TextField serveurField;
 
     @FXML
-    private TextField baseDeDonneeField;
+    private TextField dataBaseField;
 
     @FXML
     private TextField portField;
@@ -62,31 +62,31 @@ public class ParametreBDController extends FXMLWindow implements Initializable
     private Button validateButton;
 
     @FXML
-    private Button annulerBouton;
+    private Button cancelBouton;
 
     private static final Logger LOGGER_FILE = LoggerConfig.getLoggerFile();
-    private final BinarieFile<BaseDonneeParam> paramDBBinarieFile = new BinarieFile<>("param_db");
-    private BaseDonneeParam parametreDB;
-    private final Map<String, Label> erreursMap = new HashMap<>();
+    private final BinarieFile<DataBaseParameter> parameterDataBaseBinarie = new BinarieFile<>("param_db");
+    private DataBaseParameter dataBaseParameter;
+    private final Map<String, Label> errorsMap = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
-        this.mainPane = this.parametreDBPane;
+        this.mainPane = this.parameterDataBasePane;
         super.initialize(url, resourceBundle);
 
         try {
-            this.parametreDB = paramDBBinarieFile.readFile();
+            this.dataBaseParameter = parameterDataBaseBinarie.readFile();
 
-            if ( this.parametreDB == null ) {
+            if ( this.dataBaseParameter == null ) {
                 DebugHelper.debug("Ouverture Binaire file", "Le fichier binaire est vide ou inexistant", false);
             } else {
-                this.serveurField.setText(this.parametreDB.getServeur());
-                this.baseDeDonneeField.setText(this.parametreDB.getBaseDonnee());
-                this.portField.setText(this.parametreDB.getPort().toString());
-                this.loginField.setText(this.parametreDB.getLogin());
-                this.passwordField.setText(this.parametreDB.getPassword());
-                DebugHelper.debug("Ouverture Binaire file", this.parametreDB.toString(), true);
+                this.serveurField.setText(this.dataBaseParameter.getServer());
+                this.dataBaseField.setText(this.dataBaseParameter.getDataBase());
+                this.portField.setText(this.dataBaseParameter.getPort().toString());
+                this.loginField.setText(this.dataBaseParameter.getLogin());
+                this.passwordField.setText(this.dataBaseParameter.getPassword());
+                DebugHelper.debug("Ouverture Binaire file", this.dataBaseParameter.toString(), true);
             }
 
         } catch ( IOException e ) {
@@ -110,23 +110,23 @@ public class ParametreBDController extends FXMLWindow implements Initializable
     @FXML
     private void submitForm(MouseEvent event)
     {
-        if ( this.parametreDB == null ) this.parametreDB = new BaseDonneeParam();
+        if ( this.dataBaseParameter == null ) this.dataBaseParameter = new DataBaseParameter();
 
-        this.parametreDB.setServeur(
+        this.dataBaseParameter.setServer(
                 this.serveurField.getText());
-        this.parametreDB.setBaseDonnee(
-                this.baseDeDonneeField.getText());
-        this.parametreDB.setPort(
+        this.dataBaseParameter.setDataBase(
+                this.dataBaseField.getText());
+        this.dataBaseParameter.setPort(
                 Integer.parseInt(this.portField.getText()));
-        this.parametreDB.setLogin(
+        this.dataBaseParameter.setLogin(
                 this.loginField.getText());
-        this.parametreDB.setPassword(
+        this.dataBaseParameter.setPassword(
                 this.passwordField.getText());
 
         try {
-            this.paramDBBinarieFile.writeFile(this.parametreDB);
-            LOGGER_FILE.info("Succès de l'écriture du fichier : {}", this.parametreDB.toString());
-            DebugHelper.debug("Écriture Fichier Binaire", "Succès: {}" + this.parametreDB.toString(), true);
+            this.parameterDataBaseBinarie.writeFile(this.dataBaseParameter);
+            LOGGER_FILE.info("Succès de l'écriture du fichier : {}", this.dataBaseParameter.toString());
+            DebugHelper.debug("Écriture Fichier Binaire", "Succès: {}" + this.dataBaseParameter.toString(), true);
 
             this.closeWindow();
 
@@ -134,7 +134,7 @@ public class ParametreBDController extends FXMLWindow implements Initializable
             alertMessageController.setMessage("Paramètres sauvegardés avec succès.", "valid");
 
         } catch ( IOException e ) {
-            LOGGER_FILE.info("Erreur lors de l'écriture des données : {}", this.parametreDB.toString(), e);
+            LOGGER_FILE.info("Erreur lors de l'écriture des données : {}", this.dataBaseParameter.toString(), e);
             DebugHelper.debug("Écriture Fichier Binaire", "Erreur" + e.getMessage(), false);
 
             this.closeWindow();
@@ -158,10 +158,10 @@ public class ParametreBDController extends FXMLWindow implements Initializable
 
         // Validation basée sur l'ID du champ de texte
         switch (fxId) {
-            case "serveurField":
+            case "serverField":
                 isValid = Validator.isNotEmpty(value) && Validator.isValidServerName(value);
                 break;
-            case "baseDeDonneeField":
+            case "dataBaseField":
                 isValid = Validator.isNotEmpty(value) && Validator.isValidDatabaseName(value);
                 break;
             case "portField":
@@ -187,7 +187,7 @@ public class ParametreBDController extends FXMLWindow implements Initializable
 
         this.updateErrorLabel(fxId, rowId, isValid);
 
-        this.validateButton.setDisable(!erreursMap.isEmpty());
+        this.validateButton.setDisable(!errorsMap.isEmpty());
     }
 
     private void updateErrorLabel(String fxId, Integer rowId, boolean isValid)
@@ -195,15 +195,15 @@ public class ParametreBDController extends FXMLWindow implements Initializable
         TextField textField = (TextField) this.gridPane.lookup("#" + fxId);
 
 
-        Label current = this.erreursMap.get(fxId);
+        Label current = this.errorsMap.get(fxId);
         if ( current != null ) {
             this.gridPane.getChildren().remove(current);
-            this.erreursMap.remove(fxId);
+            this.errorsMap.remove(fxId);
         }
 
         if ( !isValid ) {
             Label hint = Validator.getHintLabel();
-            this.erreursMap.put(fxId, hint);
+            this.errorsMap.put(fxId, hint);
             GridPane.setRowIndex(hint, rowId + 1);
             GridPane.setColumnIndex(hint, 0);
             GridPane.setColumnSpan(hint, this.gridPane.getColumnCount());
@@ -213,7 +213,7 @@ public class ParametreBDController extends FXMLWindow implements Initializable
 
     private void updateValidateButton()
     {
-        TextField[] fields = { this.serveurField, this.baseDeDonneeField, this.portField, this.loginField, this.passwordField };
+        TextField[] fields = { this.serveurField, this.dataBaseField, this.portField, this.loginField, this.passwordField };
 
         boolean disable = false;
         for ( TextField field : fields ) {

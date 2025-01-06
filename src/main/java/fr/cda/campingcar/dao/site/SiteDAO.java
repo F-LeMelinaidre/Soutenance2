@@ -125,22 +125,22 @@ public class SiteDAO implements SiteDAOInt
                 do {
                     compteur++;
                     int    id   = rs.getInt("site_id");
-                    String nom  = rs.getString("site_nom");
-                    String lien = rs.getString("site_url");
+                    String name  = rs.getString("site_nom");
+                    String link = rs.getString("site_url");
 
-                    int    vehiculeTypeId     = rs.getInt("vehicule_type_id");
-                    String vehiculeType       = rs.getString("vehicule_type");
-                    String vehiculeParamKey   = rs.getString("param_key");
-                    String vehiculeParamValue = rs.getString("param_value");
+                    int    vehicleTypeId     = rs.getInt("vehicule_type_id");
+                    String vehicleType       = rs.getString("vehicule_type");
+                    String vehicleParamKey   = rs.getString("param_key");
+                    String vehicleParamValue = rs.getString("param_value");
 
                     int    position = rs.getInt("param_position");
-                    String groupe   = (vehiculeTypeId == 0) ? rs.getString("param_groupe") : "vehicule";
-                    String type     = (vehiculeTypeId == 0) ? rs.getString("param_type") : vehiculeType;
-                    String critere  = (vehiculeTypeId == 0) ? rs.getString("param_critere") : String.valueOf(vehiculeTypeId);
+                    String group   = (vehicleTypeId == 0) ? rs.getString("param_groupe") : "vehicule";
+                    String type     = (vehicleTypeId == 0) ? rs.getString("param_type") : vehicleType;
+                    String criteria  = (vehicleTypeId == 0) ? rs.getString("param_critere") : String.valueOf(vehicleTypeId);
 
 
-                    String paramKey = (vehiculeTypeId == 0) ? rs.getString("param_key") : vehiculeParamKey;
-                    String paramValue = (vehiculeTypeId == 0) ? rs.getString("param_value") : vehiculeParamValue;
+                    String paramKey = (vehicleTypeId == 0) ? rs.getString("param_key") : vehicleParamKey;
+                    String paramValue = (vehicleTypeId == 0) ? rs.getString("param_value") : vehicleParamValue;
                     String format = rs.getString("param_format");
 
                     // recupere l'object site dans le map
@@ -149,7 +149,7 @@ public class SiteDAO implements SiteDAOInt
 
                     // Si il n existe pas on le cree et l ajoute au map
                     if ( site == null ) {
-                        site = new Site(id, nom, lien);
+                        site = new Site(id, name, link);
                         siteMap.put(id, site);
                     }
 
@@ -158,20 +158,20 @@ public class SiteDAO implements SiteDAOInt
 
                     // Controle sans doute inutile
                     if ( site != null ) {
-                        // id = site_id | type = type de parametre | critere = critere du parametre
-                        String index = id + type + critere;
+                        // id = site_id | type = type de parametre | criteria = criteria du parametre
+                        String index = id + type + criteria;
 
                         // le parametre ne se trouve pas dans l acculmulateur on le créé
                         if ( !paramAccumulateur.contains(index)) {
                             paramAccumulateur.add(index);
-                            UrlParam urlParam = new UrlParam(id, position, groupe, type, critere, paramKey, paramValue, format);
+                            UrlParam urlParam = new UrlParam(id, position, group, type, criteria, paramKey, paramValue, format);
                             url.putParam(index, urlParam);
                         }
 
                         // Si vehiculeType != 0 le tuple n'est pas un parametre donc un type de vehicule,
                         // on le cree et l'ajoute à la liste du site
-                        if ( vehiculeTypeId != 0 && !site.typeVehiculeExiste(vehiculeTypeId) ) {
-                            TypeVehicule typeVehicule = new TypeVehicule(vehiculeTypeId, vehiculeType);
+                        if ( vehicleTypeId != 0 && !site.typeVehiculeExiste(vehicleTypeId) ) {
+                            VehicleType typeVehicule = new VehicleType(vehicleTypeId, vehicleType);
                             site.addTypeVehicule(typeVehicule);
                         }
                     }

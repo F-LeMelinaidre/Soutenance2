@@ -16,9 +16,10 @@ import java.io.IOException;
 
 public class WordFile
 {
-    private static final Logger LOGGER_FILE = LoggerConfig.getLoggerFile();
-
-    private String file;
+    protected static final Logger LOGGER_FILE = LoggerConfig.getLoggerFile();
+    protected String file;
+    protected XWPFDocument document = new XWPFDocument();
+    protected FileOutputStream fos;
 
     public WordFile(String file)
     {
@@ -26,24 +27,18 @@ public class WordFile
     }
 
 
-    protected XWPFDocument newDocument()
+    protected void newDocument()
     {
-        XWPFDocument document  = null;
         try {
-            document = new XWPFDocument();
-            FileOutputStream fos = new FileOutputStream(file);
+            FileOutputStream fos = new FileOutputStream(this.file);
         } catch ( Exception e ) {
             LOGGER_FILE.warn("Échec lors de la création du XDOC : {}", e.getMessage(), e);
         }
-
-        return document;
     }
 
     public void writeFile() throws IOException
     {
         try {
-            XWPFDocument document = new XWPFDocument();
-            FileOutputStream fos = new FileOutputStream(this.file);
 
             XWPFParagraph paragraph = document.createParagraph();
             paragraph.setAlignment(ParagraphAlignment.CENTER);
@@ -65,6 +60,7 @@ public class WordFile
 
             document.write(fos);
             fos.close();
+
         } catch ( InvalidFormatException e ) {
             e.printStackTrace();
         }

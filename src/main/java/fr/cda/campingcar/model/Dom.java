@@ -20,18 +20,18 @@ public class Dom
     private final int id;
     private final int siteId;
     private final int domElementId;
-    private final String nom;
+    private final String name;
     private final String xpath;
     private final int domParentId;
     private final Boolean withTag;
     private final List<Dom> childrensList = new ArrayList<>();
 
-    public Dom(int id, int siteId, int domElementId, String nom, String xpath, int domParentId, Boolean withTag)
+    public Dom(int id, int siteId, int domElementId, String name, String xpath, int domParentId, Boolean withTag)
     {
         this.id           = id;
         this.siteId       = siteId;
         this.domElementId = domElementId;
-        this.nom          = nom;
+        this.name         = name;
         this.xpath        = xpath;
         this.domParentId  = domParentId;
         this.withTag      = withTag;
@@ -44,12 +44,12 @@ public class Dom
 
     public int getDomElementId()
     {
-        return domElementId;
+        return this.domElementId;
     }
 
-    public String getNom()
+    public String getName()
     {
-        return nom;
+        return this.name;
     }
 
     public String getXPath()
@@ -60,11 +60,6 @@ public class Dom
     public Integer getDomParentId()
     {
         return this.domParentId;
-    }
-
-    public Boolean getWithTag()
-    {
-        return this.withTag;
     }
 
     public void setChildrensList(List<Dom> childrensList)
@@ -91,7 +86,7 @@ public class Dom
                indent + Config.YELLOW + "domElementId : " + Config.WHITE + this.domElementId + "\n" +
                indent + Config.YELLOW + "domParentId : " + Config.WHITE + this.domParentId + "\n" +
                indent + Config.YELLOW + "withTag : " + Config.WHITE + this.withTag + "\n" +
-               indent + Config.YELLOW + "nom : " + Config.WHITE + this.nom + "\n" +
+               indent + Config.YELLOW + "nom : " + Config.WHITE + this.name + "\n" +
                indent + Config.YELLOW + "xPath : " + Config.CYAN + this.xpath + "\n" +
                indent + Config.YELLOW + "xPath Child : " + Config.CYAN + this.childrensList + Config.RESET + "\n";
     }

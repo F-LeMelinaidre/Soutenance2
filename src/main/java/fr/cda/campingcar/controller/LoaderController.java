@@ -2,9 +2,11 @@ package fr.cda.campingcar.controller;
 
 import fr.cda.campingcar.scraping.CounterListenerInt;
 import fr.cda.campingcar.scraping.TaskCounter;
+import fr.cda.campingcar.settings.Config;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
@@ -44,8 +46,9 @@ public class LoaderController implements Initializable, CounterListenerInt
     @FXML
     private ProgressBar progressBar;
 
-    private final Map<String, Map<String, Label>> subCounters = new HashMap<>();
-
+    private final Map<String, HBox> counters = new HashMap<>();
+    private final Map<String, Map<String, Label>> subCountersLabels = new HashMap<>();
+    private final Map<String, Map<String, AtomicInteger>> countersValues = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
@@ -56,8 +59,17 @@ public class LoaderController implements Initializable, CounterListenerInt
 
     private void initMainProgressBloc(Map<String, AtomicInteger> counter)
     {
+
+        this.countersValues.put("main", counter);
+        this.counters.put("main", mainCounterBloc);
+
+        this.mainCounterBloc.getStyleClass().clear();
+        this.mainCounterBloc.getStyleClass().add("in-progress");
+
         this.mainCounterEnded.setText(counter.get("ended").toString());
         this.mainCounterTotal.setText(counter.get("total").toString());
+
+        this.progressBar.setProgress(0);
         this.loaderPane.setVisible(true);
     }
 
@@ -74,17 +86,21 @@ public class LoaderController implements Initializable, CounterListenerInt
 
     private void mainCounterUpDateEnded(int endedCount)
     {
+        this.countersValues.get("main").get("ended").set(endedCount);
         this.mainCounterEnded.setText(String.valueOf(endedCount));
+        this.applyCss("main");
     }
 
     private void mainCounterUpDateTotal(int totalCount)
     {
+        this.countersValues.get("main").get("total").set(totalCount);
         this.mainCounterTotal.setText(String.valueOf(totalCount));
+        this.applyCss("main");
     }
 
     private void addSubCounter(String counterName, Map<String, AtomicInteger> counter)
     {
-        if ( !subCounters.containsKey(counterName) ) {
+        if ( !subCountersLabels.containsKey(counterName) ) {
             HBox subCounter = createSubCounter(counterName, counter);
             this.subCounterBloc.getChildren().add(subCounter);
         } else {
@@ -96,7 +112,7 @@ public class LoaderController implements Initializable, CounterListenerInt
     private HBox createSubCounter(String title, Map<String, AtomicInteger> counter)
     {
         HBox subCounter = new HBox();
-        subCounter.getStyleClass().add("sub-counter");
+        subCounter.getStyleClass().addAll("sub-counter", Config.INPROGRESS_CSS);
 
 
         Label subCounterTitle = new Label(title + ":");
@@ -104,62 +120,124 @@ public class LoaderController implements Initializable, CounterListenerInt
 
         Label subCounterEnded = new Label(counter.get("ended").toString());
         subCounterEnded.getStyleClass().addAll("number", "ended");
+
         Label subCounterSeparator = new Label("/");
+        subCounterSeparator.getStyleClass().add("separator");
+
         Label subCounterTotal = new Label(counter.get("total").toString());
         subCounterTotal.getStyleClass().addAll("number", "total");
 
-        Label subCounterSuffix = new Label("Annonces terminées");
+        String state = (counter.get("total").get() > 1 )? "Annonces en cours" : "Annonce en cours";
+        Label subCounterSuffix = new Label(state);
+        subCounterSuffix.getStyleClass().add("state");
 
         subCounter.getChildren().addAll(subCounterTitle, subCounterEnded, subCounterSeparator, subCounterTotal, subCounterSuffix);
 
-        this.subCounters.put(title, new HashMap<>(Map.of("ended", subCounterEnded,
-                                                         "total", subCounterTotal)));
+        this.countersValues.put(title, counter);
+        this.subCountersLabels.put(title, new HashMap<>(Map.of("ended", subCounterEnded,
+                                                               "total", subCounterTotal)));
+        this.counters.put(title, subCounter);
 
         return subCounter;
     }
 
     private void subCounterUpDate(String counterName, Map<String, AtomicInteger> counter)
     {
+        this.countersValues.get(counterName).get("ended").set(counter.get("ended").get());
+        this.countersValues.get(counterName).get("total").set(counter.get("total").get());
+
         this.subCounterUpDateEnded(counterName, counter.get("ended").get());
         this.subCounterUpDateTotal(counterName, counter.get("total").get());
-    }
 
-    private void clearSubCounterBloc()
-    {
-        this.subCounterBloc.getChildren().clear();
-        this.subCounters.clear();
+        this.applyCss(counterName);
     }
 
     private void subCounterUpDateEnded(String counterName, int count)
     {
-        Label endedLabel = this.subCounters.get(counterName).get("ended");
-        if ( endedLabel != null ) {
+        Map counter = this.subCountersLabels.get(counterName);
+        if ( counter != null ) {
+            this.countersValues.get(counterName).get("ended").set(count);
+            Label endedLabel = (Label) counter.get("ended");
             endedLabel.setText(String.valueOf(count));
+            this.applyCss(counterName);
+            this.upStateLabel(counterName);
         }
     }
 
     private void subCounterUpDateTotal(String counterName, int count)
     {
-        Label totalLabel = this.subCounters.get(counterName).get("total");
-        if ( totalLabel != null ) {
+        Map counter = this.subCountersLabels.get(counterName);
+        if ( counter != null ) {
+            this.countersValues.get(counterName).get("total").set(count);
+            Label totalLabel = (Label) counter.get("total");
             totalLabel.setText(String.valueOf(count));
+            this.applyCss(counterName);
         }
     }
 
 
     private void upDateProgressBar(double value)
     {
-        System.out.println(value);
         this.progressBar.setProgress(value);
+    }
 
+    private void clearCounter()
+    {
+        this.subCounterBloc.getChildren().clear();
+        this.counters.clear();
+        this.subCountersLabels.clear();
+        this.countersValues.clear();
+    }
+
+    private void upStateLabel(String counterName)
+    {
+        int total = this.countersValues.get(counterName).get("total").get();
+        HBox counter = this.counters.get(counterName);
+        if ( this.isCompleted(counterName) ) {
+
+            for ( Node child : counter.getChildren() ) {
+
+                if ( child.getStyleClass().contains(Config.STATE_CSS) ) {
+                    Label stateLabel = (Label) child;
+
+                    String state = (total > 1) ? "Annonces trouvée" : "Annonce trouvée";
+                    stateLabel.setText(state);
+
+                }
+            }
+        }
+    }
+
+    private void applyCss(String counterName)
+    {
+        HBox counter = this.counters.get(counterName);
+
+        if ( this.isCompleted(counterName) ) {
+            counter.getStyleClass().remove(Config.INPROGRESS_CSS);
+            counter.getStyleClass().add(Config.COMPLETED_CSS);
+        } else {
+            counter.getStyleClass().remove(Config.COMPLETED_CSS);
+            counter.getStyleClass().add(Config.INPROGRESS_CSS);
+        }
+    }
+
+    private boolean isCompleted(String counterName)
+    {
+        int ended = this.countersValues.get(counterName).get("ended").get();
+        int total = this.countersValues.get(counterName).get("total").get();
+        return ended == total;
+    }
+
+    public void hide() {
+        this.loaderPane.setVisible(false);
     }
 
     @Override
     public void onMainCounter(Map<String, AtomicInteger> counter)
     {
         Platform.runLater(() -> {
+            this.clearCounter();
             this.initMainProgressBloc(counter);
-            this.clearSubCounterBloc();
         });
     }
 
@@ -190,7 +268,6 @@ public class LoaderController implements Initializable, CounterListenerInt
     @Override
     public void onSubCounterUpdateEnded(String counterName, int endedCount)
     {
-
         Platform.runLater(() -> this.subCounterUpDateEnded(counterName, endedCount));
     }
 

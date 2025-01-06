@@ -14,39 +14,39 @@ import fr.cda.campingcar.settings.Config;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Ville
+public class City implements SearchCriteria
 {
     private int geoId;
     private final int code;
-    private int codePostal;
+    private int zipCode;
     private final double lat;
     private final double lng;
-    private String nom;
+    private String name;
     private final Departement departement;
 
-    public Ville(int code, String nom, double lat, double lng, int codePostal, Departement departement)
+    public City(int code, String nom, double lat, double lng, int zipCode, Departement departement)
     {
         //System.out.println(Config.YELLOW + "Ville [ code: " + code + ", nom: " + nom + ", lat: " + lat + ", lng: " + lng + " ]"+Config.RESET);
         this.lat         = lat;
         this.lng         = lng;
         this.code        = code;
-        this.nom         = nom;
+        this.name        = nom;
         this.departement = departement;
     }
 
-    public String getNom()
+    public String getName()
     {
-        return nom;
+        return name;
     }
 
-    public void setNom(String nom)
+    public void setName(String name)
     {
-        this.nom = nom;
+        this.name = name;
     }
 
     public int getCode()
     {
-        return code;
+        return this.code;
     }
 
     public String getLat()
@@ -61,7 +61,7 @@ public class Ville
 
     public Departement getDepartement()
     {
-        return departement;
+        return this.departement;
     }
 
 
@@ -83,6 +83,12 @@ public class Ville
     @Override
     public String toString()
     {
-        return this.nom;
+        return this.name;
+    }
+
+    @Override
+    public String valeur()
+    {
+        return this.name + " " + this.departement.getName() + " (" + this.departement.getNumber() + ") " + this.departement.getRegion();
     }
 }

@@ -10,7 +10,7 @@ import fr.cda.campingcar.model.Site;
  * Formation CDA
  * Greta Vannes
  */
-public interface ScrapingModelInt<Object>
+public interface ScrapingModel<Object>
 {
     void setSite(Site site);
 

@@ -9,7 +9,7 @@
 
 package fr.cda.campingcar.api;
 
-import fr.cda.campingcar.model.Ville;
+import fr.cda.campingcar.model.City;
 import javafx.concurrent.Task;
 
 import java.util.List;
@@ -22,11 +22,11 @@ public class GeoApiService
         this.geoAPI = geoAPI;
     }
 
-    public Task<List<Ville>> rechercherCommune(String communeRecherche)
+    public Task<List<City>> searchCity(String communeRecherche)
     {
-        return new Task<List<Ville>>() {
+        return new Task<List<City>>() {
             @Override
-            protected List<Ville> call() throws Exception {
+            protected List<City> call() throws Exception {
                 return geoAPI.rechercheCommune(communeRecherche);
             }
         };

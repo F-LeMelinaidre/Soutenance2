@@ -9,30 +9,29 @@ package fr.cda.campingcar.model;
  * Greta Vannes
  */
 
-import fr.cda.campingcar.scraping.ScrapingModelInt;
+import fr.cda.campingcar.scraping.ScrapingModel;
 import fr.cda.campingcar.settings.Config;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Location implements ScrapingModelInt<Object>
+public class Rent implements ScrapingModel<Object>
 {
-    public static List<Location> locationList;
 
     private Site site;
     private String url;
-    private List<String> lien;
+    private List<String> link;
     private String image;
-    private String titre;
-    private String ville;
-    private Integer tarif;
+    private String title;
+    private String city;
+    private Integer price;
     private String description;
-    private final Vehicule vehicule;
+    private final Vehicle vehicle;
 
-    public Location()
+    public Rent()
     {
-        this.vehicule = new Vehicule();
+        this.vehicle = new Vehicle();
     }
 
     @Override
@@ -55,9 +54,9 @@ public class Location implements ScrapingModelInt<Object>
 
     public String getImage() {return this.image;}
 
-    public String getTitre()
+    public String getTitle()
     {
-        return this.titre;
+        return this.title;
     }
 
     public String getDescription()
@@ -65,49 +64,49 @@ public class Location implements ScrapingModelInt<Object>
         return this.description;
     }
 
-    public String getVille()
+    public String getCity()
     {
-        return this.ville;
+        return this.city;
     }
 
-    public int getTarif()
+    public int getPrice()
     {
-        return this.tarif;
+        return this.price;
     }
 
-    public Vehicule getVehicule()
+    public Vehicle getVehicle()
     {
-        return vehicule;
+        return vehicle;
     }
 
-    public String getCarburant()
+    public String getFuel()
     {
-        return this.vehicule.getCarburant();
+        return this.vehicle.getFuel();
     }
 
-    public String getTransmission()
+    public String getGearBox()
     {
-        return this.vehicule.getTransmission();
+        return this.vehicle.getGearBox();
     }
 
-    public Integer getPlace()
+    public Integer getSeat()
     {
-        return this.vehicule.getNbPlace();
+        return this.vehicle.getNbSeat();
     }
 
-    public Integer getCouchage()
+    public Integer getBed()
     {
-        return this.vehicule.getNbCouchage();
+        return this.vehicle.getNbBed();
     }
 
-    public Boolean getDouche()
+    public Boolean getShower()
     {
-        return this.vehicule.getDouche();
+        return this.vehicle.getShower();
     }
 
     public Boolean getWc()
     {
-        return this.vehicule.getWc();
+        return this.vehicle.getWc();
     }
 
     /**
@@ -121,7 +120,8 @@ public class Location implements ScrapingModelInt<Object>
         return (matcher.find()) ? Integer.parseInt(matcher.group()) : 0;
     }
 
-    private String formateVille(String value)
+    // TODO VOIR A UTILISER API
+    private String formatCity(String value)
     {
         Pattern pattern = Pattern.compile("\\(\\d+\\)");
         Matcher matcher = pattern.matcher(value);
@@ -147,7 +147,7 @@ public class Location implements ScrapingModelInt<Object>
                 this.image = value;
                 break;
             case "titre":
-                this.titre = value;
+                this.title = value;
                 break;
             case "lien":
                 this.url = value;
@@ -156,35 +156,35 @@ public class Location implements ScrapingModelInt<Object>
                 this.description = value;
                 break;
             case "ville":
-                this.ville = this.formateVille(value);
+                this.city = this.formatCity(value);
                 break;
             case "tarif":
-                this.tarif = this.extractInt(value);
+                this.price = this.extractInt(value);
                 break;
             case "model":
-                this.vehicule.setModel(value);
+                this.vehicle.setModel(value);
                 break;
             case "carburant":
-                this.vehicule.setCarburant(value);
+                this.vehicle.setFuel(value);
                 break;
             case "boite de vitesse":
-                this.vehicule.setTransmission(value);
+                this.vehicle.setGearBox(value);
                 break;
             case "nombre de place":
                 Integer nbPlace = this.extractInt(value);
-                this.vehicule.setNbPlace(nbPlace);
+                this.vehicle.setNbSeat(nbPlace);
                 break;
             case "nombre de couchage":
                 Integer nbCouchage = this.extractInt(value);
-                this.vehicule.setNbCouchage(nbCouchage);
+                this.vehicle.setNbBed(nbCouchage);
                 break;
             case "douche":
                 boolean douche = value != null;
-                this.vehicule.setDouche(douche);
+                this.vehicle.setShower(douche);
                 break;
             case "wc":
                 boolean wc = value != null;
-                this.vehicule.setWc(wc);
+                this.vehicle.setWc(wc);
                 break;
         }
     }
@@ -205,7 +205,7 @@ public class Location implements ScrapingModelInt<Object>
 
     public String toPrint()
     {
-        return Config.YELLOW + "Titre : " + Config.WHITE + this.titre + "\n" +
+        return Config.YELLOW + "Titre : " + Config.WHITE + this.title + "\n" +
                Config.YELLOW + "Lien Domain : " + Config.WHITE + this.site.getUrlRoot() + "\n" +
                Config.YELLOW + "Lien Recherche : " + Config.WHITE + this.url + "\n" +
                // Config.YELLOW + "Ville : " + Config.WHITE + this.ville + "\n" +
