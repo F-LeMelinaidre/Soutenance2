@@ -10,7 +10,7 @@
 package fr.cda.campingcar.controller;
 
 import fr.cda.campingcar.api.GeoAPI;
-import fr.cda.campingcar.dao.DAOFactory;
+import fr.cda.campingcar.dao.desktop.DeskTopDAOFactory;
 import fr.cda.campingcar.model.*;
 import fr.cda.campingcar.api.GeoApiService;
 import fr.cda.campingcar.model.Dom;
@@ -74,7 +74,7 @@ public class SearchController implements Initializable, ControllerRegistry
     private Label hintLabel;
 
     private HomeController homeController = null;
-    private final DAOFactory daoFactory;
+    private final DeskTopDAOFactory daoFactory;
     private final GeoApiService geoApiService;
     private final LocalDate currentDate;
 
@@ -82,7 +82,7 @@ public class SearchController implements Initializable, ControllerRegistry
 
     public SearchController()
     {
-        this.daoFactory    = DAOFactory.getInstance();
+        this.daoFactory    = DeskTopDAOFactory.getInstance();
         this.geoApiService = new GeoApiService(new GeoAPI());
         this.currentDate   = LocalDate.now();
     }
@@ -116,7 +116,6 @@ public class SearchController implements Initializable, ControllerRegistry
         String budgetMin = this.budgetMin.getText();
         City cityDep = this.departureCityField.getSelectionModel().getSelectedItem();
         City cityArr = this.arrivalCityField.getSelectionModel().getSelectedItem();
-        String currentDate = this.currentDate.toString();
         LocalDate periodStart = this.periodStartDatePicker.getValue();
         LocalDate periodeEnd = this.periodEndDatePicker.getValue();
 
@@ -130,7 +129,7 @@ public class SearchController implements Initializable, ControllerRegistry
 
         }
 
-        Search search = new Search(Rent::new);
+        Search<Rent> search = new Search(Rent::new);
         search.setDate(this.currentDate);
         search.setListSites(sitesSelected);
         search.setListVehicle(vehiclesTypeSelected);

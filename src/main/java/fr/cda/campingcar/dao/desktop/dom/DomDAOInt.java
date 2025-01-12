@@ -1,4 +1,4 @@
-package fr.cda.campingcar.dao.dom;
+package fr.cda.campingcar.dao.desktop.dom;
 
 /*
  * Soutenance Scraping

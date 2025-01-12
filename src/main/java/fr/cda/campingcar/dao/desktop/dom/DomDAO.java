@@ -1,4 +1,4 @@
-package fr.cda.campingcar.dao.dom;
+package fr.cda.campingcar.dao.desktop.dom;
 
 /*
  * Soutenance Scraping
@@ -9,7 +9,7 @@ package fr.cda.campingcar.dao.dom;
  * Greta Vannes
  */
 
-import fr.cda.campingcar.dao.DAOFactory;
+import fr.cda.campingcar.dao.desktop.DeskTopDAOFactory;
 import fr.cda.campingcar.model.Dom;
 import fr.cda.campingcar.util.DebugHelper;
 import fr.cda.campingcar.util.LoggerConfig;
@@ -26,11 +26,13 @@ public class DomDAO implements DomDAOInt
 
     private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
     protected Connection conn;
+    private DeskTopDAOFactory factory;
 
-    public DomDAO(DAOFactory daoFactory) throws SQLException
+    public DomDAO(DeskTopDAOFactory daoFactory) throws SQLException
     {
         try {
-            this.conn = daoFactory.getConnection();
+            this.factory = daoFactory;
+            this.conn    = daoFactory.getConnection();
         } catch ( SQLException e ) {
             DebugHelper.debug("DomDAO", "Constructor", "ERROR", e.getSQLState(), false);
             throw new SQLException("Erreur DomDAO - " + e.getMessage());
@@ -49,8 +51,7 @@ public class DomDAO implements DomDAOInt
 
         Map<Integer, Dom> domMap = new HashMap<>();
 
-        try (Connection conn = this.conn;
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = this.conn.prepareStatement(sql)) {
             ps.setInt(1, siteId);
             ResultSet rs = ps.executeQuery();
 
@@ -58,11 +59,11 @@ public class DomDAO implements DomDAOInt
 
                 int id = rs.getInt("id");
                 siteId = rs.getInt("site_id");
-                int    domElementId    = rs.getInt("dom_element_id");
-                String path      = rs.getString("path");
-                int    domParentId = rs.getInt("dom_path_parent_id");
+                int domElementId = rs.getInt("dom_element_id");
+                String path = rs.getString("path");
+                int domParentId = rs.getInt("dom_path_parent_id");
                 Boolean withTag = rs.getBoolean("with_tag");
-                String name       = rs.getString("nom");
+                String name = rs.getString("nom");
 
                 Dom dom = domMap.get(id);
                 if ( dom == null ) {
@@ -72,22 +73,32 @@ public class DomDAO implements DomDAOInt
 
             }
 
+            this.factory.closeResultSet(rs);
+
         } catch ( SQLException e ) {
             DebugHelper.debug("DomDAO", "findBySite", "ERROR", e.getSQLState(), false);
             LOGGER_DAO.error("findBySite ERROR - SQL State : {}, Message: {}",
                              e.getSQLState(), e.getMessage(), e);
+        } finally {
+            try {
+                this.factory.closeConnection();
+            } catch ( SQLException e ) {
+                e.printStackTrace();
+            }
+
         }
         List<Dom> domList = new ArrayList<>(domMap.values());
         Map<String, Dom> results = this.buildHierarchy(domList, 0);
         return results;
     }
 
-    private Map<String, Dom> buildHierarchy(List<Dom> domList, Integer parentId) {
+    private Map<String, Dom> buildHierarchy(List<Dom> domList, Integer parentId)
+    {
         Map<String, Dom> hierarchy = new HashMap<>();
 
-        for (Dom dom : domList) {
+        for ( Dom dom : domList ) {
             if ( (parentId == null && dom.getDomParentId() == 0) ||
-                 (parentId != null && dom.getDomParentId().equals(parentId))) {
+                 (parentId != null && dom.getDomParentId().equals(parentId)) ) {
 
                 // Ajouter l'élément au niveau actuel
                 hierarchy.put(dom.getName(), dom);

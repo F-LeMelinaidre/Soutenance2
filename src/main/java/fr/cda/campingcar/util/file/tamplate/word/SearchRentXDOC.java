@@ -23,19 +23,19 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 public class SearchRentXDOC extends WordFile
 {
-    private Search<ScrapingModel<Object>> search;
+    private Search<Rent> search;
 
-    public SearchRentXDOC(Search<ScrapingModel<Object>> recherche, String filePath)
+    public SearchRentXDOC(Search<Rent> recherche, String filePath)
     {
         super(filePath);
         this.initDocument(recherche);
     }
-    public SearchRentXDOC(Search<ScrapingModel<Object>> recherche) {
+    public SearchRentXDOC(Search<Rent> recherche) {
         super("");
         this.initDocument(recherche);
     }
 
-    private void initDocument(Search<ScrapingModel<Object>> recherche)
+    private void initDocument(Search<Rent> recherche)
     {
 
         if(recherche != null) {

@@ -192,10 +192,6 @@ public class ParameterDataBaseController extends FXMLWindow implements Initializ
     private void updateErrorLabel(String fxId, Integer rowId, boolean isValid)
     {
 
-        System.out.println(isValid);
-        System.out.println(fxId);
-        System.out.println(rowId);
-
         Label current = this.errorsMap.get(fxId);
         if ( current != null ) {
             this.gridPane.getChildren().remove(current);

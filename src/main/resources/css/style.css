@@ -12,7 +12,26 @@
     font-family: 'Poppins Italic';
     src: url('../fonts/poppins-italic.ttf');
 }
+/** TODO FAIRE LE MENAGE CREE UN STYLE BASE FACTORISER */
+.root {
+    -fx-secondary-color-bg: #333333;
 
+    -fx-primary-color-txt: #DCDCDC;
+    -fx-secondary-color-txt: #A3FF00;
+
+    -fx-in-progress-color-txt: #ffcc00;
+
+    -fx-grey-80: #333333;
+    -fx-grey-70: #4c4c4c;
+    -fx-grey-60: #676767;
+    -fx-grey-55: #777777;
+    -fx-grey-40: #999999;
+    -fx-grey-30: #B2B2B2;
+    -fx-grey-25: #bfbfbf;
+    -fx-grey-20: #cccccc;
+
+    -fx-blue-color: #0099cc;
+}
 #homePane {
     -fx-background-color: #999999;
 }
@@ -458,25 +477,6 @@
 * {
 }
 
-.root {
-    -fx-secondary-color-bg: #333333;
-
-    -fx-primary-color-txt: #DCDCDC;
-    -fx-secondary-color-txt: #A3FF00;
-
-    -fx-in-progress-color-txt: #ffcc00;
-
-    -fx-grey-80: #333333;
-    -fx-grey-70: #4c4c4c;
-    -fx-grey-60: #676767;
-    -fx-grey-55: #777777;
-    -fx-grey-40: #999999;
-    -fx-grey-30: #B2B2B2;
-    -fx-grey-25: #bfbfbf;
-    -fx-grey-20: #cccccc;
-
-    -fx-blue-color: #0099cc;
-}
 
 .progress-bar .track {
     -fx-margin: 0;

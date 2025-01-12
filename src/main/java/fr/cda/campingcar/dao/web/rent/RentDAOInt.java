@@ -1,4 +1,4 @@
-package fr.cda.campingcar.dao.location;
+package fr.cda.campingcar.dao.web.rent;
 
 import fr.cda.campingcar.model.Rent;
 

@@ -1,4 +1,4 @@
-package fr.cda.campingcar.dao.site;
+package fr.cda.campingcar.dao.desktop.site;
 
 /*
  * Soutenance Scraping
@@ -10,7 +10,7 @@ package fr.cda.campingcar.dao.site;
  */
 
 
-import fr.cda.campingcar.dao.DAOFactory;
+import fr.cda.campingcar.dao.desktop.DeskTopDAOFactory;
 import fr.cda.campingcar.model.*;
 import fr.cda.campingcar.util.DebugHelper;
 import fr.cda.campingcar.util.LoggerConfig;
@@ -29,11 +29,13 @@ public class SiteDAO implements SiteDAOInt
 {
     private static final Logger LOGGER_DAO = LoggerConfig.getLoggerScraping();
     protected Connection conn;
+    private DeskTopDAOFactory factory;
 
-    public SiteDAO(DAOFactory daoFactory) throws SQLException
+    public SiteDAO(DeskTopDAOFactory daoFactory) throws SQLException
     {
         try {
-            this.conn = daoFactory.getConnection();
+            this.factory = daoFactory;
+            this.conn    = daoFactory.getConnection();
         } catch ( SQLException e ) {
             DebugHelper.debug("SiteDAO", "Constructor", "ERROR", e.getSQLState(), false);
             throw new SQLException("Erreur SiteDAO " + e);
@@ -49,25 +51,32 @@ public class SiteDAO implements SiteDAOInt
     @Override
     public List<Site> findAll()
     {
-        String     sql   = "SELECT * FROM site";
+        String sql = "SELECT * FROM site";
         List<Site> sites = new ArrayList<Site>();
 
-        try (Connection conn = this.conn;
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = this.conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
 
             while ( rs.next() ) {
-                int    id   = rs.getInt("id");
-                String nom  = rs.getString("nom");
-                String url  = rs.getString("url");
-                Site   site = new Site(id, nom, url);
+                int id = rs.getInt("id");
+                String nom = rs.getString("nom");
+                String url = rs.getString("url");
+                Site site = new Site(id, nom, url);
 
                 sites.add(site);
             }
+            this.factory.closeResultSet(rs);
         } catch ( SQLException e ) {
             DebugHelper.debug("DAOFACTORY", "findAll", "ERROR", e.getSQLState(), false);
             LOGGER_DAO.error("Close Connection ERROR - SQL State : {}, Message: {}",
                              e.getSQLState(), e.getMessage(), e);
+        } finally {
+            try {
+                this.factory.closeConnection();
+            } catch ( SQLException e ) {
+                e.printStackTrace();
+            }
+
         }
         return sites;
     }
@@ -75,6 +84,7 @@ public class SiteDAO implements SiteDAOInt
     /**
      * Map les objets Site, avec leur Objet Url, contenant leurs Objets Parametres d'Url, inclu a l'objet Site <br>
      * Les Objets typeVehicules
+     *
      * @return
      */
     @Override
@@ -113,30 +123,29 @@ public class SiteDAO implements SiteDAOInt
                      "ORDER BY site_id, vehicule_type_id, param_position";
 
         // Map de retour de la liste des site
-        Map<Integer, Site> siteMap           = new HashMap<>();
+        Map<Integer, Site> siteMap = new HashMap<>();
         // Accumulateur pour eviter les doublons
-        List<String>       paramAccumulateur = new ArrayList<>();
+        List<String> paramAccumulateur = new ArrayList<>();
 
-        try (Connection conn = this.conn;
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs       = ps.executeQuery();
-            int       compteur = 0;
+        try (PreparedStatement ps = this.conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            int compteur = 0;
             if ( rs.next() ) {
                 do {
                     compteur++;
-                    int    id   = rs.getInt("site_id");
-                    String name  = rs.getString("site_nom");
+                    int id = rs.getInt("site_id");
+                    String name = rs.getString("site_nom");
                     String link = rs.getString("site_url");
 
-                    int    vehicleTypeId     = rs.getInt("vehicule_type_id");
-                    String vehicleType       = rs.getString("vehicule_type");
-                    String vehicleParamKey   = rs.getString("param_key");
+                    int vehicleTypeId = rs.getInt("vehicule_type_id");
+                    String vehicleType = rs.getString("vehicule_type");
+                    String vehicleParamKey = rs.getString("param_key");
                     String vehicleParamValue = rs.getString("param_value");
 
-                    int    position = rs.getInt("param_position");
-                    String group   = (vehicleTypeId == 0) ? rs.getString("param_groupe") : "vehicule";
-                    String type     = (vehicleTypeId == 0) ? rs.getString("param_type") : vehicleType;
-                    String criteria  = (vehicleTypeId == 0) ? rs.getString("param_critere") : String.valueOf(vehicleTypeId);
+                    int position = rs.getInt("param_position");
+                    String group = (vehicleTypeId == 0) ? rs.getString("param_groupe") : "vehicule";
+                    String type = (vehicleTypeId == 0) ? rs.getString("param_type") : vehicleType;
+                    String criteria = (vehicleTypeId == 0) ? rs.getString("param_critere") : String.valueOf(vehicleTypeId);
 
 
                     String paramKey = (vehicleTypeId == 0) ? rs.getString("param_key") : vehicleParamKey;
@@ -145,7 +154,7 @@ public class SiteDAO implements SiteDAOInt
 
                     // recupere l'object site dans le map
                     Site site = siteMap.get(id);
-                    Url  url  = null;
+                    Url url = null;
 
                     // Si il n existe pas on le cree et l ajoute au map
                     if ( site == null ) {
@@ -162,7 +171,7 @@ public class SiteDAO implements SiteDAOInt
                         String index = id + type + criteria;
 
                         // le parametre ne se trouve pas dans l acculmulateur on le créé
-                        if ( !paramAccumulateur.contains(index)) {
+                        if ( !paramAccumulateur.contains(index) ) {
                             paramAccumulateur.add(index);
                             UrlParam urlParam = new UrlParam(id, position, group, type, criteria, paramKey, paramValue, format);
                             url.putParam(index, urlParam);
@@ -177,10 +186,18 @@ public class SiteDAO implements SiteDAOInt
                     }
                 } while ( rs.next() );
             }
+            this.factory.closeResultSet(rs);
         } catch ( SQLException e ) {
             DebugHelper.debug("DAOFACTORY", "findAllSitesWithVehiclesParamsAndXPaths", "ERROR", e.getSQLState(), false);
             LOGGER_DAO.error("findAllSitesWithVehiclesParamsAndXPaths ERROR - SQL State : {}, Message: {}",
                              e.getSQLState(), e.getMessage(), e);
+        } finally {
+            try {
+                this.factory.closeConnection();
+            } catch ( SQLException e ) {
+                e.printStackTrace();
+            }
+
         }
         return new ArrayList<>(siteMap.values());
     }

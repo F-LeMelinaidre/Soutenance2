@@ -40,6 +40,10 @@ public class DataBaseParameter implements Serializable
         this.server = server;
     }
 
+    public String getJdbcUrlServer() {
+        return "jdbc:mysql://" + this.server + ":" + this.port + "/" + this.dataBase;
+    }
+
     public String getDataBase()
     {
         return this.dataBase;

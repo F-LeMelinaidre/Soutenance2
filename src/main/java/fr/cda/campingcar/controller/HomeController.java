@@ -9,13 +9,13 @@
 
 package fr.cda.campingcar.controller;
 
+import fr.cda.campingcar.model.Rent;
 import fr.cda.campingcar.model.Search;
 import fr.cda.campingcar.scraping.ScrapingManager;
 import fr.cda.campingcar.scraping.ScrapingModel;
 import fr.cda.campingcar.settings.Config;
 import fr.cda.campingcar.util.render.FXMLRender;
 import fr.cda.campingcar.util.file.tamplate.word.SearchRentXDOC;
-import fr.cda.campingcar.util.sendmail.templatemail.SearchMail;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -48,9 +48,9 @@ public class HomeController
     private FXMLRender fxmlRender;
     private LoaderController loaderController;
     private ResultController resultController;
-    private List<ScrapingModel<Object>> results;
+    private List<Rent> results;
     private SearchController searchController;
-    private Search<ScrapingModel<Object>> search;
+    private Search<Rent> search;
     private Pane currentResultView;
 
     @FXML
@@ -66,28 +66,37 @@ public class HomeController
         MenuItem item = (MenuItem) event.getSource();
 
         switch (item.getId()) {
+            case "paramDB":
+                FXMLRender.openNewWindow("window/parameterDB.fxml", "Paramètres Base de Donnée");
+                break;
             case "saveFile":
-                if(this.search != null) {
+                if(this.search != null && this.search.getResults().size() > 0 ) {
                     this.saveSearch();
                 } else {
+                    String msg = (this.search == null) ? "Aucune recherche n'a été effectué!" : "Aucune annonce a sauvegarder!";
                     AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde de la recherche");
-                    alertMessageController.setMessage("Aucune recherche n'a été effectué!", "warning");
+                    alertMessageController.setMessage(msg, "warning");
                 }
                 break;
             case "saveInDataBase":
-                FXMLRender.openNewWindow("window/transmissionDB.fxml", "Sauvegarder En Base de Donnée");
+                if(this.search != null && this.search.getResults().size() > 0) {
+                    SaveDataController saveDataController = FXMLRender.openNewWindow("window/transmissionDB.fxml",
+                                                                                     "Sauvegarder En Base de Donnée");
+                    saveDataController.setSearchResult((List<Rent>) this.search.getResults());
+                } else {
+                    String msg = (this.search == null) ? "Aucune recherche n'a été effectué!" : "Aucune annonce a sauvegarder!";
+                    AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde de la recherche");
+                    alertMessageController.setMessage(msg, "warning");
+                }
                 break;
             case "sendMail":
                 SendMailController sendMailController = FXMLRender.openNewWindow("window/sendMail.fxml", "Envoi Email");
                 if(this.search != null) {
-                    sendMailController.setSearchMail(this.search);
+                    sendMailController.setSearchResult(this.search);
                 } else {
                     AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde de la recherche");
                     alertMessageController.setMessage("Aucune recherche n'a été effectué!", "warning");
                 }
-                break;
-            case "paramDB":
-                FXMLRender.openNewWindow("window/parameterDB.fxml", "Paramètres Base de Donnée");
                 break;
             case "quit":
             default:
@@ -131,7 +140,7 @@ public class HomeController
     }
 
 
-    public void startScrapping(Search<ScrapingModel<Object>> recherche)
+    public void startScrapping(Search<Rent> recherche)
     {
         this.search = recherche;
 

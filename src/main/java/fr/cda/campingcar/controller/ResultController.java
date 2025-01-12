@@ -9,11 +9,14 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -52,16 +55,16 @@ public class ResultController implements ControllerRegistry, Initializable
         this.homeController = (HomeController) parentController;
     }
 
-    public void load(List<ScrapingModel<Object>> results)
+    public void load(List<? extends ScrapingModel<Object>> results)
     {
         Task<Void> loadResultsTask = new Task<Void>()
         {
             @Override
             protected Void call() throws Exception
             {
-
-                for ( Object annonce : results ) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(Config.FXML_ROOT_PATH + "component/annonceCard.fxml"));
+                if(results.size() > 0) {
+                    for ( Object annonce : results ) {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource(Config.FXML_ROOT_PATH + "component/annonceCard.fxml"));
 
                         try {
                             Parent view = loader.load();
@@ -84,7 +87,16 @@ public class ResultController implements ControllerRegistry, Initializable
                             throw new RuntimeException(e);
                         }
 
+                    }
+                } else {
+                    Label message = new Label("Aucune annonce n'a été trouvée.");
+                    message.getStyleClass().add("validator-error");
+                    message.setStyle("-fx-font-size: 14px; -fx-padding: 80px 0 0 0;");
+                    Platform.runLater(() -> {
+                        flowPane.getChildren().add(message);
+                    });
                 }
+
 
                 return null;
             }

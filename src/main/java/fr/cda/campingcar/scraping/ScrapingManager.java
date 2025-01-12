@@ -55,11 +55,11 @@ public class ScrapingManager
     private static final Logger LOGGER_SCRAPING = LoggerConfig.getLoggerScraping();
 
     private final ExecutorService executor = Executors.newCachedThreadPool();
-    private final Search<ScrapingModel<Object>> recherche;
+    private final Search<? extends ScrapingModel<Object>> recherche;
     private final List<Site> sites;
     private TaskCounter counterTask;
 
-    public ScrapingManager(Search<ScrapingModel<Object>> recherche)
+    public ScrapingManager(Search<? extends ScrapingModel<Object>> recherche)
     {
         this.recherche = recherche;
         this.sites     = this.recherche.getListSites();

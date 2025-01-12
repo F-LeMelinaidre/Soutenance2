@@ -18,7 +18,8 @@ import java.util.regex.Pattern;
 public class Config
 {
     public static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String SQL_SERVER = "jdbc:mysql://localhost:3306/";
+    public static final String SQL_SERVER = "localhost";
+    public static final int SQL_PORT = 3306;
     public static final String SQL_DATA_BASE = "thousand_miles_desktop";
     public static final String SQL_USER = "admin";
     public static final String SQL_PASS = "admin";

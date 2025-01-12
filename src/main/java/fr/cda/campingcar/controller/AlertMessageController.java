@@ -34,7 +34,6 @@ public class AlertMessageController extends FXMLWindow
     private Label messageLabel;
     @FXML
     private Button closeButton;
-    private boolean buttonActived;
 
 
     @Override

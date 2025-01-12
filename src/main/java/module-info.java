@@ -22,6 +22,7 @@ module fr.cda.campingcar {
     requires org.apache.logging.log4j;
     requires java.sql;
     requires sib.api.v3.sdk;
+    requires java.desktop;
 
     opens fr.cda.campingcar to javafx.fxml;
     exports fr.cda.campingcar;

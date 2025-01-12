@@ -18,7 +18,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.util.Base64;
 import java.util.ResourceBundle;
 
 /*
@@ -68,7 +67,7 @@ public class SendMailController extends FXMLWindow implements Initializable
         super.closeWindow();
     }
 
-    public void setSearchMail(Search search)
+    public void setSearchResult(Search search)
     {
         SearchMail searchMailTemplate = new SearchMail();
         searchMailTemplate.setSiteList(search.getListSites());
