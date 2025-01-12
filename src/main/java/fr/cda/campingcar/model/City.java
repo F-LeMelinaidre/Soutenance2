@@ -14,7 +14,7 @@ import fr.cda.campingcar.settings.Config;
 import java.util.HashMap;
 import java.util.Map;
 
-public class City implements SearchCriteria
+public class City
 {
     private int geoId;
     private final int code;
@@ -86,9 +86,4 @@ public class City implements SearchCriteria
         return this.name;
     }
 
-    @Override
-    public String valeur()
-    {
-        return this.name + " " + this.departement.getName() + " (" + this.departement.getNumber() + ") " + this.departement.getRegion();
-    }
 }

@@ -1,20 +1,15 @@
 package fr.cda.campingcar.util.file;
 
 import fr.cda.campingcar.util.LoggerConfig;
+import javafx.concurrent.Task;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.util.Units;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class WordFile
+public abstract class WordFile
 {
     protected static final Logger LOGGER_FILE = LoggerConfig.getLoggerFile();
     protected String file;
@@ -26,53 +21,41 @@ public class WordFile
         this.file = file;
     }
 
-
     protected void newDocument()
     {
         try {
-            FileOutputStream fos = new FileOutputStream(this.file);
+            this.fos = new FileOutputStream(this.file);
         } catch ( Exception e ) {
             LOGGER_FILE.warn("Échec lors de la création du XDOC : {}", e.getMessage(), e);
         }
     }
 
-    public void writeFile() throws IOException
+    private void writeFile() throws IOException
     {
-        try {
+            this.document.write(this.fos);
+            this.fos.close();
+    }
 
-            XWPFParagraph paragraph = document.createParagraph();
-            paragraph.setAlignment(ParagraphAlignment.CENTER);
-            XWPFRun run = paragraph.createRun();
+    public byte[] getTempFile() {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
-            run.setText("Normally, both your asses would be dead as fucking fried chicken.");
-            run.setFontFamily("Times New Roman");
-            run.setColor("FF8833");
-            run.setBold(true);
-            run.setFontSize(18);
-
-            run.addBreak();
-            run.addBreak();
-
-            String imgFile = "src/main/resources/poulet.jpg";
-
-            FileInputStream fis = new FileInputStream(imgFile);
-            run.addPicture(fis, XWPFDocument.PICTURE_TYPE_JPEG, imgFile, Units.toEMU(300), Units.toEMU(200));
-
-            document.write(fos);
-            fos.close();
-
-        } catch ( InvalidFormatException e ) {
-            e.printStackTrace();
+            this.document.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            LOGGER_FILE.error("Erreur lors de la création du fichier temporaire XDOC : {}", e.getMessage(), e);
+            return new byte[0];
         }
     }
 
-    public void readFile() throws IOException
-    {
-        FileInputStream fis = new FileInputStream(this.file);
-        XWPFDocument document = new XWPFDocument(fis);
-        XWPFWordExtractor extractor = new XWPFWordExtractor(document);
-        String text = extractor.getText();
-        System.out.println(text);
-        fis.close();
+
+    public Task<Void> save() {
+        return new Task<>() {
+            @Override
+            protected Void call() throws Exception
+            {
+                writeFile();
+                return null;
+            }
+        };
     }
 }

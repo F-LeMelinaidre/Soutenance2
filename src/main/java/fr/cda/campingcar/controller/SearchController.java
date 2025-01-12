@@ -120,20 +120,6 @@ public class SearchController implements Initializable, ControllerRegistry
         LocalDate periodStart = this.periodStartDatePicker.getValue();
         LocalDate periodeEnd = this.periodEndDatePicker.getValue();
 
-        Map<String, Object> criteriaSearch = new HashMap<>()
-        {{
-            put("Liste Sites", sitesSelected);
-            put("Liste Véhicules", vehiclesTypeSelected);
-            put("Budget Max", budgetMax);
-            put("Budget Min", budgetMin);
-            put("Ville Départ", cityDep);
-            put("Ville Arrivée", cityArr);
-            put("Date Départ", periodStart);
-            put("Date Retour", periodeEnd);
-
-            put("Date de Recherche", currentDate);
-        }};
-
 
         for ( Site site : sitesSelected ) {
             List<VehicleType> typeVehiclesFiltred = site.filterVehicle(vehiclesTypeSelected);
@@ -146,8 +132,14 @@ public class SearchController implements Initializable, ControllerRegistry
 
         Search search = new Search(Rent::new);
         search.setDate(this.currentDate);
-        search.setSitesList(sitesSelected);
-        search.addCriteria("Liste des Véhicules", vehiclesTypeSelected);
+        search.setListSites(sitesSelected);
+        search.setListVehicle(vehiclesTypeSelected);
+        search.setBugdetMin(budgetMin);
+        search.setBudgetMax(budgetMax);
+        search.setDepartureCity(cityDep);
+        search.setArrivalCity(cityArr);
+        search.setPeriodStart(periodStart);
+        search.setPeriodEnd(periodeEnd);
 
         this.homeController.startScrapping(search);
 
@@ -481,6 +473,7 @@ public class SearchController implements Initializable, ControllerRegistry
                     } else {
                         setDisable(false);
                         getStyleClass().removeAll("disabled");
+
                     }
                 }
             }

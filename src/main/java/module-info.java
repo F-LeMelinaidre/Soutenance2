@@ -21,6 +21,7 @@ module fr.cda.campingcar {
     requires org.apache.poi.ooxml;
     requires org.apache.logging.log4j;
     requires java.sql;
+    requires sib.api.v3.sdk;
 
     opens fr.cda.campingcar to javafx.fxml;
     exports fr.cda.campingcar;

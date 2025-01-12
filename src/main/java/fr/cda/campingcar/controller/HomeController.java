@@ -12,9 +12,10 @@ package fr.cda.campingcar.controller;
 import fr.cda.campingcar.model.Search;
 import fr.cda.campingcar.scraping.ScrapingManager;
 import fr.cda.campingcar.scraping.ScrapingModel;
+import fr.cda.campingcar.settings.Config;
 import fr.cda.campingcar.util.render.FXMLRender;
-import fr.cda.campingcar.util.file.tamplate.word.RechercheXDOC;
-import javafx.application.Platform;
+import fr.cda.campingcar.util.file.tamplate.word.SearchRentXDOC;
+import fr.cda.campingcar.util.sendmail.templatemail.SearchMail;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -66,19 +67,24 @@ public class HomeController
 
         switch (item.getId()) {
             case "saveFile":
-                this.saveSearch();
-                /*System.out.println(Config.CYAN + " Resultats :");
-                if(this.resultats != null) {
-                    for(ScrapingModelInt<Object> model : this.resultats) {
-                        System.out.println(Config.YELLOW + model.getSite().getName());
-                    }
-                }*/
+                if(this.search != null) {
+                    this.saveSearch();
+                } else {
+                    AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde de la recherche");
+                    alertMessageController.setMessage("Aucune recherche n'a été effectué!", "warning");
+                }
                 break;
             case "saveInDataBase":
                 FXMLRender.openNewWindow("window/transmissionDB.fxml", "Sauvegarder En Base de Donnée");
                 break;
             case "sendMail":
-                FXMLRender.openNewWindow("window/sendMail.fxml", "Envoi Email");
+                SendMailController sendMailController = FXMLRender.openNewWindow("window/sendMail.fxml", "Envoi Email");
+                if(this.search != null) {
+                    sendMailController.setSearchMail(this.search);
+                } else {
+                    AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde de la recherche");
+                    alertMessageController.setMessage("Aucune recherche n'a été effectué!", "warning");
+                }
                 break;
             case "paramDB":
                 FXMLRender.openNewWindow("window/parameterDB.fxml", "Paramètres Base de Donnée");
@@ -92,11 +98,17 @@ public class HomeController
     private void saveSearch() {
         FileChooser fileDialog = new FileChooser();
         fileDialog.setTitle("Save file");
+        fileDialog.setInitialDirectory(new File(Config.DEFAULT_FILE_PATH));
+        fileDialog.setInitialFileName(Config.DEFAULT_XDOC_NAME);
+        FileChooser.ExtensionFilter filterText = new FileChooser.ExtensionFilter("Fichiers texte (*.docx)", "*.docx");
+        FileChooser.ExtensionFilter filterAll = new FileChooser.ExtensionFilter("Tous les fichiers (*.*)", "*.*");
+        fileDialog.getExtensionFilters().addAll(filterText, filterAll);
+
         File file = fileDialog.showSaveDialog(this.homePane.getScene().getWindow());
 
         if (file != null) {
             String filePath = file.getAbsolutePath();
-            Task<Void> saveDocumentTask = new RechercheXDOC(this.search, filePath).save();
+            Task<Void> saveDocumentTask = new SearchRentXDOC(this.search, filePath).save();
 
             AlertMessageController alertMessageController = FXMLRender.openNewWindow("window/alertMessage.fxml", "Sauvegarde");
 
@@ -161,6 +173,7 @@ public class HomeController
     public void clearScrapResult() {
         if( this.resultController != null) {
             this.resultController.clear();
+            this.search = null;
         }
     }
 }

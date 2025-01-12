@@ -27,6 +27,13 @@ public class Config
      * Racine du dossier des fichiers FXML
      */
     public static final String FXML_ROOT_PATH = "/fr/cda/campingcar/";
+
+    /**
+     * Paramètre pour enregistrement de fichier
+     */
+    public static final String DEFAULT_XDOC_NAME = "rent.docx";
+    public static final String DEFAULT_FILE_PATH = "C:\\Users\\"+System.getProperty("user.name")+"\\Documents";
+
     public static final String BINARIE_FOLDER_PATH = "binaries/";
     public static final String BINARIE_EXT = "bin";
 

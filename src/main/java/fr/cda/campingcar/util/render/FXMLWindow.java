@@ -62,7 +62,6 @@ public abstract class FXMLWindow implements Initializable
 
     private void initTitle()
     {
-        System.out.println("initTitle");
         this.titleTopBar.getStyleClass().add("title-label");
         this.titleTopBar.setAlignment(Pos.CENTER_LEFT);
         this.titleTopBar.setContentDisplay(ContentDisplay.CENTER);

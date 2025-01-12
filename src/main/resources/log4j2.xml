@@ -18,11 +18,22 @@
                 %m%n
                 %ex%n"/>
         </File>
+
+        <File name="MailLog" fileName="c:/a_thousand_miles/desktop/log/mail_log.log" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p%n
+                Logger: %c{1}: Méthode: %M. Ligne: %L%n
+                %m%n
+                %ex%n"/>
+        </File>
     </Appenders>
 
     <Loggers>
         <Logger name="FileLog" level="info" additivity="false">
             <AppenderRef ref="FileLog"/>
+        </Logger>
+
+        <Logger name="MailLog" level="info" additivity="false">
+            <AppenderRef ref="MailLog"/>
         </Logger>
 
         <Logger name="ScrapingLog" level="info" additivity="false">

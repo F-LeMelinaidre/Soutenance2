@@ -28,7 +28,7 @@
             <Label fx:id="hintLabel" maxHeight="24.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" styleClass="hint-error" />
             <HBox alignment="TOP_RIGHT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="16.0">
                <children>
-                  <Button fx:id="annulerBouton" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" styleClass="btn" text="Annuler" />
+                  <Button fx:id="cancelButton" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="30.0" styleClass="btn" text="Annuler" />
                   <Button fx:id="validButton" maxHeight="-Infinity" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onMouseClicked="#submitForm" prefHeight="30.0" styleClass="btn" text="Envoyer" />
                </children>
                <VBox.margin>

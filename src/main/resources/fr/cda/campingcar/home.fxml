@@ -10,7 +10,7 @@
 
 <VBox fx:id="homePane" alignment="TOP_CENTER" minHeight="750.0" minWidth="900.0" styleClass=".main-container" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cda.campingcar.controller.HomeController">
    <children>
-      <MenuBar maxHeight="-Infinity" styleClass="nav-bar">
+      <MenuBar fx:id="NavBar" maxHeight="-Infinity" styleClass="nav-bar">
         <menus>
           <Menu mnemonicParsing="false" text="Fichier">
             <items>

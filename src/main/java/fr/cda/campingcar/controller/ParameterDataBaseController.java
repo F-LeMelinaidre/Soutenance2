@@ -44,7 +44,7 @@ public class ParameterDataBaseController extends FXMLWindow implements Initializ
     private GridPane gridPane;
 
     @FXML
-    private TextField serveurField;
+    private TextField serverField;
 
     @FXML
     private TextField dataBaseField;
@@ -81,7 +81,7 @@ public class ParameterDataBaseController extends FXMLWindow implements Initializ
             if ( this.dataBaseParameter == null ) {
                 DebugHelper.debug("Ouverture Binaire file", "Le fichier binaire est vide ou inexistant", false);
             } else {
-                this.serveurField.setText(this.dataBaseParameter.getServer());
+                this.serverField.setText(this.dataBaseParameter.getServer());
                 this.dataBaseField.setText(this.dataBaseParameter.getDataBase());
                 this.portField.setText(this.dataBaseParameter.getPort().toString());
                 this.loginField.setText(this.dataBaseParameter.getLogin());
@@ -113,7 +113,7 @@ public class ParameterDataBaseController extends FXMLWindow implements Initializ
         if ( this.dataBaseParameter == null ) this.dataBaseParameter = new DataBaseParameter();
 
         this.dataBaseParameter.setServer(
-                this.serveurField.getText());
+                this.serverField.getText());
         this.dataBaseParameter.setDataBase(
                 this.dataBaseField.getText());
         this.dataBaseParameter.setPort(
@@ -181,19 +181,20 @@ public class ParameterDataBaseController extends FXMLWindow implements Initializ
             default:
                 isValid = false;
         }
-
         String style = Validator.getValidatorStyle();
         textField.getStyleClass().add(style);
 
         this.updateErrorLabel(fxId, rowId, isValid);
 
-        this.validateButton.setDisable(!errorsMap.isEmpty());
+        this.updateValidateButton();
     }
 
     private void updateErrorLabel(String fxId, Integer rowId, boolean isValid)
     {
-        TextField textField = (TextField) this.gridPane.lookup("#" + fxId);
 
+        System.out.println(isValid);
+        System.out.println(fxId);
+        System.out.println(rowId);
 
         Label current = this.errorsMap.get(fxId);
         if ( current != null ) {
@@ -213,16 +214,18 @@ public class ParameterDataBaseController extends FXMLWindow implements Initializ
 
     private void updateValidateButton()
     {
-        TextField[] fields = { this.serveurField, this.dataBaseField, this.portField, this.loginField, this.passwordField };
+        TextField[] fields = { this.serverField, this.dataBaseField, this.portField, this.loginField, this.passwordField };
 
-        boolean disable = false;
+        boolean notEmpty = false;
         for ( TextField field : fields ) {
             if ( field.getText() == null || field.getText().isEmpty() ) {
-                disable = true;
+                notEmpty = true;
                 break;
             }
         }
 
+
+        boolean disable = notEmpty && this.errorsMap.isEmpty();
         this.validateButton.setDisable(disable);
     }
 

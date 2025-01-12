@@ -1,0 +1,308 @@
+@font-face {
+    font-family: 'Poppins Medium';
+    src: url('../fonts/poppins-medium.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins Bold';
+    src: url('../fonts/poppins-bold.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins Italic';
+    src: url('../fonts/poppins-italic.ttf');
+}
+
+.root {
+
+    -fx-primary-color: #A3FF00;
+    -fx-primary-low-color: #dcff96;
+
+    -fx-primary-bg-color: -fx-grey-40;
+    -fx-secondary-bg-color: -fx-grey-80;
+
+    -fx-primary-color-txt: #DCDCDC;
+    -fx-secondary-color-txt: #A3FF00;
+    -fx-tertiary-color-txt: -fx-grey-80;
+
+    -fx-red: #cc0000;
+    -fx-orange: #ff9b00;
+
+    -fx-error: -fx-red;
+    -fx-warning: -fx-orange;
+    -fx-valid: -fx-primary;
+
+    -fx-in-progress-color-txt: #ffcc00;
+
+    -fx-grey-100: #000000;
+    -fx-grey-80: #333333;
+    -fx-grey-75: #404040;
+    -fx-grey-70: #4c4c4c;
+    -fx-grey-60: #676767;
+    -fx-grey-55: #777777;
+    -fx-grey-50: #808080;
+    -fx-grey-40: #999999;
+    -fx-grey-30: #B2B2B2;
+    -fx-grey-25: #bfbfbf;
+    -fx-grey-20: #cccccc;
+    -fx-grey-10: #E6E6E6;
+
+    -fx-blue-color: #0099cc;
+}
+
+/* ------ FORM ELEMENT ------ */
+
+.label,
+.combo-box,
+.combo-box-base,
+.date-picker,
+.text-field,
+.button,
+.label.validator-valid,
+.valid,
+.label.validator-error,
+.invalid,
+.label.validator-warning,
+.warning {
+    -fx-font-family: 'Poppins Medium';
+}
+
+.combo-box,
+.combo-box .arrow-button,
+.combo-box .text-input,
+.combo-box-base,
+.combo-box-base .arrow-button,
+.combo-box-base .text-input,
+.date-picker,
+.text-field {
+    -fx-border-insets: 0;
+    -fx-border-radius: 2px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2px;
+}
+
+
+.text-field,
+.combo-box-base,
+.combo-box .list-cell,
+.combo-box-popup .list-cell:indeterminate,
+.date-picker-popup .day-name-cell {
+    -fx-text-fill: -fx-secondary-color-txt;
+}
+
+.combo-box-popup .list-cell,
+.calendar-grid .day-cell {
+    -fx-text-fill: -fx-tertiary-color-txt;
+}
+
+.text-field,
+.combo-box-base {
+    -fx-control-inner-background: -fx-grey-50;
+    -fx-background-color: -fx-grey-50;
+}
+
+.arrow {
+    -fx-background-color: -fx-grey-40;
+}
+
+.arrow-button {
+    -fx-background-color: -fx-grey-70;
+}
+
+.arrow-button:hover .arrow {
+    -fx-background-color: -fx-grey-70;
+}
+
+/* ------ TextField ------ */
+
+.text-field {
+    -fx-prompt-text-fill: -fx-grey-70;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+}
+
+/* ------ ComboBox ------ */
+.combo-box-base {
+    -fx-background-radius: 2 2 2 2;
+}
+
+.combo-box-base .arrow-button {
+    -fx-background-radius: 0 2 2 0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-insets: 0;
+    -fx-background-radius: 2px;
+    -fx-background-color: -fx-grey-50;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-text-fill: -fx-grey-70;
+}
+
+.combo-box-popup .list-cell:hover,
+.check-box:selected .mark {
+    -fx-background-color: -fx-primary-color;
+}
+
+.list-cell:hover .check-box:selected .mark {
+    -fx-background-color: -fx-grey-70;
+}
+
+.check-box .box {
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-grey-70;
+    -fx-border-radius: 3px;
+    -fx-background-color: none;
+}
+
+/* ------ DatePicker ------ */
+.date-picker {
+    -fx-font-size: 12px;
+}
+
+.date-picker-popup {
+    -fx-padding: 0;
+    -fx-border-width: 0;
+}
+
+.date-picker .arrow-button {
+    -fx-border-width: 0;
+}
+
+.calendar-grid {
+    -fx-border-width: 0;
+    -fx-background-color: -fx-secondary-bg-color;
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-border-width: 0;
+    -fx-background-color: -fx-grey-100;
+}
+
+.date-picker-popup .week-number-cell {
+    -fx-text-fill: -fx-grey-50;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup .day-name-cell {
+    -fx-padding: 2px 0 3px 0;
+}
+
+.calendar-grid .day-cell {
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+}
+
+.calendar-grid .day-cell {
+    -fx-background-color: -fx-grey-40;
+}
+
+.calendar-grid .day-cell.today {
+    -fx-text-fill: -fx-grey-60;
+    -fx-background-color: -fx-primary-low-color;
+    -fx-background-insets: 1px;
+}
+
+.calendar-grid .day-cell.previous-month,
+.calendar-grid .day-cell.next-month {
+    -fx-background-color: -fx-grey-50;
+}
+
+.calendar-grid .day-cell:hover,
+.calendar-grid .day-cell.next-month:hover {
+    -fx-background-color: -fx-primary-color;
+}
+
+.calendar-grid .day-cell.disabled {
+    -fx-background-color: #ffa0a0;
+}
+.calendar-grid .day-cell.disabled.previous-month,
+.calendar-grid .day-cell.disabled.next-month {
+    -fx-background-color: #c37d7d;
+}
+
+
+
+/* --- BOUTON ---*/
+.button {
+    -fx-padding: 0;
+    -fx-text-fill: #333333;
+    -fx-background-color: #AAAAAA;
+}
+
+.button .btn {
+    -fx-min-height: 30px;
+    -fx-pref-height: 30px;
+    -fx-min-width: 80px;
+}
+
+.date-picker-popup .spinner .button {
+    -fx-background-color: transparent;
+}
+
+/* --- MOUSE EVENT --- */
+.button:hover,
+.combo-box-base .arrow-button:hover,
+.calendar-grid .day-cell.today:hover,
+.calendar-grid .day-cell:focused,
+.calendar-grid .day-cell:hover {
+    -fx-text-fill: -fx-tertiary-color-txt;
+    -fx-background-color: -fx-primary-color;
+}
+
+.date-picker-popup .spinner .button:hover .left-arrow,
+.date-picker-popup .spinner .button:hover .right-arrow {
+    -fx-cursor: hand;
+    -fx-border-insets: 0;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-primary-color;
+    -fx-background-insets: 0;
+    -fx-background-color: -fx-primary-color;
+}
+
+
+/* ---- Validation Champ ------ */
+.text-field.validator-valid,
+.combo-box.validator-valid {
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-primary-color;
+}
+
+.label.validator-valid,
+.valid {
+    -fx-text-fill: -fx-valid;
+}
+
+.combo-box.validator-error,
+.text-field.validator-error,
+.combo-box.validator-warning,
+.text-field.validator-warning {
+    -fx-border-width: 1px;
+}
+
+.combo-box.validator-error,
+.text-field.validator-error {
+    -fx-border-color: -fx-error;
+}
+
+.label.validator-error,
+.invalid {
+    -fx-text-fill: -fx-error;
+}
+
+.combo-box.validator-warning,
+.text-field.validator-warning {
+    -fx-border-color: -fx-warning;
+}
+
+.label.validator-warning,
+.warning {
+    -fx-text-fill: -fx-warning;
+}

@@ -12,7 +12,7 @@ package fr.cda.campingcar.model;
 
 import java.util.Objects;
 
-public class VehicleType implements SearchCriteria
+public class VehicleType
 {
 
     private int id;
@@ -57,9 +57,4 @@ public class VehicleType implements SearchCriteria
         return this.type;
     }
 
-    @Override
-    public String valeur()
-    {
-        return this.type;
-    }
 }

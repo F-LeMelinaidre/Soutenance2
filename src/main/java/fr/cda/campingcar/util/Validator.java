@@ -139,6 +139,7 @@ public class Validator
         String msg = _validatorMessage != null ? _validatorMessage : "";
 
         Label hintErreur = new Label(msg);
+        hintErreur.getStyleClass().add("hint-label");
         hintErreur.getStyleClass().add(getValidatorStyle());
         GridPane.setHalignment(hintErreur, HPos.RIGHT);
 
