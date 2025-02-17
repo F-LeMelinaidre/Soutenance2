@@ -22,12 +22,6 @@ import java.sql.SQLException;
 public class Main extends Application
 {
 
-    // TODO EXCEPTION LOG4J FAIRE LE POINT
-    //  TEST UNITAIRE
-    //  FAIRE LE MENAGE DU CSS ET FACTORISER
-    //  FAIRE LA DOC
-    //  METTRE A JOUR LA JAVADOC
-
 
     @Override
     public void start(Stage stage) throws IOException, SQLException
