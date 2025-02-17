@@ -28,7 +28,7 @@ public class Mail
 {
     private static final Logger LOGGER_MAIL = LoggerConfig.getLoggerMail();
     private String template;
-    private String sender = "contact@greta-bretagne-sud.org";
+    private String sender = "";
     private String senderName = "A Thousand Miles";
     private String mailTo;
     private String subject;
@@ -39,7 +39,7 @@ public class Mail
     {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
         ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
-        apiKey.setApiKey("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");
+        apiKey.setApiKey("");
 
     }
 
